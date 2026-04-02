@@ -58,6 +58,11 @@ export interface SEOConfig {
   }>
   /** Hooks run in order; prefer `createSEOContext` for request-scoped registration (future hardening). */
   readonly plugins?: readonly SEOPlugin[]
+  /**
+   * Route → partial input via {@link applyRules} / {@link createSEOForRoute} / {@link seoRoute} (Wave 6 / N9).
+   * Ignored by plain `createSEO` — use route-aware APIs when you need rules applied.
+   */
+  readonly rules?: readonly SEORule[]
 }
 
 /** hreflang → absolute or path URL (adapter maps to framework expectations). */

@@ -22,10 +22,42 @@
 [![Coverage — next](https://img.shields.io/badge/coverage-@better--seo%2Fnext%20≥82%25%20lines-informational?style=flat-square)](./packages/next/README.md#coverage)
 [![Coverage — assets](https://img.shields.io/badge/coverage-@better--seo%2Fassets%20≥85%25%20lines-informational?style=flat-square)](./packages/better-seo-assets/README.md#coverage)
 [![Coverage — cli](https://img.shields.io/badge/coverage-@better--seo%2Fcli%20≥80%25%20lines-informational?style=flat-square)](./packages/better-seo-cli/README.md#coverage)
+[![Coverage — react](https://img.shields.io/badge/coverage-@better--seo%2Freact%20≥85%25%20lines-informational?style=flat-square)](./packages/react/README.md)
+[![Coverage — crawl](https://img.shields.io/badge/coverage-better--seo--crawl-Vitest-informational?style=flat-square)](./packages/better-seo-crawl/)
+
+### CI and test results (badges, tables, reports)
+
+Workflow badges use GitHub’s **`/actions/workflows/<file>.yml/badge.svg`** URLs, so they update automatically after each run on **`main`**. This monorepo does **not** wire [Codecov](https://codecov.io/) / [Coveralls](https://coveralls.io/) badges; **`npm run test:coverage`** enforces per-package thresholds in CI, and selected **`lcov.info`** files are uploaded as workflow artifacts ([`ci.yml`](./.github/workflows/ci.yml)).
+
+| What                      | How                                                                        | Where to look                                                                                                                                                        |
+| ------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Unit tests + coverage** | Vitest (V8), `npm run test:coverage` in each workspace that defines it     | Logs under [CI → quality job](https://github.com/0xMilord/better-seo-js/actions/workflows/ci.yml); artifact **`coverage`** (e.g. `packages/core/coverage/lcov.info`) |
+| **Lint, types, format**   | ESLint, `tsc`, Prettier via `npm run check`                                | Same [CI workflow](https://github.com/0xMilord/better-seo-js/actions/workflows/ci.yml)                                                                               |
+| **E2E**                   | Playwright, `npm run test:e2e` (`examples/nextjs-app`, Vite React example) | Same workflow after browser install                                                                                                                                  |
+| **Size budget**           | `npm run size` (`@better-seo/core`)                                        | Final step in [CI](https://github.com/0xMilord/better-seo-js/actions/workflows/ci.yml)                                                                               |
+| **Conventional commits**  | commitlint                                                                 | [commitlint workflow](https://github.com/0xMilord/better-seo-js/actions/workflows/commitlint.yml)                                                                    |
+| **Security scans**        | npm audit + scheduled workflow                                             | [security workflow](https://github.com/0xMilord/better-seo-js/actions/workflows/security.yml) + CI **security** job                                                  |
+
+**Quick links:** [all workflow runs](https://github.com/0xMilord/better-seo-js/actions) · [CI (`ci.yml`)](https://github.com/0xMilord/better-seo-js/actions/workflows/ci.yml) · [releases (`release.yml`)](https://github.com/0xMilord/better-seo-js/actions/workflows/release.yml)
 
 **One place to describe how a page should look to Google, social apps, and structured-data consumers—then map that description to your framework without inventing five parallel sources of truth.**
 
-This repo is a **monorepo**: the published **`@better-seo/core`** package is the brain (pure data + rules). **`@better-seo/next`** and future adapters are thin translators to Next, Helmet, Remix, and so on. Heavy work (OG image servers, crawlers, CLIs) stays in optional packages so your Edge bundle never pays for it.
+This repo is a **monorepo**: the published **`@better-seo/core`** package is the brain (pure data + rules). **`@better-seo/next`** and **`@better-seo/react`** translate that model to **Next.js `Metadata`** and **react-helmet-async**. Heavy work (OG/icons, **robots/sitemap** builders, CLIs) stays in optional packages so your Edge bundle never pays for it.
+
+### Wave status (snapshot)
+
+Shipping focus follows the internal roadmap; this table matches **[`internal-docs/PROGRESS.md`](./internal-docs/PROGRESS.md)** (maintainers: update both in the same PR when waves move).
+
+| Waves (group)    | Theme                                                        | Status (Apr 2026)                                                                                                                                                                                              |
+| ---------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1, 4**         | Core + Next + E2E, distribution                              | **Done** — `createSEO`, `mergeSEO`, `withSEO`, `validateSEO`, rules, **`serializeJSONLD`**, **`@better-seo/next`**, Playwright **`nextjs-app`**, **size-limit**, Changesets, **`docs/compare`**                |
+| **2–3**          | OG + icons                                                   | **Done** — **`@better-seo/assets`**, CLI **`og`** / **`icons`**, recipes                                                                                                                                       |
+| **5**            | React + validation depth                                     | **Done** — **`@better-seo/react`** (Helmet, **`useSEO`**, **`SEOProvider`**), **`renderTags`** parity, golden Next metadata tests, **`react-seo-vite`** E2E                                                    |
+| **9** (partial)  | Operations CLI                                               | **Partial** — **interactive `better-seo` TUI** (Clack); CLI **`crawl robots` / `crawl sitemap`**; **`doctor`**, **`init`**, **`migrate`** hints — industry **templates** / **`template switch`** not built yet |
+| **12** (partial) | Crawl + migrate                                              | **Partial** — **`better-seo-crawl`** (`renderRobotsTxt`, `renderSitemapXml`, …) + CLI wrappers; RSS / codemod **`migrate`** TBD                                                                                |
+| **6–8, 10–11**   | Rules scale, compiler, snapshot/preview, scan/fix, design OG | **Not started or early** — see PROGRESS                                                                                                                                                                        |
+
+Public guides: **[`docs/recipes/`](./docs/recipes/README.md)** · **[`docs/commands.md`](./docs/commands.md)** (CLI + TUI) · **[`docs/adapters/future-frameworks.md`](./docs/adapters/future-frameworks.md)** (Remix / Astro / Nuxt — future).
 
 ---
 
@@ -169,31 +201,35 @@ flowchart TB
 flowchart LR
   subgraph pkgs [Packages you ship or will ship]
     CORE["@better-seo/core\n0 runtime deps"]
-    NEXT["@better-seo/next\npeers: next, react"]
+    NEXT["@better-seo/next\nMetadata"]
     REACT["@better-seo/react\nHelmet, useSEO"]
     FUTURE["Future: remix, astro, …"]
-    ASSETS["@better-seo/assets\nOG (Wave 2)"]
-    CLI["@better-seo/cli\nog command"]
+    ASSETS["@better-seo/assets\nOG + icons"]
+    CRAWL["better-seo-crawl\nrobots + sitemap XML"]
+    CLI["@better-seo/cli\nTUI, og, icons, crawl, doctor…"]
   end
 
   CORE --> NEXT
   CORE --> REACT
   CORE --> FUTURE
+  CORE --> CRAWL
   CLI -.-> ASSETS
+  CLI -.-> CRAWL
 ```
 
-| Location                           | Role                                                                                                                       |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **`packages/core`**                | npm **`@better-seo/core`** — overview **[`packages/core/README.md`](./packages/core/README.md)**                           |
-| **`packages/next`**                | **`@better-seo/next`** — overview **[`packages/next/README.md`](./packages/next/README.md)**                               |
-| **`packages/react`**               | **`@better-seo/react`** — **[`packages/react/README.md`](./packages/react/README.md)** (Wave 5, **Helmet** + **`useSEO`**) |
-| **`examples/nextjs-app`**          | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                          |
-| **`examples/react-seo-vite`**      | **Vite + React** + **`BetterSEOHelmet`**; **Playwright** checks document title / meta.                                     |
-| **`packages/better-seo-assets`**   | npm **`@better-seo/assets`** — **[`packages/better-seo-assets/README.md`](./packages/better-seo-assets/README.md)**        |
-| **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — **[`packages/better-seo-cli/README.md`](./packages/better-seo-cli/README.md)**                 |
-| **`examples/vanilla-render-tags`** | **D7** — **`createSEO` + `renderTags`** in plain Node (**no React**).                                                      |
-| **`docs/recipes/`**                | Copy-paste recipes (layout/page merge, async `generateMetadata`, OG, icons, sitemap/robots).                               |
-| **`internal-docs/`** (clone only)  | Maintainer specs: PRD, architecture, features, roadmap — index in **CONTRIBUTING.md** (not part of published docs site).   |
+| Location                           | Role                                                                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`packages/core`**                | npm **`@better-seo/core`** — overview **[`packages/core/README.md`](./packages/core/README.md)**                                                                          |
+| **`packages/next`**                | **`@better-seo/next`** — overview **[`packages/next/README.md`](./packages/next/README.md)**                                                                              |
+| **`packages/react`**               | **`@better-seo/react`** — **[`packages/react/README.md`](./packages/react/README.md)** (Wave 5, **Helmet** + **`useSEO`**)                                                |
+| **`examples/nextjs-app`**          | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                         |
+| **`examples/react-seo-vite`**      | **Vite + React** + **`BetterSEOHelmet`**; **Playwright** checks document title / meta.                                                                                    |
+| **`packages/better-seo-assets`**   | npm **`@better-seo/assets`** — **[`packages/better-seo-assets/README.md`](./packages/better-seo-assets/README.md)**                                                       |
+| **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — TUI launcher, **`og`**, **`icons`**, **`crawl`**, **`doctor`**, **`init`**, **`migrate`** — **[README](./packages/better-seo-cli/README.md)** |
+| **`packages/better-seo-crawl`**    | **`better-seo-crawl`** — **`renderRobotsTxt`**, **`renderSitemapXml`** (optional **`@better-seo/core`** type helper) — use from CLI, recipes, or build scripts            |
+| **`examples/vanilla-render-tags`** | **`createSEO` + `renderTags`** in plain Node (**no React**).                                                                                                              |
+| **`docs/recipes/`**                | Copy-paste recipes (layout/page merge, async `generateMetadata`, OG, icons, sitemap/robots).                                                                              |
+| **`internal-docs/`** (clone only)  | Maintainer specs: PRD, architecture, features, roadmap — index in **CONTRIBUTING.md** (not part of published docs site).                                                  |
 
 Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
 
@@ -228,13 +264,13 @@ Typed errors with stable **`code`** values (`VALIDATION`, `ADAPTER_NOT_FOUND`, `
 | JSON-LD in JSX                     | **`@better-seo/next/json-ld`** → **`NextJsonLd`**                                                                   |
 | Low-level mapping                  | **`toNextMetadata`** from `@better-seo/next` (tests and advanced use)                                               |
 
-**`useSEO` today:** the hook is a **stub** that throws with a clear code until **`@better-seo/react`** lands; App Router projects should prefer **`metadata` / `generateMetadata`**.
+**`useSEO`:** implemented in **`@better-seo/react`** behind **`SEOProvider`**. For **App Router**, prefer **`metadata` / `generateMetadata`** and **`prepareNextSeo`**; use the React stack for **SPAs** (see **[`docs/recipes/react-wave5.md`](./docs/recipes/react-wave5.md)**).
 
 ---
 
 ## JSON-LD helpers
 
-Core ships small builders—**`webPage`**, **`article`**, **`organization`**, **`person`**, **`product`**, **`breadcrumbList`**, **`faqPage`**—plus **`customSchema`** for escape hatches. Each helper sets `@context` and `@type` correctly so your graph is boring and predictable.
+Core ships small builders—**`webPage`**, **`article`**, **`techArticle`**, **`organization`**, **`person`**, **`product`**, **`breadcrumbList`**, **`faqPage`**—plus **`customSchema`** for escape hatches. Each helper sets `@context` and `@type` correctly so your graph is boring and predictable.
 
 ---
 
@@ -279,6 +315,7 @@ Core has a **size budget** (see **`packages/core/package.json`** and `npm run si
 | **[`docs/recipes/README.md`](./docs/recipes/README.md)**                                 | Next/React patterns and tutorials            |
 | **[`docs/commands.md`](./docs/commands.md)**                                             | **`@better-seo/cli`** command reference      |
 | **[`docs/compare/next-seo-vs-better-seo.md`](./docs/compare/next-seo-vs-better-seo.md)** | Comparison with next-seo                     |
+| **[`docs/adapters/future-frameworks.md`](./docs/adapters/future-frameworks.md)**         | Planned adapters (Remix, Astro, Nuxt, …)     |
 | **[`CONTRIBUTING.md`](./CONTRIBUTING.md)**                                               | Dev setup; maintainer `internal-docs/` index |
 | **[`PACKAGE.md`](./PACKAGE.md)**                                                         | Releases, Changesets, publishing             |
 

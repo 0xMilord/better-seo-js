@@ -20,4 +20,15 @@ describe("createSEOContext", () => {
     const ctx = createSEOContext(cfg)
     expect(ctx.config).toBe(cfg)
   })
+
+  it("createSEOForRoute merges config.rules", () => {
+    const cfg = {
+      baseUrl: "https://x.test",
+      rules: [{ match: "/blog/*", seo: { description: "Blog" } }],
+    } as const
+    const ctx = createSEOContext(cfg)
+    const doc = ctx.createSEOForRoute("/blog/post", { title: "Post" })
+    expect(doc.meta.title).toBe("Post")
+    expect(doc.meta.description).toBe("Blog")
+  })
 })

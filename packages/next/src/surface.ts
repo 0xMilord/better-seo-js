@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import {
   createSEO,
+  createSEOForRoute,
   mergeSEO,
   type SEO,
   type SEOConfig,
@@ -37,4 +38,31 @@ export function prepareNextSeo(
 ): { readonly metadata: Metadata; readonly seo: SEO } {
   const doc = createSEO(input, config)
   return { metadata: toNextMetadata(doc), seo: doc }
+}
+
+/** V5 — Next `Metadata` with {@link SEOConfig.rules} applied for an explicit pathname (N9). */
+export function seoRoute(route: string, input: SEOInput, config?: SEOConfig): Metadata {
+  const rules = config?.rules ?? []
+  return toNextMetadata(createSEOForRoute(route, input, rules, config))
+}
+
+/** Like {@link prepareNextSeo}, but merges route rules from `config.rules` first. */
+export function prepareNextSeoForRoute(
+  route: string,
+  input: SEOInput,
+  config?: SEOConfig,
+): { readonly metadata: Metadata; readonly seo: SEO } {
+  const rules = config?.rules ?? []
+  const seo = createSEOForRoute(route, input, rules, config)
+  return { metadata: toNextMetadata(seo), seo }
+}
+
+/** V4 — layout defaults as canonical parent `SEO` (alias of `createSEO` for voilà naming). */
+export function seoLayout(input: SEOInput, config?: SEOConfig): SEO {
+  return createSEO(input, config)
+}
+
+/** V4 — page `Metadata` layered on layout `SEO` (same as {@link withSEO}). */
+export function seoPage(parent: SEO, input: SEOInput, config?: SEOConfig): Metadata {
+  return withSEO(parent, input, config)
 }

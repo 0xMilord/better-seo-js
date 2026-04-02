@@ -8,7 +8,8 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       include: ["src/**/*.ts"],
-      exclude: ["src/**/*.test.ts", "src/cli.ts"],
+      /** TUI flows are exercised manually / via binary smoke; clack prompts are costly to branch-cover. */
+      exclude: ["src/**/*.test.ts", "src/cli.ts", "src/launch-interactive.ts"],
       thresholds: {
         lines: 80,
         functions: 75,
