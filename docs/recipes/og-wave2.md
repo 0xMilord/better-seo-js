@@ -17,6 +17,24 @@ Or with `npx` once published:
 npx @better-seo/cli og "My post title" -o ./public/og.png
 ```
 
+## Custom template (compiled `.js` / `.mjs`)
+
+`generateOG` can load a **default-exported React function component** with the same props as the built-in card (**`OgCardProps`** re-exported from **`@better-seo/assets`**). The file must be **ESM** (`.mjs` or `.js`), not raw TSX — bundle or transpile first.
+
+Place the template **inside a project that can resolve `react`** (e.g. your app or this monorepo). A lone file under `/tmp` may not resolve `import` from `"react"` because Node walks **`node_modules`** from the template’s directory upward.
+
+```bash
+npx @better-seo/cli og "Branded" --template ./dist/my-og.mjs -o ./public/og.png --site-name "Acme"
+```
+
+```ts
+await generateOG({
+  title: "Branded",
+  siteName: "Acme",
+  template: new URL("./templates/og-branded.mjs", import.meta.url).pathname,
+})
+```
+
 ## Library (CI / build script)
 
 ```ts

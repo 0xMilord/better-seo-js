@@ -1,0 +1,16 @@
+{
+  "name": "vanilla-render-tags-example",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Minimal Node demo: @better-seo/core createSEO + renderTags (Wave 4 / FEATURES D7)",
+  "type": "module",
+  "scripts": {
+    "demo": "node ./demo.mjs"
+  },
+  "dependencies": {
+    "@better-seo/core": "file:../../packages/core"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

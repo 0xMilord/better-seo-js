@@ -1,6 +1,7 @@
 import { mkdirSync, unlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { afterEach, describe, expect, it } from "vitest"
 import { imageSize } from "image-size"
 import { generateOG } from "./og/generate-og.js"
@@ -57,40 +58,13 @@ describe("generateOG", () => {
         siteName: "S",
         template: "./custom.tsx",
       }),
-    ).rejects.toThrow(/\.js or \.mjs/)
+    ).rejects.toThrow(/compiled \.js or \.mjs/)
   })
 
   it("renders with a custom .mjs template module", async () => {
-    const dir = join(tmpdir(), `bsa-tpl-${Date.now()}`)
-    mkdirSync(dir, { recursive: true })
-    const tplPath = join(dir, "custom-og.mjs")
-    writeFileSync(
-      tplPath,
-      `import { createElement } from "react";
-export default function CustomOg(p) {
-  return createElement(
-    "div",
-    {
-      style: {
-        width: p.width,
-        height: p.height,
-        background: p.palette.bg,
-        color: p.palette.fg,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 56,
-        fontFamily: "Inter",
-      },
-    },
-    p.title + " — " + p.siteName,
-  );
-}
-`,
-      "utf8",
+    const tplPath = fileURLToPath(
+      new URL("./__fixtures__/minimal-og-template.mjs", import.meta.url),
     )
-    tmpFiles.push(tplPath)
-
     const buf = await generateOG({
       title: "Custom tmpl",
       siteName: "CI",

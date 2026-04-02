@@ -9,4 +9,5 @@ Version bumps and detailed entries for published packages are normally generated
 
 ## Unreleased
 
-- Repository scaffold, packages, and first public release pending.
+- **Wave 4 (distribution polish):** README before/after table for OG + icons; **`docs/compare/next-seo-vs-better-seo.md`** stub (**D6**); **`examples/vanilla-render-tags`** (**D7**); **`examples/nextjs-app`** asset pipeline (**`npm run assets`** on **`predev` / `prebuild`**) + E2E static file checks; **`@better-seo/cli og --template`** + **`generateOG` custom `.js`/`.mjs` template** (finish deferred Wave 2 template path).
+- Repository scaffold and first npm publish still done via Changesets when ready (see **`PACKAGE.md`**).

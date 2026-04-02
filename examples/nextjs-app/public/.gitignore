@@ -1,0 +1,3 @@
+# Populated by `npm run assets` (see package.json predev/prebuild). Do not commit generated binaries.
+*
+!.gitignore

@@ -1,4 +1,5 @@
-import { writeFile } from "node:fs/promises"
+import { mkdir, writeFile } from "node:fs/promises"
+import { dirname } from "node:path"
 import { parseArgs } from "node:util"
 import { generateIcons, generateOG } from "@better-seo/assets"
 import type { IconManifestConfig, OGTheme, PwaDisplay } from "@better-seo/assets"
@@ -151,6 +152,7 @@ async function runOg(rest: string[]): Promise<number> {
       ...(values.logo !== undefined ? { logo: values.logo } : {}),
       ...(values.template !== undefined ? { template: values.template } : {}),
     })
+    await mkdir(dirname(out), { recursive: true })
     await writeFile(out, png)
     const ms = Math.round(performance.now() - started)
     console.log(`Wrote ${out} (${png.byteLength} bytes) in ${ms}ms`)

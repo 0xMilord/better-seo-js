@@ -4,6 +4,9 @@
   "private": true,
   "description": "Reference Next.js App Router application for @better-seo/core and @better-seo/next: demonstrates Metadata, NextJsonLd, layout and page SEO merging, dynamic routes, and Playwright end-to-end checks. Used only inside the monorepo for development, docs, and CI; not published to npm.",
   "scripts": {
+    "assets": "node ../../packages/better-seo-cli/dist/cli.cjs og \"better-seo.js example\" -o public/og-example.png --site-name \"Demo\" && node ../../packages/better-seo-cli/dist/cli.cjs icons assets/logo.svg -o public --no-manifest",
+    "prebuild": "npm run assets",
+    "predev": "npm run assets",
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 3000",

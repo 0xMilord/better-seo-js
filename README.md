@@ -87,7 +87,17 @@ The core stays free of OG renderers. Install **`@better-seo/assets`** in Node/bu
 npx @better-seo/cli og "Hello World" -o ./og.png --site-name "My site"
 ```
 
-Built-in **light** and **dark** card templates; **1200×630** PNG. See **`internal-docs/USAGE.md`** and **`docs/recipes/og-wave2.md`**.
+Built-in **light** and **dark** card templates; **1200×630** PNG. Custom cards: pass **`--template ./my-og.mjs`** (compiled ESM module; props = **`OgCardProps`** from **`@better-seo/assets`**). See **`docs/recipes/og-wave2.md`**.
+
+### Visual proof: assets before → after (Wave 4)
+
+| Surface             | Before                                | After (CLI / library)                                                                                                                                              |
+| ------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Open Graph**      | Missing or generic preview card       | **`npx @better-seo/cli og "Title" -o ./public/og.png`** → **1200×630** PNG                                                                                         |
+| **Favicon / PWA**   | Single `favicon` or hand-copied sizes | **`npx @better-seo/cli icons ./logo.svg -o ./public`** → `favicon.ico`, **16–512** PNGs, **`apple-touch-icon`**, **`maskable-icon`**, optional **`manifest.json`** |
+| **Next.js example** | Meta pointed at missing static files  | **`examples/nextjs-app`** runs **`npm run assets`** on **`predev` / `prebuild`** (see that README); E2E fetches **`/og-example.png`** and **`/favicon.ico`**.      |
+
+This repo stays **headless**: we do not ship raster screenshots in git; run the commands above (or open **`examples/nextjs-app`**) to see real output locally or in CI.
 
 ---
 
@@ -156,15 +166,16 @@ flowchart LR
   CLI -.-> ASSETS
 ```
 
-| Location                         | Role                                                                                                                                                                              |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`packages/core`**              | npm **`@better-seo/core`**: `createSEO`, `mergeSEO`, `withSEO`, schema builders, `serializeJSONLD`, `renderTags`, validation hooks, adapter registry, plugins, rules, `SEOError`. |
-| **`packages/next`**              | **`@better-seo/next`**: `seo`, `prepareNextSeo`, `withSEO`, `toNextMetadata`, **`@better-seo/next/json-ld`** (`NextJsonLd`). Registers the `"next"` adapter on import.            |
-| **`examples/nextjs-app`**        | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                                 |
-| **`packages/better-seo-assets`** | npm **`@better-seo/assets`**: **`generateOG`**, **`generateIcons`**, manifest helpers (**A1** / PRD §3.7).                                                                        |
-| **`packages/better-seo-cli`**    | npm **`@better-seo/cli`**: **`better-seo` / `better-seo-cli` bins**, **`og`** / **`icons`** (**L2**).                                                                             |
-| **`docs/recipes/`**              | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                                                                                      |
-| **`internal-docs/`**             | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                                                                                    |
+| Location                           | Role                                                                                                                                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`packages/core`**                | npm **`@better-seo/core`**: `createSEO`, `mergeSEO`, `withSEO`, schema builders, `serializeJSONLD`, `renderTags`, validation hooks, adapter registry, plugins, rules, `SEOError`. |
+| **`packages/next`**                | **`@better-seo/next`**: `seo`, `prepareNextSeo`, `withSEO`, `toNextMetadata`, **`@better-seo/next/json-ld`** (`NextJsonLd`). Registers the `"next"` adapter on import.            |
+| **`examples/nextjs-app`**          | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                                 |
+| **`packages/better-seo-assets`**   | npm **`@better-seo/assets`**: **`generateOG`** (built-in + **custom `.mjs` template**), **`generateIcons`**, manifest helpers.                                                    |
+| **`packages/better-seo-cli`**      | npm **`@better-seo/cli`**: **`og`** / **`icons`** bins (**L2**).                                                                                                                  |
+| **`examples/vanilla-render-tags`** | **D7** — **`createSEO` + `renderTags`** in plain Node (**no React**).                                                                                                             |
+| **`docs/recipes/`**                | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                                                                                      |
+| **`internal-docs/`**               | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                                                                                    |
 
 Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
 
@@ -224,15 +235,16 @@ Core has a **size budget** (see **`packages/core/package.json`** and `npm run si
 
 ## Documentation index
 
-| Doc                                                                    | Purpose                                                        |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **[`internal-docs/USAGE.md`](./internal-docs/USAGE.md)**               | Install, Next patterns, **`SEOError`**, **`withSEO` + config** |
-| **[`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)** | Boundaries, package topology, serializer rule, Edge safety     |
-| **[`internal-docs/FEATURES.md`](./internal-docs/FEATURES.md)**         | Feature IDs and quality bar                                    |
-| **[`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md)**           | Waves and traceability to FEATURES                             |
-| **[`internal-docs/PROGRESS.md`](./internal-docs/PROGRESS.md)**         | What is done vs in flight vs not started                       |
-| **[`internal-docs/PRD.md`](./internal-docs/PRD.md)**                   | Product intent and scope                                       |
-| **[`PACKAGE.md`](./PACKAGE.md)**                                       | Releases, Changesets, publishing                               |
+| Doc                                                                                      | Purpose                                                        |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **[`internal-docs/USAGE.md`](./internal-docs/USAGE.md)**                                 | Install, Next patterns, **`SEOError`**, **`withSEO` + config** |
+| **[`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)**                   | Boundaries, package topology, serializer rule, Edge safety     |
+| **[`internal-docs/FEATURES.md`](./internal-docs/FEATURES.md)**                           | Feature IDs and quality bar                                    |
+| **[`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md)**                             | Waves and traceability to FEATURES                             |
+| **[`internal-docs/PROGRESS.md`](./internal-docs/PROGRESS.md)**                           | What is done vs in flight vs not started                       |
+| **[`internal-docs/PRD.md`](./internal-docs/PRD.md)**                                     | Product intent and scope                                       |
+| **[`docs/compare/next-seo-vs-better-seo.md`](./docs/compare/next-seo-vs-better-seo.md)** | Compare stub (**D6**, Wave 4)                                  |
+| **[`PACKAGE.md`](./PACKAGE.md)**                                                         | Releases, Changesets, publishing                               |
 
 ---
 

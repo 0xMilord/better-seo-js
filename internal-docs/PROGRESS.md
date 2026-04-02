@@ -2,18 +2,18 @@
 
 **Purpose:** Single place to see **which Roadmap waves are done, partial, or not started**, with **repo evidence** and **FEATURES** IDs. Sequencing and exit criteria remain in **`Roadmap.md`**. Product intent: **`PRD.md`**.
 
-**Last updated:** 2026-04-02 — Wave 3 icons + manifest shipped (**`@better-seo/assets`**, **`@better-seo/cli`** `icons`).
+**Last updated:** 2026-04-02 — Wave 4 distribution polish + Wave 2 **`template`** path; Next example asset pipeline + **D6/D7** docs/examples.
 
 ---
 
 ## Wave 1–2 gap audit (vs PRD / Roadmap exit criteria)
 
-| Wave  | Exit intent (PRD §5)                                                                        | Verdict     | Gaps / notes                                                                                                                                                                                                                                                                                 |
-| ----- | ------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | Next App Router `metadata = seo({ title })` &lt; 60s; CI E2E; no public `any` in `.d.ts`    | **Met**\*   | \*Canonical import is **`@better-seo/next`** (`seo`, `prepareNextSeo`); **`USAGE.md`** is source of truth vs PRD §0. **Non-blocking:** no **`@better-seo/core/node`** `exports` yet; no automated Edge bundle guard. **`createSEOContext` / `initSEO`** still 🟨 in tracker for that reason. |
-| **2** | `npx @better-seo/cli og "Hello World"` → great PNG in ~2s; README before/after visual proof | **Partial** | **Done:** `generateOG` + CLI **`og`**, light/dark templates, tests + bin smoke. **Open:** user **`template`** path (deferred). **Wave 4:** README “before/after” hero imagery (called out in PRD §4.4 / distribution wave).                                                                  |
+| Wave  | Exit intent (PRD §5)                                                                        | Verdict   | Gaps / notes                                                                                                                                                                                                                                                                                 |
+| ----- | ------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | Next App Router `metadata = seo({ title })` &lt; 60s; CI E2E; no public `any` in `.d.ts`    | **Met**\* | \*Canonical import is **`@better-seo/next`** (`seo`, `prepareNextSeo`); **`USAGE.md`** is source of truth vs PRD §0. **Non-blocking:** no **`@better-seo/core/node`** `exports` yet; no automated Edge bundle guard. **`createSEOContext` / `initSEO`** still 🟨 in tracker for that reason. |
+| **2** | `npx @better-seo/cli og "Hello World"` → great PNG in ~2s; README before/after visual proof | **Met**\* | \* **`generateOG`** + **`og`**, light/dark, **`--template`** for compiled `.js`/`.mjs` modules (**`OgCardProps`**). **Wave 4:** README table + links (hero raster screenshots still optional / local-only).                                                                                  |
 
-No blocking gaps remain for starting Wave 3 work; Wave 3 is now **done** below.
+Waves **1–4** in this tracker are complete through **Wave 4** below; later waves remain queued on [`Roadmap.md`](./Roadmap.md).
 
 ---
 
@@ -30,10 +30,10 @@ No blocking gaps remain for starting Wave 3 work; Wave 3 is now **done** below.
 | **Rules / globs**           | Improved          | **`rules.ts`**: multi-segment `**` globs, legacy trailing `path/*`, mid-path `*` segments; tests in **`rules.test.ts`**.                                                                                                     |
 | **Plugins**                 | Tested            | **`beforeMerge` / `afterMerge`** order + **`features.jsonLd`** interaction — **`plugins.test.ts`**.                                                                                                                          |
 | **Coverage**                | Meets goal        | **`packages/core/vitest.config.ts`**: lines/statements **≥90%**, functions **88%**, branches **80%**; **`context.ts`** / **`singleton.ts`** included; registry, migrate, integration-style tests added.                      |
-| **E2E**                     | Deeper            | **`examples/nextjs-app/e2e/head-tags.spec.ts`**: canonical, hreflang, OG/Twitter, parseable JSON-LD, dynamic **`/blog/[slug]`** + **`generateMetadata`**.                                                                    |
+| **E2E**                     | Deeper            | **`head-tags.spec.ts`**: canonical, hreflang, OG/Twitter, JSON-LD, **`/blog/[slug]`**; static **`/og-example.png`** + **`/favicon.ico`** served (**CLI asset pipeline**).                                                    |
 | **Edge / prod docs**        | Documented        | **`internal-docs/USAGE.md`**: **`createSEOContext`** vs **`initSEO`**, multi-tenant / Workers cautions, **`validateSEO`** codes and options.                                                                                 |
 | **Next adapter**            | Golden            | **`toNextMetadata`** + pipeline tests; root **`build`**: **`@better-seo/core`** → **`@better-seo/assets`** → **`@better-seo/cli`** → **`@better-seo/next`** → **`nextjs-app`**.                                              |
-| **OG / CLI (Wave 2)**       | Shipped           | **`@better-seo/assets`**: **`generateOG`** (Satori, Resvg, light/dark, **1200×630**); **`@better-seo/cli`**: **`og`**; tests + built-bin smoke. Custom **`template`** deferred.                                              |
+| **OG / CLI (Wave 2)**       | Shipped           | **`@better-seo/assets`**: **`generateOG`** + optional **`template`** (`.js`/`.mjs`); **`@better-seo/cli`**: **`og`**, **`--template`**; tests + bin smoke.                                                                   |
 | **Icons / CLI (Wave 3)**    | Shipped           | **`@better-seo/assets`**: **`generateIcons`**, **`buildWebAppManifest`**, **`formatWebManifest`** (Sharp, **`to-ico`** favicon); **`@better-seo/cli`**: **`icons`**; tests + bin smoke. **`splash`** still future (Wave 11). |
 | **Still not built**         | See waves 4+      | **`@better-seo/react`**, crawl, full **`fromNextSeo`**, **`useSEO`** real, **`onRenderTags`** / **`extendChannels`**, rich **`initSEO`** inference (PRD §3.9).                                                               |
 | **`@better-seo/core/node`** | Open              | No separate conditional **`exports`** entry on published core yet (ARCHITECTURE §10); Edge bundle tree-shaking not verified by automated test.                                                                               |
@@ -90,7 +90,7 @@ No blocking gaps remain for starting Wave 3 work; Wave 3 is now **done** below.
 | CLI **`og`** (**L2**)                 |   ✅   | Bins **`better-seo`** / **`better-seo-cli`** → **`dist/cli.cjs`**; **`run-cli*.test.ts`**, **`run-cli.binary.test.ts`** |
 | README / USAGE / recipe               |   ✅   | **`README.md`**, **`internal-docs/USAGE.md`**, **`docs/recipes/og-wave2.md`**                                           |
 
-**Deferred (not Wave 2):** user-provided **`template`** file path. Full “before/after” hero imagery → **Wave 4** polish.
+**Also shipped (Wave 4 catch-up):** **`--template`** / **`OGConfig.template`** → compiled **`.js`/`.mjs`** ESM module (default export = Satori component; props = **`OgCardProps`**).
 
 ---
 
@@ -109,11 +109,15 @@ No blocking gaps remain for starting Wave 3 work; Wave 3 is now **done** below.
 
 ### Wave 4 — Distribution & polish
 
-| Item                     | Status | Evidence                                |
-| ------------------------ | ------ | --------------------------------------- |
-| npm publish / Changesets | 🟨     | See `PACKAGE.md`                        |
-| README visual proof      | 🟨     | OG + icons ready; hero before/after TBD |
-| Extra examples (D7)      | 🟨     | Only `nextjs-app`                       |
+| Item                      | Status | Evidence                                                                                        |
+| ------------------------- | :----: | ----------------------------------------------------------------------------------------------- |
+| npm publish / Changesets  |   🟨   | `PACKAGE.md`, `.changeset/`, `release.yml`; publish when org + **`NPM_TOKEN`** ready            |
+| Dual ESM/CJS + semver     |   ✅   | **`tsup`**; **`CHANGELOG.md`** + Changesets                                                     |
+| **size-limit** (core)     |   ✅   | **`npm run ci`** → **`npm run size`**                                                           |
+| README + visual proof     |   ✅   | Root **README** before/after table; links to recipes / compare                                  |
+| **`examples/nextjs-app`** |   ✅   | **`predev`/`prebuild` → `assets`** (CLI **`og`+`icons`**), layout **`icons`**, E2E static files |
+| **D6** compare            |   ✅   | **`docs/compare/next-seo-vs-better-seo.md`**                                                    |
+| **D7** extra example      |   ✅   | **`examples/vanilla-render-tags`**                                                              |
 
 ---
 

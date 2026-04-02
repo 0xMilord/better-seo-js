@@ -74,14 +74,14 @@ export async function resolveLogoDataUrl(logo: string | undefined): Promise<stri
 function resolveTemplateFile(template: string): string {
   const raw = template.trim()
   const abs = isAbsolute(raw) ? raw : resolve(process.cwd(), raw)
-  if (!existsSync(abs)) {
-    throw new Error(`[@better-seo/assets] template not found: ${abs}`)
-  }
   const lower = abs.toLowerCase()
   if (!lower.endsWith(".js") && !lower.endsWith(".mjs")) {
     throw new Error(
       `[@better-seo/assets] template must be a compiled .js or .mjs file (got: ${abs}). Transpile TSX separately or use a .mjs module.`,
     )
+  }
+  if (!existsSync(abs)) {
+    throw new Error(`[@better-seo/assets] template not found: ${abs}`)
   }
   return abs
 }

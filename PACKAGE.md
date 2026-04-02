@@ -93,26 +93,27 @@ You can rename scripts (e.g. **`npm run version-packages`**) as long as **GitHub
 
 ## 4. Build & local commands
 
-| Command                        | Purpose                                                                            |
-| ------------------------------ | ---------------------------------------------------------------------------------- |
-| `npm install`                  | Install all workspaces                                                             |
-| `npm run build`                | Build every package that defines `build`                                           |
-| `npm run typecheck`            | TypeScript across workspaces                                                       |
-| `npm run test`                 | Unit tests (Vitest, no coverage report)                                            |
-| `npm run test:coverage`        | Vitest with **v8** coverage + thresholds (`packages/core`, `to-next-metadata.ts`)  |
-| `npm run test:e2e`             | Playwright on `examples/nextjs-app`                                                |
-| `npm run lint`                 | ESLint in workspaces + `next lint` in the example                                  |
-| `npm run format`               | Prettier `--write` (whole repo)                                                    |
-| `npm run format:check`         | Prettier `--check` (runs inside **`npm run check`**)                               |
-| `npm run check`                | **Default gate:** build + **format:check** + lint + typecheck + **test:coverage**  |
-| `npm run ci`                   | **`check` + E2E** + core **`size-limit`**                                          |
-| `npm run commit`               | Interactive Conventional Commit (cz-git); Husky still validates plain `git commit` |
-| `npm run commitlint:last`      | Lint the latest commit (`--last`)                                                  |
-| `npm run commitlint:since-tag` | Lint commits since the last git tag (fails if there is no tag yet)                 |
-| `npm run changeset`            | Interactive: add a **`.changeset/*.md`** (semver + summary) for release            |
-| `npm run release`              | Interactive menu: **CI**, **changeset**, **version**, **publish**, or guided chain |
-| `npm run release:version`      | Apply changesets → bump **`package.json`** + **CHANGELOG(s)** (no npm publish)     |
-| `npm run release:publish`      | **`npm run ci`** then **`changeset publish`** (all publishable workspaces)         |
+| Command                        | Purpose                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| `npm install`                  | Install all workspaces                                                                |
+| `npm run build`                | Build every package that defines `build`                                              |
+| `npm run typecheck`            | TypeScript across workspaces                                                          |
+| `npm run test`                 | Unit tests (Vitest, no coverage report)                                               |
+| `npm run test:coverage`        | Vitest with **v8** coverage + thresholds (`packages/core`, `to-next-metadata.ts`)     |
+| `npm run test:e2e`             | Playwright on `examples/nextjs-app`                                                   |
+| `npm run lint`                 | ESLint in workspaces + `next lint` in the example                                     |
+| `npm run format`               | Prettier `--write` (whole repo)                                                       |
+| `npm run format:check`         | Prettier `--check` (runs inside **`npm run check`**)                                  |
+| `npm run check`                | **Default gate:** build + **format:check** + lint + typecheck + **test:coverage**     |
+| `npm run ci`                   | **`check` + E2E** + core **`size-limit`**                                             |
+| `npm run commit`               | Interactive Conventional Commit (cz-git); Husky still validates plain `git commit`    |
+| `npm run commitlint:last`      | Lint the latest commit (`--last`)                                                     |
+| `npm run commitlint:since-tag` | Lint commits since the last git tag (fails if there is no tag yet)                    |
+| `npm run changeset`            | Interactive: add a **`.changeset/*.md`** (semver + summary) for release               |
+| `npm run release`              | Interactive menu: **CI**, **changeset**, **version**, **publish**, or guided chain    |
+| `npm run release:version`      | Apply changesets → bump **`package.json`** + **CHANGELOG(s)** (no npm publish)        |
+| `npm run release:publish`      | **`npm run ci`** then **`changeset publish`** (all publishable workspaces)            |
+| `npm run publish`              | **Alias of `release:publish`** — same command **`release.yml`** uses after versioning |
 
 **Per-package** (`packages/core`, etc.): each has its own **`package.json`** with **`exports`**, **`types`**, **`files`** (publish allowlist), and **`build`** producing `dist/` (or publish `src/` only if policy allows—prefer `dist` for clear API surfaces).
 
@@ -284,5 +285,6 @@ Internal specs stay in **`internal-docs/`**; public contributor path starts at *
 
 ## 12. Current repo state
 
-- **P0 / Wave 1 scaffold is present:** **`@better-seo/core`**, **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Publishable workspaces are aligned at **`0.0.1`** for the first release; **`examples/nextjs-app`** stays **`private: true`** (not published).
+- **P0 / Wave 1 scaffold is present:** **`@better-seo/core`**, **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Publishable workspaces are aligned at **`0.0.1`** for the first release; **`examples/nextjs-app`** and **`examples/vanilla-render-tags-example`** stay **`private: true`** (not published).
+- **Wave 4 (distribution / polish):** root **README** documents OG + icon “before/after”; **`docs/compare/next-seo-vs-better-seo.md`** (**D6** stub); extra **D7** example **`examples/vanilla-render-tags`**; golden Next app wires **`@better-seo/cli`**-generated **`public/`** assets + E2E checks. **`size-limit`** still gates core in **`npm run ci`** (see [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)).
 - Replace **`OWNER`** in **SECURITY.md** / **CONTRIBUTING.md** clone URLs with your GitHub org or username after the remote exists.

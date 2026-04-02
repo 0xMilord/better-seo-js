@@ -37,6 +37,14 @@ test.describe("head tags (home)", () => {
     const parsed = JSON.parse(raw as string) as { "@type"?: string }
     expect(parsed["@type"]).toBe("WebPage")
   })
+
+  test("serves OG PNG and favicon from public (Wave 4 asset pipeline)", async ({ request }) => {
+    const og = await request.get("/og-example.png")
+    expect(og.status()).toBe(200)
+    expect(og.headers()["content-type"] ?? "").toMatch(/png/i)
+    const ico = await request.get("/favicon.ico")
+    expect(ico.status()).toBe(200)
+  })
 })
 
 test("dynamic generateMetadata blog route", async ({ page }) => {

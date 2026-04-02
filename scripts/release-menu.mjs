@@ -44,7 +44,7 @@ async function menu() {
   const choice = await rl.question(`  1  Full CI (check + e2e + size) — same as npm run ci
   2  Add changeset (pick packages + patch/minor/major) — npm run changeset
   3  Version packages (bump package.json + CHANGELOGs) — npm run release:version
-  4  Publish to npm (runs CI first, then changeset publish) — npm run release:publish
+  4  Publish to npm (runs CI first, then changeset publish) — npm run publish  (same as release:publish)
   5  Guided: 2 → 3 (then you commit & push; publish via CI or run 4)
   0  Exit
 
@@ -63,7 +63,7 @@ async function menu() {
       console.log("\nNext: git add . && git commit (conventional) && git push")
       break
     case "4":
-      runNpm("release:publish")
+      runNpm("publish")
       break
     case "5":
       runNpm("changeset")
@@ -79,7 +79,7 @@ async function menu() {
 
   Publishing:
   • With GitHub: merge to main; .github/workflows/release.yml runs publish when ready.
-  • Local: npm run release → 4 (needs npm login + packages not private).
+  • Local: npm run publish   (or: npm run release → 4; needs npm login + publishable workspaces).
 `)
       break
     case "0":
