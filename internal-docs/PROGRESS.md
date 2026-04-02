@@ -2,30 +2,42 @@
 
 **Purpose:** Single place to see **which Roadmap waves are done, partial, or not started**, with **repo evidence** and **FEATURES** IDs. Sequencing and exit criteria remain in **`Roadmap.md`**. Product intent: **`PRD.md`**.
 
-**Last updated:** 2026-04-02 (Wave 2 — **`better-seo-assets`** + **`better-seo-cli`** `og`; Wave 1 items unchanged).
+**Last updated:** 2026-04-02 — Wave 3 icons + manifest shipped (**`@better-seo/assets`**, **`@better-seo/cli`** `icons`).
+
+---
+
+## Wave 1–2 gap audit (vs PRD / Roadmap exit criteria)
+
+| Wave  | Exit intent (PRD §5)                                                                     | Verdict     | Gaps / notes                                                                                                                                                                                                                                                                                                           |
+| ----- | ---------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | Next App Router `metadata = seo({ title })` &lt; 60s; CI E2E; no public `any` in `.d.ts` | **Met**\*   | \*Canonical import is **`@better-seo/next`** (`seo`, `prepareNextSeo`); **`USAGE.md`** is source of truth vs PRD §0 bare `better-seo.js` snippet. **Non-blocking:** no **`better-seo.js/node`** `exports` yet; no automated Edge bundle guard. **`createSEOContext` / `initSEO`** still 🟨 in tracker for that reason. |
+| **2** | `npx better-seo og "Hello World"` → great PNG in ~2s; README before/after visual proof   | **Partial** | **Done:** `generateOG` + CLI **`og`**, light/dark templates, tests + bin smoke. **Open:** user **`template`** path (deferred). **Wave 4:** README “before/after” hero imagery (called out in PRD §4.4 / distribution wave).                                                                                            |
+
+No blocking gaps remain for starting Wave 3 work; Wave 3 is now **done** below.
 
 ---
 
 ## Deep audit snapshot (2026-04-02)
 
-| Area                     | Status            | Notes                                                                                                                                                                                                                     |
-| ------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core pipeline**        | Aligned           | `createSEO` → plugins → optional **`features.jsonLd`** strip; **`serializeJSONLD`** single path.                                                                                                                          |
-| **P5 `features`**        | Wired             | **`jsonLd`**, **`openGraphMerge`** read in **`packages/core/src/core.ts`**; documented in **`USAGE.md`**.                                                                                                                 |
-| **Twitter ↔ OG**         | Wired             | **`twitter.image`** defaults from first **`openGraph.images[].url`** when OG merge is on (PRD §3.3).                                                                                                                      |
-| **`validateSEO`**        | PRD §3.5 baseline | **`ValidationIssueCode`** on each issue; **`requireDescription`** (error + **`DESCRIPTION_REQUIRED`**); title/desc/OG/schema checks; dev-only + **`enabled: false`** / production strip; tests in **`validate.test.ts`**. |
-| **`serializeJSONLD`**    | Hardened          | **`Reflect.ownKeys`** iteration catches **`JSON.parse`**-shaped **`__proto__`**, **`constructor`**, **`prototype`**; non-string keys rejected; tests use realistic payloads (**`serialize.test.ts`**).                    |
-| **`renderTags`**         | Extended          | Canonical, hreflang, OG/Twitter, JSON-LD script tags; extra branches covered in **`render.test.ts`**.                                                                                                                     |
-| **Rules / globs**        | Improved          | **`rules.ts`**: multi-segment `**` globs, legacy trailing `path/*`, mid-path `*` segments; tests in **`rules.test.ts`**.                                                                                                  |
-| **Plugins**              | Tested            | **`beforeMerge` / `afterMerge`** order + **`features.jsonLd`** interaction — **`plugins.test.ts`**.                                                                                                                       |
-| **Coverage**             | Meets goal        | **`packages/core/vitest.config.ts`**: lines/statements **≥90%**, functions **88%**, branches **80%**; **`context.ts`** / **`singleton.ts`** included; registry, migrate, integration-style tests added.                   |
-| **E2E**                  | Deeper            | **`examples/nextjs-app/e2e/head-tags.spec.ts`**: canonical, hreflang, OG/Twitter, parseable JSON-LD, dynamic **`/blog/[slug]`** + **`generateMetadata`**.                                                                 |
-| **Edge / prod docs**     | Documented        | **`internal-docs/USAGE.md`**: **`createSEOContext`** vs **`initSEO`**, multi-tenant / Workers cautions, **`validateSEO`** codes and options.                                                                              |
-| **Next adapter**         | Golden            | **`toNextMetadata`** + pipeline tests; monorepo **`build`** order: core → **`@better-seo/next`** → example (avoids DTS race).                                                                                             |
-| **OG / CLI (Wave 2)**    | Shipped           | **`packages/better-seo-assets`**: **`generateOG`** (Satori, Resvg, light/dark, **1200×630**); **`packages/better-seo-cli`**: **`better-seo og`**; tests + built-bin smoke in CI. Custom **`template`** deferred.          |
-| **Still not built**      | See waves 3+      | **`@better-seo/react`**, crawl, full **`fromNextSeo`**, **`useSEO`** real, **`onRenderTags`** / **`extendChannels`**, rich **`initSEO`** inference (PRD §3.9).                                                            |
-| **`better-seo.js/node`** | Open              | No separate conditional **`exports`** entry yet (ARCHITECTURE §10); Edge bundle tree-shaking not verified by automated test.                                                                                              |
-| **`.d.ts` public `any`** | Clean             | No `any` on published typings (comment-only match in `index.d.ts`).                                                                                                                                                       |
+| Area                     | Status            | Notes                                                                                                                                                                                                                        |
+| ------------------------ | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core pipeline**        | Aligned           | `createSEO` → plugins → optional **`features.jsonLd`** strip; **`serializeJSONLD`** single path.                                                                                                                             |
+| **P5 `features`**        | Wired             | **`jsonLd`**, **`openGraphMerge`** read in **`packages/core/src/core.ts`**; documented in **`USAGE.md`**.                                                                                                                    |
+| **Twitter ↔ OG**        | Wired             | **`twitter.image`** defaults from first **`openGraph.images[].url`** when OG merge is on (PRD §3.3).                                                                                                                         |
+| **`validateSEO`**        | PRD §3.5 baseline | **`ValidationIssueCode`** on each issue; **`requireDescription`** (error + **`DESCRIPTION_REQUIRED`**); title/desc/OG/schema checks; dev-only + **`enabled: false`** / production strip; tests in **`validate.test.ts`**.    |
+| **`serializeJSONLD`**    | Hardened          | **`Reflect.ownKeys`** iteration catches **`JSON.parse`**-shaped **`__proto__`**, **`constructor`**, **`prototype`**; non-string keys rejected; tests use realistic payloads (**`serialize.test.ts`**).                       |
+| **`renderTags`**         | Extended          | Canonical, hreflang, OG/Twitter, JSON-LD script tags; extra branches covered in **`render.test.ts`**.                                                                                                                        |
+| **Rules / globs**        | Improved          | **`rules.ts`**: multi-segment `**` globs, legacy trailing `path/*`, mid-path `*` segments; tests in **`rules.test.ts`**.                                                                                                     |
+| **Plugins**              | Tested            | **`beforeMerge` / `afterMerge`** order + **`features.jsonLd`** interaction — **`plugins.test.ts`**.                                                                                                                          |
+| **Coverage**             | Meets goal        | **`packages/core/vitest.config.ts`**: lines/statements **≥90%**, functions **88%**, branches **80%**; **`context.ts`** / **`singleton.ts`** included; registry, migrate, integration-style tests added.                      |
+| **E2E**                  | Deeper            | **`examples/nextjs-app/e2e/head-tags.spec.ts`**: canonical, hreflang, OG/Twitter, parseable JSON-LD, dynamic **`/blog/[slug]`** + **`generateMetadata`**.                                                                    |
+| **Edge / prod docs**     | Documented        | **`internal-docs/USAGE.md`**: **`createSEOContext`** vs **`initSEO`**, multi-tenant / Workers cautions, **`validateSEO`** codes and options.                                                                                 |
+| **Next adapter**         | Golden            | **`toNextMetadata`** + pipeline tests; root **`build`**: **`@better-seo/core`** → **`@better-seo/assets`** → **`@better-seo/cli`** → **`@better-seo/next`** → **`nextjs-app`**.                                              |
+| **OG / CLI (Wave 2)**    | Shipped           | **`@better-seo/assets`**: **`generateOG`** (Satori, Resvg, light/dark, **1200×630**); **`@better-seo/cli`**: **`og`**; tests + built-bin smoke. Custom **`template`** deferred.                                              |
+| **Icons / CLI (Wave 3)** | Shipped           | **`@better-seo/assets`**: **`generateIcons`**, **`buildWebAppManifest`**, **`formatWebManifest`** (Sharp, **`to-ico`** favicon); **`@better-seo/cli`**: **`icons`**; tests + bin smoke. **`splash`** still future (Wave 11). |
+| **Still not built**      | See waves 4+      | **`@better-seo/react`**, crawl, full **`fromNextSeo`**, **`useSEO`** real, **`onRenderTags`** / **`extendChannels`**, rich **`initSEO`** inference (PRD §3.9).                                                               |
+| **`better-seo.js/node`** | Open              | No separate conditional **`exports`** entry on published core yet (ARCHITECTURE §10); Edge bundle tree-shaking not verified by automated test.                                                                               |
+| **`.d.ts` public `any`** | Clean             | No `any` on published typings (comment-only match in `index.d.ts`).                                                                                                                                                          |
 
 ---
 
@@ -64,40 +76,44 @@
 | **N5 / N6** recipes                                     |   ✅   | `docs/recipes/n5-*`, `n6-*`                                                                                                                                         |
 | Structured **`SEOError`**                               |   ✅   | `packages/core/src/errors.ts`                                                                                                                                       |
 | **`validateSEO`** (PRD §3.5 baseline)                   |   ✅   | **`validate.ts`**: **`ValidationIssueCode`**, **`requireDescription`**, logging toggle; prod / **`enabled: false`** strip — **`validate.test.ts`**                  |
-| Monorepo build order (DTS / `file:` deps)               |   ✅   | Root **`package.json` `build`**: **`better-seo.js`** → **`better-seo-assets`** → **`better-seo-cli`** → **`@better-seo/next`** → **`nextjs-app`**                   |
+| Monorepo build order (DTS / `file:` deps)               |   ✅   | Root **`package.json` `build`**: **`@better-seo/core`** → **`@better-seo/assets`** → **`@better-seo/cli`** → **`@better-seo/next`** → **`nextjs-app`**              |
 
-**Remaining Wave 1 adjacencies (not blocking “core path”):** separate **`better-seo.js`** export for Node-only surfaces (ARCHITECTURE §10), automated Edge/tree-shaking verification, `seo()` path wording in PRD §0 vs **`@better-seo/next`** (USAGE is canonical).
+**Remaining Wave 1 adjacencies (not blocking “core path”):** separate **Node-only** `exports` on published core (ARCHITECTURE §10), automated Edge/tree-shaking verification, PRD §0 import snippet vs **`@better-seo/next`** (**`USAGE.md`** is canonical).
 
 ---
 
 ### Wave 2 — OG generator
 
-| Item                                       | Status | Evidence                                                                                                                                                                |
-| ------------------------------------------ | :----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `better-seo-assets` OG (Satori, templates) |   ✅   | **`packages/better-seo-assets`**: **`generateOG`**, **`OGConfig`**, light/dark templates (`og/templates/og-card.tsx`); Inter **`.woff`**; **`generate-og.test.ts`**     |
-| CLI **`og`** (**L2**)                      |   ✅   | **`packages/better-seo-cli`**: bins **`better-seo`** / **`better-seo-cli`** → **`dist/cli.cjs`**; **`run-cli*.test.ts`**, **`run-cli.binary.test.ts`** (production bin) |
-| README / USAGE / recipe                    |   ✅   | **`README.md`**, **`internal-docs/USAGE.md`**, **`docs/recipes/og-wave2.md`**                                                                                           |
+| Item                                  | Status | Evidence                                                                                                                |
+| ------------------------------------- | :----: | ----------------------------------------------------------------------------------------------------------------------- |
+| `@better-seo/assets` OG (Satori, tpl) |   ✅   | **`generateOG`**, **`OGConfig`**, light/dark (`og/templates/og-card.tsx`); Inter **`.woff`**; **`generate-og.test.ts`** |
+| CLI **`og`** (**L2**)                 |   ✅   | Bins **`better-seo`** / **`better-seo-cli`** → **`dist/cli.cjs`**; **`run-cli*.test.ts`**, **`run-cli.binary.test.ts`** |
+| README / USAGE / recipe               |   ✅   | **`README.md`**, **`internal-docs/USAGE.md`**, **`docs/recipes/og-wave2.md`**                                           |
 
-**Deferred (not Wave 2):** user-provided **`template`** file path; PRD **`generateIcons`** / **`generateManifest`** → **Wave 3**. Full “before/after” hero imagery → **Wave 4** polish.
+**Deferred (not Wave 2):** user-provided **`template`** file path. Full “before/after” hero imagery → **Wave 4** polish.
 
 ---
 
 ### Wave 3 — Icons + manifest
 
-| Item                   | Status | Evidence |
-| ---------------------- | ------ | -------- |
-| Icons + manifest       | ⬜     |          |
-| CLI `icons` / `splash` | ⬜     |          |
+| Item                               | Status | Evidence                                                                                                                                                                             |
+| ---------------------------------- | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Icon pipeline (Sharp) + faviconICO |   ✅   | **`@better-seo/assets`** `icons/generate-icons.ts`: `icon-{16,32,192,512}.png`, **`apple-touch-icon.png`**, **`maskable-icon.png`**, **`favicon.ico`**; **`generate-icons.test.ts`** |
+| **`manifest.json`** (**A3**)       |   ✅   | **`buildWebAppManifest`**, **`formatWebManifest`**, **`defaultWebManifestIcons`**; CLI writes manifest by default (`--no-manifest` to skip)                                          |
+| CLI **`icons`** (**L2**)           |   ✅   | **`run-cli.ts`** `icons` subcommand; **`run-cli.test.ts`**, **`run-cli.binary.test.ts`**                                                                                             |
+| Docs recipe                        |   ✅   | **`docs/recipes/icons-wave3.md`**, **`docs/recipes/README.md`**                                                                                                                      |
+
+**Deferred:** **`splash`** / rich asset matrix — **Wave 11** (Roadmap §3).
 
 ---
 
 ### Wave 4 — Distribution & polish
 
-| Item                     | Status | Evidence                              |
-| ------------------------ | ------ | ------------------------------------- |
-| npm publish / Changesets | 🟨     | See `PACKAGE.md`                      |
-| README visual proof      | 🟨     | Depends on Wave 2 OG for before/after |
-| Extra examples (D7)      | 🟨     | Only `nextjs-app`                     |
+| Item                     | Status | Evidence                                |
+| ------------------------ | ------ | --------------------------------------- |
+| npm publish / Changesets | 🟨     | See `PACKAGE.md`                        |
+| README visual proof      | 🟨     | OG + icons ready; hero before/after TBD |
+| Extra examples (D7)      | 🟨     | Only `nextjs-app`                       |
 
 ---
 
@@ -121,7 +137,7 @@
 | 8       | Snapshot / preview CLI |   ⬜   | **L5/L6**                                                            |
 | 9       | TUI, init, doctor      |   ⬜   | **L1/L8/L9–L11**                                                     |
 | 10      | add / scan / fix       |   ⬜   | **L3/L4**                                                            |
-| 11      | Design system OG       |   ⬜   | **A5**                                                               |
+| 11      | Design system OG       |   ⬜   | **A5**, **`splash`** depth                                           |
 | 12      | Crawl + migrate        |   ⬜   | `fromNextSeo` throws **MIGRATE_NOT_IMPLEMENTED**                     |
 | Ongoing | Plugins ecosystem      |   ⬜   | **P3/P4**, D8                                                        |
 

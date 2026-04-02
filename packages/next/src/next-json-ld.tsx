@@ -1,5 +1,5 @@
-import { serializeJSONLD } from "better-seo.js"
-import type { SEO } from "better-seo.js"
+import { serializeJSONLD } from "@better-seo/core"
+import type { SEO } from "@better-seo/core"
 
 /** Renders JSON-LD using core `serializeJSONLD` only (FEATURES N4, ARCHITECTURE §7). */
 export function NextJsonLd(props: { readonly seo: SEO }): React.JSX.Element | null {

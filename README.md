@@ -10,7 +10,7 @@
 
 **One place to describe how a page should look to Google, social apps, and structured-data consumers—then map that description to your framework without inventing five parallel sources of truth.**
 
-This repo is a **monorepo**: the published **`better-seo.js`** package is the brain (pure data + rules). **`@better-seo/next`** and future adapters are thin translators to Next, Helmet, Remix, and so on. Heavy work (OG image servers, crawlers, CLIs) stays in optional packages so your Edge bundle never pays for it.
+This repo is a **monorepo**: the published **`@better-seo/core`** package is the brain (pure data + rules). **`@better-seo/next`** and future adapters are thin translators to Next, Helmet, Remix, and so on. Heavy work (OG image servers, crawlers, CLIs) stays in optional packages so your Edge bundle never pays for it.
 
 ---
 
@@ -34,7 +34,7 @@ You describe a page with a small, typed object: title, description, canonical UR
 For **Next.js App Router**, the adapter turns that document into **`Metadata`** for `export const metadata` or `generateMetadata`, and gives you a ready-made **`NextJsonLd`** component so JSON-LD goes through the same **`serializeJSONLD`** path as everything else—not a hand-built string hiding in a template.
 
 ```bash
-npm install better-seo.js @better-seo/next
+npm install @better-seo/core @better-seo/next
 ```
 
 Minimal page (copy-paste friendly):
@@ -43,7 +43,7 @@ Minimal page (copy-paste friendly):
 // app/page.tsx
 import { NextJsonLd } from "@better-seo/next/json-ld"
 import { prepareNextSeo } from "@better-seo/next"
-import { webPage } from "better-seo.js"
+import { webPage } from "@better-seo/core"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
@@ -81,10 +81,10 @@ A full runnable App Router demo with **Playwright** checks lives in **`examples/
 
 ### Optional: OG image generation (Wave 2)
 
-The core stays free of OG renderers. Install **`better-seo-assets`** in Node/build scripts and call **`generateOG`**, or use **`better-seo-cli`**:
+The core stays free of OG renderers. Install **`@better-seo/assets`** in Node/build scripts and call **`generateOG`**, or use **`@better-seo/cli`**:
 
 ```bash
-npx better-seo-cli og "Hello World" -o ./og.png --site-name "My site"
+npx @better-seo/cli og "Hello World" -o ./og.png --site-name "My site"
 ```
 
 Built-in **light** and **dark** card templates; **1200×630** PNG. See **`internal-docs/USAGE.md`** and **`docs/recipes/og-wave2.md`**.
@@ -99,7 +99,7 @@ SEO work splits naturally into three layers:
 2. **Transport** — how does that meaning reach HTML? (Next `Metadata`, `<meta>`, `<script type="application/ld+json">`, or vanilla tag descriptors.)
 3. **Operations** — assets, migrations, crawling, CI “doctor” commands. Important, but not something every serverless function should import.
 
-Most teams accidentally merge (2) and (3) into their React tree. **better-seo.js** keeps (1) in **`better-seo.js`** with **zero runtime npm dependencies**, pushes (2) into **small adapter packages** that depend on your framework as **their** peers, and leaves (3) to optional packages and CLIs that can use Node APIs freely.
+Most teams accidentally merge (2) and (3) into their React tree. **better-seo** keeps (1) in **`@better-seo/core`** with **zero runtime npm dependencies**, pushes (2) into **small adapter packages** that depend on your framework as **their** peers, and leaves (3) to optional packages and CLIs that can use Node APIs freely.
 
 That is how you keep **Edge** and **browser** bundles honest: the core never opens **`fs`**, never reads **`package.json`** at runtime, and never pulls in OG renderers “just because they’re convenient.”
 
@@ -114,7 +114,7 @@ flowchart TB
     B["SEOConfig: baseUrl, titleTemplate, plugins, schemaMerge…"]
   end
 
-  subgraph core ["better-seo.js (core)"]
+  subgraph core ["@better-seo/core"]
     C["createSEO / mergeSEO / withSEO"]
     D["Plugins: beforeMerge / afterMerge"]
     E["Canonical SEO document"]
@@ -144,11 +144,11 @@ flowchart TB
 ```mermaid
 flowchart LR
   subgraph pkgs [Packages you ship or will ship]
-    CORE["better-seo.js\n0 runtime deps"]
+    CORE["@better-seo/core\n0 runtime deps"]
     NEXT["@better-seo/next\npeers: next, react"]
     FUTURE["Future: @better-seo/react,\nremix, astro, …"]
-    ASSETS["better-seo-assets\nOG (Wave 2)"]
-    CLI["better-seo-cli\nog command"]
+    ASSETS["@better-seo/assets\nOG (Wave 2)"]
+    CLI["@better-seo/cli\nog command"]
   end
 
   CORE --> NEXT
@@ -156,17 +156,17 @@ flowchart LR
   CLI -.-> ASSETS
 ```
 
-| Location                         | Role                                                                                                                                                                                   |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`packages/core`**              | npm package **`better-seo.js`**: `createSEO`, `mergeSEO`, `withSEO`, schema builders, `serializeJSONLD`, `renderTags`, validation hooks, adapter registry, plugins, rules, `SEOError`. |
-| **`packages/next`**              | **`@better-seo/next`**: `seo`, `prepareNextSeo`, `withSEO`, `toNextMetadata`, **`@better-seo/next/json-ld`** (`NextJsonLd`). Registers the `"next"` adapter on import.                 |
-| **`examples/nextjs-app`**        | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                                      |
-| **`packages/better-seo-assets`** | **`generateOG`**: Satori + Resvg, light/dark templates (**A1** / PRD §3.7).                                                                                                            |
-| **`packages/better-seo-cli`**    | **`better-seo` / `better-seo-cli` bin**: `og` command (**L2**).                                                                                                                        |
-| **`docs/recipes/`**              | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                                                                                           |
-| **`internal-docs/`**             | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                                                                                         |
+| Location                         | Role                                                                                                                                                                              |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`packages/core`**              | npm **`@better-seo/core`**: `createSEO`, `mergeSEO`, `withSEO`, schema builders, `serializeJSONLD`, `renderTags`, validation hooks, adapter registry, plugins, rules, `SEOError`. |
+| **`packages/next`**              | **`@better-seo/next`**: `seo`, `prepareNextSeo`, `withSEO`, `toNextMetadata`, **`@better-seo/next/json-ld`** (`NextJsonLd`). Registers the `"next"` adapter on import.            |
+| **`examples/nextjs-app`**        | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                                 |
+| **`packages/better-seo-assets`** | **`generateOG`**: Satori + Resvg, light/dark templates (**A1** / PRD §3.7).                                                                                                       |
+| **`packages/better-seo-cli`**    | **`better-seo` / `better-seo-cli` bin**: `og` command (**L2**).                                                                                                                   |
+| **`docs/recipes/`**              | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                                                                                      |
+| **`internal-docs/`**             | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                                                                                    |
 
-Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`better-seo.js`** and feed `serializeJSONLD` yourself—no Next required.
+Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
 
 ---
 
@@ -243,4 +243,4 @@ Licensed under **MIT** — **[`LICENSE`](./LICENSE)**.
 
 ---
 
-**Summary:** treat **`better-seo.js`** as the source of truth for SEO _meaning_, let adapters handle framework _transport_, and keep heavy operational tooling out of the hot path. That is the whole trick—and it stays “plug and play” because **`prepareNextSeo`** and **`seo`** give you a working Next integration in a handful of lines without locking you out of merges, plugins, or structured data later.
+**Summary:** treat **`@better-seo/core`** as the source of truth for SEO _meaning_, let adapters handle framework _transport_, and keep heavy operational tooling out of the hot path. That is the whole trick—and it stays “plug and play” because **`prepareNextSeo`** and **`seo`** give you a working Next integration in a handful of lines without locking you out of merges, plugins, or structured data later.

@@ -27,7 +27,7 @@ function validateJSONLDNode(node: unknown, path = "root"): void {
       // Only allow schema.org context
       if (context !== "https://schema.org" && !context.startsWith("https://schema.org/")) {
         console.warn(
-          `[better-seo.js] Non-standard @context at ${path}: ${context}. ` +
+          `[@better-seo/core] Non-standard @context at ${path}: ${context}. ` +
             "Only https://schema.org is recommended for security.",
         )
       }

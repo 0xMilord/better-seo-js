@@ -113,7 +113,9 @@ export function validateSEO(seo: SEO, options?: ValidateSEOOptions): readonly Va
 
   if (log) {
     for (const i of issues) {
-      console.warn(`[better-seo.js] validateSEO [${i.severity}] ${i.code} ${i.field}: ${i.message}`)
+      console.warn(
+        `[@better-seo/core] validateSEO [${i.severity}] ${i.code} ${i.field}: ${i.message}`,
+      )
     }
   }
 

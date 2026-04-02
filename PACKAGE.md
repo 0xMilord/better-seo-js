@@ -32,11 +32,11 @@ better-seo-js/
 ├── docs/                       # Public-facing stubs (e.g. recipes for N5/N6)
 ├── internal-docs/              # PRD, ARCHITECTURE, FEATURES, Roadmap
 ├── packages/
-│   ├── core/                   # npm: better-seo.js (zero runtime deps); P0 implementation + Vitest
+│   ├── core/                   # npm: @better-seo/core (zero runtime deps); P0 implementation + Vitest
 │   ├── next/                   # npm: @better-seo/next
 │   ├── react/                  # npm: @better-seo/react
-│   ├── assets/                 # npm: better-seo-assets
-│   ├── cli/                    # npm: better-seo-cli (bin)
+│   ├── assets/                 # npm: @better-seo/assets
+│   ├── cli/                    # npm: @better-seo/cli (bin)
 │   └── crawl/                  # npm: better-seo-crawl
 ├── examples/
 │   └── nextjs-app/             # Golden path + Playwright
@@ -52,7 +52,7 @@ better-seo-js/
 └── tsconfig.base.json          # Shared TS compiler defaults (packages extend)
 ```
 
-**Naming:** publish **`better-seo.js`** from `packages/core`, not `@better-seo/core` (see ARCHITECTURE header).
+**Naming:** core ships as **`@better-seo/core`** under the npm org **`@better-seo`** (see `README.md` and `internal-docs/ARCHITECTURE.md`).
 
 ---
 
@@ -126,7 +126,7 @@ We use **[Changesets](https://github.com/changesets/changesets)** so version bum
 
 ### First-time npm publish
 
-Packages must not be **`"private": true"`** if you want **`changeset publish`** to ship them. Today the leaf packages are private until you intentionally flip them and own the **`better-seo.js`** / **`@better-seo/*`** names on npm. Keep **`examples/nextjs-app`** private.
+Packages must not be **`"private": true"`** if you want **`changeset publish`** to ship them. Publishable workspaces are **`@better-seo/core`**, **`@better-seo/next`**, **`@better-seo/assets`**, **`@better-seo/cli`** once you control the org on npm. Keep **`examples/nextjs-app`** private.
 
 ### Contributor flow
 
@@ -172,7 +172,7 @@ Per **PRD**: breaking changes require **`CHANGELOG.md`** entries and, when possi
 
 ### npm (default)
 
-1. **Org / account** on npm for **`better-seo.js`** and **`@better-seo/*`**.
+1. **Org / account** on npm for **`@better-seo/*`** (scoped packages require the org to exist before first publish).
 2. **Automation:** GitHub **Actions** use **`NPM_TOKEN`** (granular **publish** token, **not** your password).
 3. **Provenance** (optional): `npm publish --provenance` on supported npm CLI + linked repo.
 
@@ -284,5 +284,5 @@ Internal specs stay in **`internal-docs/`**; public contributor path starts at *
 
 ## 12. Current repo state
 
-- **P0 / Wave 1 scaffold is present:** **`better-seo.js`** (core), **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Packages stay **`private: true`** at **`0.0.0`** until you cut a release; then remove **`private`** on publishable packages and add Changesets as needed.
+- **P0 / Wave 1 scaffold is present:** **`@better-seo/core`**, **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Versions start at **`0.0.0`** until you run Changesets and publish; **`examples/nextjs-app`** stays **`private: true`**.
 - Replace **`OWNER`** in **SECURITY.md** / **CONTRIBUTING.md** clone URLs with your GitHub org or username after the remote exists.

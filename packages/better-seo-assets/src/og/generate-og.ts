@@ -58,7 +58,7 @@ export async function resolveLogoDataUrl(logo: string | undefined): Promise<stri
   if (t.startsWith("http://") || t.startsWith("https://")) {
     const res = await fetch(t)
     if (!res.ok) {
-      throw new Error(`better-seo-assets: failed to fetch logo (${res.status} ${res.statusText})`)
+      throw new Error(`[@better-seo/assets] failed to fetch logo (${res.status} ${res.statusText})`)
     }
     const buf = Buffer.from(await res.arrayBuffer())
     const ct = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "image/png"
@@ -77,17 +77,17 @@ export async function resolveLogoDataUrl(logo: string | undefined): Promise<stri
 export async function generateOG(config: OGConfig): Promise<Buffer> {
   if (config.template != null && String(config.template).trim() !== "") {
     throw new Error(
-      "better-seo-assets: custom `template` paths are not supported yet. Use `theme`: light | dark | auto.",
+      "[@better-seo/assets] custom `template` paths are not supported yet. Use `theme`: light | dark | auto.",
     )
   }
 
   const title = config.title.trim()
   if (!title) {
-    throw new Error("better-seo-assets: `title` is required.")
+    throw new Error("[@better-seo/assets] `title` is required.")
   }
   const siteName = config.siteName.trim()
   if (!siteName) {
-    throw new Error("better-seo-assets: `siteName` is required.")
+    throw new Error("[@better-seo/assets] `siteName` is required.")
   }
 
   const mode = resolveTheme(config.theme)

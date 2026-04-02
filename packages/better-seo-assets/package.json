@@ -1,7 +1,6 @@
 {
-  "name": "better-seo-assets",
+  "name": "@better-seo/assets",
   "version": "0.0.0",
-  "private": true,
   "description": "Optional OG images and PWA assets for better-seo.js — Roadmap Wave 2 (OG) + Wave 3 (icons)",
   "license": "MIT",
   "type": "module",
@@ -36,6 +35,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",

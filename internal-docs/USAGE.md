@@ -1,11 +1,11 @@
 # Usage & errors — better-seo.js
 
-**Scope:** **`better-seo.js`** (core), **`@better-seo/next`**, and optional **Wave 2** packages **`better-seo-assets`** / **`better-seo-cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
+**Scope:** **`@better-seo/core`**, **`@better-seo/next`**, and optional **Wave 2** packages **`@better-seo/assets`** / **`@better-seo/cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
 
 ## Install (monorepo / local)
 
 ```bash
-npm install better-seo.js
+npm install @better-seo/core
 npm install @better-seo/next
 ```
 
@@ -15,7 +15,7 @@ npm install @better-seo/next
 
 - **`initSEO()`** only sets an in-memory global. Treat it as **Node / local** convenience, not something to rely on in **Edge** or **multi-tenant** servers where requests must stay isolated.
 - In production Edge (middleware, Vercel Edge, Cloudflare Workers), use **`createSEOContext(explicitConfig)`** per request (or per tenant) and call **`ctx.createSEO`** / **`ctx.mergeSEO`**. Pass **`baseUrl`**, **`titleTemplate`**, and **`plugins`** explicitly—no filesystem or `package.json` reads.
-- The default **`better-seo.js`** import path stays **Edge-safe** (no `fs`). A future **`better-seo.js/node`** export (ARCHITECTURE §10) would carry Node-only inference; until then, keep inference out of hot paths.
+- The default **`@better-seo/core`** import path stays **Edge-safe** (no `fs`). A future **`@better-seo/core/node`** export (ARCHITECTURE §10) would carry Node-only inference; until then, keep inference out of hot paths.
 
 ## Next.js App Router — quick start
 
@@ -23,7 +23,7 @@ npm install @better-seo/next
 // app/page.tsx
 import { NextJsonLd } from "@better-seo/next/json-ld"
 import { prepareNextSeo } from "@better-seo/next"
-import { webPage } from "better-seo.js"
+import { webPage } from "@better-seo/core"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
@@ -60,7 +60,7 @@ export const metadata = seo({ title: "Hi", description: "There" })
 ### Layered metadata (`withSEO`)
 
 ```ts
-import { createSEO, mergeSEO } from "better-seo.js"
+import { createSEO, mergeSEO } from "@better-seo/core"
 import { withSEO } from "@better-seo/next"
 
 const seoConfig = { baseUrl: site, titleTemplate: "%s | App" } as const
@@ -107,7 +107,7 @@ Enterprise callers can branch on **`code`** (stable) and log **`message`** (huma
 | `USE_SEO_NOT_AVAILABLE`   | `useSEO()` stub until `@better-seo/react` (Wave 5) |
 
 ```ts
-import { isSEOError, SEOError } from "better-seo.js"
+import { isSEOError, SEOError } from "@better-seo/core"
 
 try {
   createSEO({})
@@ -128,12 +128,12 @@ Returns **`ValidationIssue[]`** with **`code`** (`TITLE_EMPTY`, `DESCRIPTION_MIS
 
 ## Open Graph images (Wave 2 — optional)
 
-**Packages:** **`better-seo-assets`** (library) and **`better-seo-cli`** (CLI). These depend on **Satori**, **Resvg**, **React** (for JSX elements only), and embed **Inter** from **`@fontsource/inter`** (WOFF, not WOFF2 — Satori’s parser requirement).
+**Packages:** **`@better-seo/assets`** (library) and **`@better-seo/cli`** (CLI). These depend on **Satori**, **Resvg**, **React** (for JSX elements only), and embed **Inter** from **`@fontsource/inter`** (WOFF, not WOFF2 — Satori’s parser requirement).
 
 **API:**
 
 ```ts
-import { generateOG } from "better-seo-assets"
+import { generateOG } from "@better-seo/assets"
 import { writeFile } from "node:fs/promises"
 
 const png = await generateOG({
@@ -149,7 +149,7 @@ await writeFile("og.png", png)
 **CLI** (install the workspace package or publish later; global/binary name **`better-seo`**):
 
 ```bash
-npx better-seo-cli og "Hello World" -o ./public/og.png --site-name "Brand"
+npx @better-seo/cli og "Hello World" -o ./public/og.png --site-name "Brand"
 ```
 
 Custom `template` paths are reserved (throws until a later release). Output is always **1200×630** PNG.

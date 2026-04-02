@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createSEO } from "better-seo.js"
+import { createSEO } from "@better-seo/core"
 import { withSEO } from "./surface.js"
 
 describe("withSEO (Next)", () => {

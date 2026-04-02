@@ -8,7 +8,7 @@
 
 ```ts
 import type { Metadata } from "next"
-import { createSEO, webPage } from "better-seo.js"
+import { createSEO, webPage } from "@better-seo/core"
 import { toNextMetadata } from "@better-seo/next"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL!

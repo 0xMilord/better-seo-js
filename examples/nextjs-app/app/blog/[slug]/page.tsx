@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { toNextMetadata } from "@better-seo/next"
-import { article, createSEO } from "better-seo.js"
+import { article, createSEO } from "@better-seo/core"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3000"
 

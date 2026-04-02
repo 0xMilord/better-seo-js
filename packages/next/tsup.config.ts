@@ -8,7 +8,7 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   splitting: false,
-  external: ["next", "react", "react-dom", "better-seo.js"],
+  external: ["next", "react", "react-dom", "@better-seo/core"],
   esbuildOptions(options) {
     options.jsx = "automatic"
   },

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@better-seo/next": "file:../../packages/next",
-    "better-seo.js": "file:../../packages/core",
+    "@better-seo/core": "file:../../packages/core",
     "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

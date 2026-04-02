@@ -1,6 +1,6 @@
 import { NextJsonLd } from "@better-seo/next/json-ld"
 import { prepareNextSeo } from "@better-seo/next"
-import { webPage } from "better-seo.js"
+import { webPage } from "@better-seo/core"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3000"
 

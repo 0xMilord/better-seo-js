@@ -1,6 +1,6 @@
 import { NextJsonLd } from "@better-seo/next/json-ld"
 import { withSEO } from "@better-seo/next"
-import { createSEO, mergeSEO, webPage } from "better-seo.js"
+import { createSEO, mergeSEO, webPage } from "@better-seo/core"
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3000"
 const baseConfig = { baseUrl: site, titleTemplate: "%s | merge demo" } as const

@@ -15,7 +15,7 @@
 Build a parent document once (e.g. in `lib/site-seo.ts` or next to the layout), then in a leaf page:
 
 ```ts
-import { createSEO, mergeSEO, webPage } from "better-seo.js"
+import { createSEO, mergeSEO, webPage } from "@better-seo/core"
 import { withSEO } from "@better-seo/next"
 import { NextJsonLd } from "@better-seo/next/json-ld"
 

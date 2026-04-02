@@ -32,12 +32,12 @@ If a dev can't go from _install → working SEO on a page_ in under **60 seconds
 ### The 60-Second Benchmark
 
 ```bash
-npm install better-seo.js
+npm install @better-seo/core
 ```
 
 ```ts
 // app/page.tsx
-import { seo } from "better-seo.js"
+import { seo } from "@better-seo/core"
 
 export const metadata = seo({ title: "Home" })
 ```
@@ -169,7 +169,7 @@ Adapters implement one **contract**: _normalized `SEO` in → framework-native h
 | P1       | **Remix**                  | `@better-seo/remix` | `meta` / `links` exports                                          |
 | P2       | **Astro**                  | `@better-seo/astro` | Frontmatter + layout integration                                  |
 | P2       | **Nuxt**                   | `@better-seo/nuxt`  | Module + `useHead` bridge                                         |
-| —        | **Vanilla / custom**       | `better-seo.js`     | `renderTags()`, JSON-LD strings                                   |
+| —        | **Vanilla / custom**       | `@better-seo/core`  | `renderTags()`, JSON-LD strings                                   |
 
 ### 2.5 Industry presets (templates)
 
@@ -545,11 +545,11 @@ The **SEO document model** remains the authority for **titles, descriptions, and
 
 ### 3.7 Asset Generation Engine (Separate Module)
 
-**Package:** `better-seo-assets` (optional install)
+**Package:** `@better-seo/assets` (optional install)
 
 ```ts
 // Keep separate from core to maintain 5KB bundle
-import { generateOG, generateIcons, generateManifest } from "better-seo-assets"
+import { generateOG, generateIcons, generateManifest } from "@better-seo/assets"
 ```
 
 #### OG Image Generator
@@ -778,7 +778,7 @@ function inferFromEnv(): string {
 }
 
 // Usage: NO config needed for basic usage (global path)
-import { seo } from "better-seo.js"
+import { seo } from "@better-seo/core"
 export const metadata = seo({ title: "Home" }) // Just works when initSEO ran or inference is allowed
 ```
 
@@ -850,7 +850,7 @@ async function addSEOToPage(
   // Fallback heuristic only when AST path unavailable — document false +/- rates in CLI docs
 
   const injectCode = `
-import { seo } from 'better-seo.js'
+import { seo } from '@better-seo/core'
 export const metadata = seo({ title: "${capitalize(route)}" })
 `
 
@@ -1159,7 +1159,7 @@ export function fromMDX(mdx: MDXFile): Partial<SEO> {
 **Usage:**
 
 ```ts
-import { seo, fromContent, fromMDX } from "better-seo.js"
+import { seo, fromContent, fromMDX } from "@better-seo/core"
 import post from "./my-post.mdx"
 
 export const metadata = seo(fromMDX(post))
@@ -1320,7 +1320,7 @@ Each template provides:
 
 ```ts
 // better-seo.config.ts (blog template)
-import { defineSEO, Article } from "better-seo.js"
+import { defineSEO, Article } from "@better-seo/core"
 
 export default defineSEO({
   template: "blog",
@@ -1480,7 +1480,7 @@ npx better-seo template preview blog
 
 ```ts
 // Core (better-seo.js)
-import { createSEO, mergeSEO, type SEO, type SEOConfig } from "better-seo.js"
+import { createSEO, mergeSEO, type SEO, type SEOConfig } from "@better-seo/core"
 
 // Schema helpers
 import {
@@ -1491,29 +1491,34 @@ import {
   Person,
   BreadcrumbList,
   FAQPage,
-} from "better-seo.js"
+} from "@better-seo/core"
 
 // Adapters
-import { toNextMetadata, toHelmetProps } from "better-seo.js"
+import { toNextMetadata, toHelmetProps } from "@better-seo/core"
 
 // Validation (dev-only)
-import { validateSEO } from "better-seo.js"
+import { validateSEO } from "@better-seo/core"
 
 // Migration
-import { fromNextSeo } from "better-seo.js"
+import { fromNextSeo } from "@better-seo/core"
 
 // Content compiler
-import { fromContent, fromMDX } from "better-seo.js"
+import { fromContent, fromMDX } from "@better-seo/core"
 
 // Assets (better-seo-assets - optional)
-import { generateOG, generateIcons, generateManifest, generateSplash } from "better-seo-assets"
+import { generateOG, generateIcons, generateManifest, generateSplash } from "@better-seo/assets"
 
 // Voilà API (Quick Attach)
-import { seo, withSEO, useSEO, initSEO } from "better-seo.js"
+import { seo, withSEO, useSEO, initSEO } from "@better-seo/core"
 
 // Types & extensibility
-import type { SEORule, SEOPlugin } from "better-seo.js"
-import { registerAdapter, defineSEOPlugin, serializeJSONLD, createSEOContext } from "better-seo.js"
+import type { SEORule, SEOPlugin } from "@better-seo/core"
+import {
+  registerAdapter,
+  defineSEOPlugin,
+  serializeJSONLD,
+  createSEOContext,
+} from "@better-seo/core"
 ```
 
 ### 4.2 Voilà API (Quick Attach)
@@ -1522,7 +1527,7 @@ import { registerAdapter, defineSEOPlugin, serializeJSONLD, createSEOContext } f
 
 ```ts
 // lib/seo.ts
-import { seo } from "better-seo.js"
+import { seo } from "@better-seo/core"
 
 initSEO({
   defaultTitle: "My App",
@@ -1574,7 +1579,7 @@ Internally calls `mergeSEO()` automatically.
 #### React Hook
 
 ```tsx
-import { useSEO } from "better-seo.js"
+import { useSEO } from "@better-seo/core"
 
 function Page() {
   useSEO({ title: "Dashboard" })
@@ -1703,7 +1708,7 @@ npx better-seo fix
 
 ```ts
 // app/page.tsx
-import { createSEO, mergeSEO, toNextMetadata, Article } from "better-seo.js"
+import { createSEO, mergeSEO, toNextMetadata, Article } from "@better-seo/core"
 
 // Layout-level SEO (root layout)
 const layoutSEO = createSEO(
@@ -1767,7 +1772,7 @@ export const metadata = toNextMetadata(pageSEO)
 #### React (React Helmet Async)
 
 ```tsx
-import { createSEO, toHelmetProps } from 'better-seo.js'
+import { createSEO, toHelmetProps } from '@better-seo/core'
 import { Helmet } from 'react-helmet-async'
 
 function Page() {
@@ -1799,7 +1804,7 @@ import { NextSeo } from 'next-seo'
 />
 
 // After (better-seo.js)
-import { createSEO, fromNextSeo } from 'better-seo.js'
+import { createSEO, fromNextSeo } from '@better-seo/core'
 
 // Option 1: Manual migration
 const seo = createSEO({
@@ -1869,7 +1874,7 @@ export default defineSEO({
 })
 
 // app/layout.tsx
-import { createSEO, toNextMetadata } from "better-seo.js"
+import { createSEO, toNextMetadata } from "@better-seo/core"
 import config from "../better-seo.config"
 
 const seo = createSEO(config.meta, {
@@ -2112,7 +2117,7 @@ Waves are **sequenced for risk reduction**, not "MVP vs enterprise": **all capab
 
 ## 7. Competitive Differentiation
 
-| Feature                               | better-seo.js                               | next-seo       | Next.js Metadata |
+| Feature                               | @better-seo/core                            | next-seo       | Next.js Metadata |
 | ------------------------------------- | ------------------------------------------- | -------------- | ---------------- |
 | Unified SEO object                    | ✅                                          | ❌             | ❌               |
 | JSON-LD as primitive                  | ✅                                          | ⚠️ (add-on)    | ❌               |
@@ -2203,7 +2208,7 @@ Make replacement trivial:
 
 ```diff
 - import { NextSeo } from "next-seo"
-+ import { createSEO } from "better-seo.js"
++ import { createSEO } from "@better-seo/core"
 ```
 
 Provide migration guide with direct mappings.
@@ -2329,7 +2334,7 @@ Ship list for **crawl + dedupe + plugins** lives in §3 and **Wave 12**. The fol
 
 | Package          | Name                                       | Import               |
 | ---------------- | ------------------------------------------ | -------------------- |
-| Core             | `better-seo.js`                            | `better-seo.js`      |
+| Core             | `@better-seo/core`                         | `@better-seo/core`   |
 | Adapters         | `@better-seo/next`, `@better-seo/react`, … | Scoped packages      |
 | Crawl (optional) | `better-seo-crawl`                         | Sitemap, robots, RSS |
 | Assets           | `better-seo-assets`                        | `better-seo-assets`  |

@@ -1,10 +1,10 @@
 import { writeFile } from "node:fs/promises"
 import { parseArgs } from "node:util"
-import { generateIcons, generateOG } from "better-seo-assets"
-import type { IconManifestConfig, OGTheme, PwaDisplay } from "better-seo-assets"
+import { generateIcons, generateOG } from "@better-seo/assets"
+import type { IconManifestConfig, OGTheme, PwaDisplay } from "@better-seo/assets"
 
 function printGlobalHelp(): void {
-  console.log(`better-seo — CLI for better-seo.js (optional packages)
+  console.log(`better-seo — CLI for @better-seo (optional packages)
 
 Usage:
   better-seo og <title> [options]
@@ -22,15 +22,15 @@ Usage:
 
 Options:
   --out, -o          Output PNG path (default: og.png)
-  --site-name        Site label in card header (default: "better-seo.js")
+  --site-name        Site label in card header (default: "@better-seo")
   --description, -d  Subtitle text
   --theme            light | dark | auto (default: light; auto → light in Node)
   --logo             Local file path or https URL for the logo image
   --help, -h         Show help
 
 Examples:
-  npx better-seo-cli og "Hello World"
-  npx better-seo-cli og "Ship faster" -o ./public/og.png --site-name "Acme"
+  npx @better-seo/cli og "Hello World"
+  npx @better-seo/cli og "Ship faster" -o ./public/og.png --site-name "Acme"
   npx better-seo og "Hello World"
 `)
 }
@@ -72,7 +72,7 @@ function parseDisplay(s: string | undefined): PwaDisplay {
 
 const ogCommandOptions = {
   out: { type: "string" as const, short: "o", default: "og.png" },
-  "site-name": { type: "string" as const, default: "better-seo.js" },
+  "site-name": { type: "string" as const, default: "@better-seo" },
   description: { type: "string" as const, short: "d" },
   theme: { type: "string" as const },
   logo: { type: "string" as const },
@@ -135,7 +135,7 @@ async function runOg(rest: string[]): Promise<number> {
   }
 
   const out = values.out ?? "og.png"
-  const siteName = values["site-name"] ?? "better-seo.js"
+  const siteName = values["site-name"] ?? "@better-seo"
 
   try {
     const started = performance.now()

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import type { SEO } from "better-seo.js"
+import type { SEO } from "@better-seo/core"
 
 function robotsFromString(robots: string): Metadata["robots"] {
   const lower = robots.toLowerCase()

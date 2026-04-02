@@ -50,11 +50,11 @@ We aim to:
 
 ### Core Package
 
-The **`better-seo.js` core** is designed with **zero runtime npm dependencies** (see [`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)). This minimizes supply chain attack surface.
+The **`@better-seo/core` package** is designed with **zero runtime npm dependencies** (see [`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)). This minimizes supply chain attack surface.
 
 ### Optional Packages
 
-Optional packages (`better-seo-assets`, CLI, adapters) have their own dependency graphs. We run automated checks in CI:
+Optional packages (`@better-seo/assets`, `@better-seo/cli`, adapters) have their own dependency graphs. We run automated checks in CI:
 
 ```yaml
 # Weekly security audits
@@ -68,10 +68,10 @@ After npm publish (Wave 4+), verify packages using:
 
 ```bash
 # Check npm provenance (after enabling)
-npm view better-seo.js --json | jq .attestations
+npm view @better-seo/core --json | jq .attestations
 
 # Verify package contents
-npm pack better-seo.js --dry-run
+npm pack @better-seo/core --dry-run
 ```
 
 ## JSON-LD and HTML Embedding
@@ -81,7 +81,7 @@ npm pack better-seo.js --dry-run
 Consumers **must** use the library's **documented serialization** for structured data:
 
 ```ts
-import { serializeJSONLD } from 'better-seo.js'
+import { serializeJSONLD } from '@better-seo/core'
 
 // ✅ SAFE - Uses proper JSON serialization
 const json = serializeJSONLD(schema)
@@ -109,7 +109,7 @@ See [`SECURITY_AUDIT.md`](./SECURITY_AUDIT.md) §2.1 for detailed analysis.
 When using CMS or user-generated content with JSON-LD:
 
 ```ts
-import { customSchema } from "better-seo.js"
+import { customSchema } from "@better-seo/core"
 import DOMPurify from "dompurify"
 
 // Sanitize HTML content before passing to schema
@@ -149,7 +149,7 @@ For server-side rendering:
 
 ```ts
 // ✅ SAFE - Request-scoped
-import { createSEOContext } from "better-seo.js"
+import { createSEOContext } from "@better-seo/core"
 
 export async function generateMetadata({ params }) {
   const seo = createSEOContext({ baseUrl: process.env.NEXT_PUBLIC_SITE_URL })
@@ -157,7 +157,7 @@ export async function generateMetadata({ params }) {
 }
 
 // ❌ UNSAFE - Global state (don't use in SSR)
-import { initSEO } from "better-seo.js"
+import { initSEO } from "@better-seo/core"
 initSEO({ baseUrl: "..." }) // Can leak between requests!
 ```
 

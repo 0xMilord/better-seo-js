@@ -1,7 +1,6 @@
 {
   "name": "@better-seo/next",
   "version": "0.0.0",
-  "private": true,
   "description": "Next.js adapter for better-seo.js — Metadata, voilà `seo()` — see internal-docs/FEATURES.md N1–N10",
   "license": "MIT",
   "type": "module",
@@ -25,7 +24,7 @@
     "dist"
   ],
   "dependencies": {
-    "better-seo.js": "file:../core"
+    "@better-seo/core": "file:../core"
   },
   "peerDependencies": {
     "next": ">=14.2.0",

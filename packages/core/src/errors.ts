@@ -21,7 +21,7 @@ export class SEOError extends Error {
 
   constructor(code: SEOErrorCode, message?: string, options?: { cause?: unknown }) {
     const base = message ?? messages[code]
-    super(`better-seo.js [${code}]: ${base}`)
+    super(`[@better-seo/core] [${code}]: ${base}`)
     this.name = "SEOError"
     this.code = code
     this.cause = options?.cause

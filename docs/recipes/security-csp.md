@@ -123,7 +123,7 @@ export function middleware(request: NextRequest) {
 
 ```tsx
 // components/json-ld.tsx
-import { serializeJSONLD, type SEO } from "better-seo.js"
+import { serializeJSONLD, type SEO } from "@better-seo/core"
 import { headers } from "next/headers"
 
 export function NextJsonLd({ seo }: { seo: SEO }) {

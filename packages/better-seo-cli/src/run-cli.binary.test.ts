@@ -5,7 +5,7 @@ import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 import { imageSize } from "image-size"
-import { OG_IMAGE_SIZE } from "better-seo-assets"
+import { OG_IMAGE_SIZE } from "@better-seo/assets"
 
 /** Production-style check: built `dist/cli.cjs` (requires `npm run build` first). */
 const cliCjs = fileURLToPath(new URL("../dist/cli.cjs", import.meta.url))
@@ -23,7 +23,7 @@ describe("built better-seo CLI (CJS bin)", () => {
     const buf = readFileSync(out)
     expect(imageSize(buf).width).toBe(OG_IMAGE_SIZE.width)
     expect(imageSize(buf).height).toBe(OG_IMAGE_SIZE.height)
-    unlinkSync(out)
+    rmSync(out, { force: true })
   })
 
   it("runs `icons` and writes favicon.ico", () => {

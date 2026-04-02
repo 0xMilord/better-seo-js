@@ -1,7 +1,6 @@
 {
-  "name": "better-seo.js",
+  "name": "@better-seo/core",
   "version": "0.0.0",
-  "private": true,
   "description": "Zero-runtime-dep SEO document model, merge, JSON-LD serialization — see internal-docs/ARCHITECTURE.md",
   "license": "MIT",
   "type": "module",

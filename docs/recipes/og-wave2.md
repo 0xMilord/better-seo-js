@@ -1,6 +1,6 @@
 # Recipe — Open Graph PNG (Wave 2)
 
-**Packages:** `better-seo-assets`, `better-seo-cli`  
+**Packages:** `@better-seo/assets`, `@better-seo/cli`  
 **Roadmap:** Wave 2 (**A1**, **L2**)
 
 ## CLI (fastest)
@@ -14,14 +14,14 @@ node packages/better-seo-cli/dist/cli.cjs og "My post title" -o ./public/og.png 
 Or with `npx` once published:
 
 ```bash
-npx better-seo-cli og "My post title" -o ./public/og.png
+npx @better-seo/cli og "My post title" -o ./public/og.png
 ```
 
 ## Library (CI / build script)
 
 ```ts
 import { writeFile } from "node:fs/promises"
-import { generateOG } from "better-seo-assets"
+import { generateOG } from "@better-seo/assets"
 
 const png = await generateOG({
   title: "Shipping checklists",

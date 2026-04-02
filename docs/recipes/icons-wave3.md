@@ -1,6 +1,6 @@
 # Recipe — Icons + PWA manifest (Wave 3)
 
-**Packages:** `better-seo-assets`, `better-seo-cli`  
+**Packages:** `@better-seo/assets`, `@better-seo/cli`  
 **Roadmap:** Wave 3 (**A2**, **A3**, **L2**)
 
 ## CLI
@@ -16,7 +16,7 @@ Skip `manifest.json` with `--no-manifest`. Tune PWA fields with `--short-name`, 
 ## Library (build script)
 
 ```ts
-import { generateIcons } from "better-seo-assets"
+import { generateIcons } from "@better-seo/assets"
 
 await generateIcons({
   source: "assets/logo.svg",

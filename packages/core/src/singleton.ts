@@ -31,7 +31,7 @@ export function initSEO(config: SEOConfig): void {
   // Security warning in development
   if (typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
     console.warn(
-      "[better-seo.js] ⚠️ initSEO() uses global state and is NOT safe for " +
+      "[@better-seo/core] ⚠️ initSEO() uses global state and is NOT safe for " +
         "multi-tenant or serverless environments. Use createSEOContext() instead. " +
         "See: https://github.com/OWNER/better-seo-js/blob/main/internal-docs/ARCHITECTURE.md",
     )

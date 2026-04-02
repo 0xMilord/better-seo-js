@@ -27,7 +27,7 @@ function validateAdapterId(id: string): void {
   // Warn on overriding existing adapter (supply chain attack detection)
   if (adapters.has(id)) {
     console.warn(
-      `[better-seo.js] Overriding existing adapter: "${id}". ` +
+      `[@better-seo/core] Overriding existing adapter: "${id}". ` +
         "This may indicate a dependency conflict or malicious package.",
     )
   }
@@ -44,7 +44,7 @@ function validateAdapterId(id: string): void {
  *
  * @example
  * ```ts
- * import { registerAdapter } from 'better-seo.js'
+ * import { registerAdapter } from '@better-seo/core'
  *
  * registerAdapter({
  *   id: 'my-framework',

@@ -1,9 +1,9 @@
-import { mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { imageSize } from "image-size"
-import { OG_IMAGE_SIZE } from "better-seo-assets"
+import { OG_IMAGE_SIZE } from "@better-seo/assets"
 import { runCli } from "./run-cli.js"
 
 const SAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect width="32" height="32" fill="#111"/></svg>`
@@ -22,7 +22,7 @@ describe("runCli", () => {
     created.length = 0
     for (const d of createdDirs) {
       try {
-        rmdirSync(d, { recursive: true })
+        rmSync(d, { recursive: true, force: true })
       } catch {
         /* ignore */
       }

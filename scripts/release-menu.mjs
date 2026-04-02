@@ -30,7 +30,7 @@ function runNpx(args) {
 async function menu() {
   console.log(`
 ╔══════════════════════════════════════════════════════════════════╗
-║  better-seo.js — release (Changesets + npm)                      ║
+║  @better-seo — release (Changesets + npm)                        ║
 ╚══════════════════════════════════════════════════════════════════╝
 
   Typical flow:

@@ -5,7 +5,7 @@ describe("SEOError", () => {
   it("sets code and message prefix", () => {
     const e = new SEOError("VALIDATION", "bad")
     expect(e.code).toBe("VALIDATION")
-    expect(e.message).toMatch(/better-seo\.js \[VALIDATION\]/)
+    expect(e.message).toMatch(/\[@better-seo\/core\] \[VALIDATION\]/)
     expect(e.message).toContain("bad")
   })
 

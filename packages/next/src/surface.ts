@@ -6,7 +6,7 @@ import {
   type SEOConfig,
   type SEOInput,
   withSEO as withSeoCore,
-} from "better-seo.js"
+} from "@better-seo/core"
 import { toNextMetadata } from "./to-next-metadata.js"
 
 /** Voilà: `export const metadata = seo({ title: "..." })` (FEATURES N1). */

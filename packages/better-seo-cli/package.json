@@ -1,7 +1,6 @@
 {
-  "name": "better-seo-cli",
+  "name": "@better-seo/cli",
   "version": "0.0.0",
-  "private": true,
   "description": "CLI for better-seo.js — Wave 2: `og`, Wave 3: `icons` (+ manifest)",
   "license": "MIT",
   "type": "module",
@@ -22,7 +21,7 @@
     "dist"
   ],
   "dependencies": {
-    "better-seo-assets": "file:../better-seo-assets"
+    "@better-seo/assets": "file:../better-seo-assets"
   },
   "scripts": {
     "build": "tsup",
@@ -33,6 +32,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",

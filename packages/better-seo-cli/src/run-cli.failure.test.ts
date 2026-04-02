@@ -3,8 +3,8 @@ import { join } from "node:path"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { runCli } from "./run-cli.js"
 
-vi.mock("better-seo-assets", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("better-seo-assets")>()
+vi.mock("@better-seo/assets", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@better-seo/assets")>()
   return {
     ...actual,
     generateOG: vi.fn().mockRejectedValue(new Error("generateOG failed")),

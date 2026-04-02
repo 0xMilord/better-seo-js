@@ -3,8 +3,10 @@
 export default {
   extends: ["@commitlint/config-conventional"],
   rules: {
-    "body-max-line-length": [2, "always", 200],
-    "header-max-length": [2, "always", 100],
+    // No max length on header / body / footer (team preference; avoid wizard + commitlint fighting).
+    "header-max-length": [0],
+    "body-max-line-length": [0],
+    "footer-max-line-length": [0],
   },
   /* cz-git reads `prompt` from this file when using `npm run commit` */
   prompt: {
@@ -51,8 +53,8 @@ export default {
     customIssuePrefixAlias: "custom",
     allowCustomIssuePrefix: true,
     confirmColorize: true,
-    maxHeaderLength: 200,
-    maxSubjectLength: 100,
+    maxHeaderLength: Number.MAX_SAFE_INTEGER,
+    maxSubjectLength: Number.MAX_SAFE_INTEGER,
     minSubjectLength: 0,
     scopeOverrides: undefined,
     defaultIssues: "",

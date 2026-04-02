@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createSEO, webPage } from "better-seo.js"
+import { createSEO, webPage } from "@better-seo/core"
 import { toNextMetadata } from "./to-next-metadata.js"
 
 describe("toNextMetadata", () => {

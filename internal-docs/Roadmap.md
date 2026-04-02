@@ -11,7 +11,7 @@
 | Gate               | Source                      | Requirement                                                                                                              |
 | ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **Voilà**          | PRD §0                      | `seo({ title })` on **Next.js App Router** in **&lt; 60s** after install (Node reference path).                          |
-| **Zero-dep core**  | ARCHITECTURE §1             | Published **`better-seo.js`**: **`dependencies: {}`** at runtime; no required peers on core.                             |
+| **Zero-dep core**  | ARCHITECTURE §1             | Published **`@better-seo/core`**: **`dependencies: {}`** at runtime; no required peers on core.                          |
 | **One serializer** | ARCHITECTURE §7             | JSON-LD only via **`serializeJSONLD`**; adapters never hand-roll unsafe strings.                                         |
 | **E2E**            | PRD §5 Wave 1, FEATURES N10 | **Playwright** on **`examples/nextjs-app`** in default CI for Next-facing changes.                                       |
 | **Edge-safe**      | ARCHITECTURE §10–§13        | No **`fs` / package.json inference** in Edge bundles; **`createSEOContext` + explicit config** documented for prod/Edge. |
@@ -25,20 +25,20 @@
 
 Approximate **week labels** mirror [`PRD.md`](./PRD.md) §5; calendar is **indicative**—**dependency order** wins.
 
-| Stage    | Wave        | Theme                            | Primary packages                                           |
-| -------- | ----------- | -------------------------------- | ---------------------------------------------------------- |
-| **I**    | **1**       | Core + **Next** + E2E (**gate**) | `better-seo.js`, `@better-seo/next`, `examples/nextjs-app` |
-| **II**   | **2–3**     | Assets flywheel                  | `better-seo-assets`, `better-seo-cli` (og, icons)          |
-| **III**  | **4**       | Distribution & polish            | npm, README, examples, announcement                        |
-| **IV**   | **5**       | Breadth adapters + validation    | `@better-seo/react`, core `renderTags`, `validateSEO`      |
-| **V**    | **6**       | Rules / scale                    | `rules.ts`, N9, pathname recipes                           |
-| **VI**   | **7**       | Content → SEO                    | C16; C17 optional package per ARCHITECTURE                 |
-| **VII**  | **8**       | Trust & debug CLI                | snapshot, preview                                          |
-| **VIII** | **9**       | TUI, `init`, templates, `doctor` | `better-seo-cli`, D\* foundations                          |
-| **IX**   | **10**      | Automation                       | `add`, `scan`, `fix`                                       |
-| **X**    | **11**      | Design system + advanced assets  | A5, custom OG, splash depth                                |
-| **XI**   | **12**      | Crawl + migration + docs finish  | `better-seo-crawl`, `migrate`, L7, docs                    |
-| **—**    | **Ongoing** | Ecosystem                        | P4 packaged plugins, D8 playground, NX2–NX7 depth          |
+| Stage    | Wave        | Theme                            | Primary packages                                              |
+| -------- | ----------- | -------------------------------- | ------------------------------------------------------------- |
+| **I**    | **1**       | Core + **Next** + E2E (**gate**) | `@better-seo/core`, `@better-seo/next`, `examples/nextjs-app` |
+| **II**   | **2–3**     | Assets flywheel                  | `@better-seo/assets`, `@better-seo/cli` (og, icons)           |
+| **III**  | **4**       | Distribution & polish            | npm, README, examples, announcement                           |
+| **IV**   | **5**       | Breadth adapters + validation    | `@better-seo/react`, core `renderTags`, `validateSEO`         |
+| **V**    | **6**       | Rules / scale                    | `rules.ts`, N9, pathname recipes                              |
+| **VI**   | **7**       | Content → SEO                    | C16; C17 optional package per ARCHITECTURE                    |
+| **VII**  | **8**       | Trust & debug CLI                | snapshot, preview                                             |
+| **VIII** | **9**       | TUI, `init`, templates, `doctor` | `@better-seo/cli`, D\* foundations                            |
+| **IX**   | **10**      | Automation                       | `add`, `scan`, `fix`                                          |
+| **X**    | **11**      | Design system + advanced assets  | A5, custom OG, splash depth                                   |
+| **XI**   | **12**      | Crawl + migration + docs finish  | `better-seo-crawl`, `migrate`, L7, docs                       |
+| **—**    | **Ongoing** | Ecosystem                        | P4 packaged plugins, D8 playground, NX2–NX7 depth             |
 
 ---
 
@@ -72,17 +72,17 @@ Approximate **week labels** mirror [`PRD.md`](./PRD.md) §5; calendar is **indic
 
 **Plugin hooks:** ship **minimal `afterMerge`** plus stub or full **`beforeMerge`** in Wave 1 if low cost (PRD **P1** lists both); otherwise **Wave 6** with rules.
 
-**Optional build surface (ARCHITECTURE §10, §12):** plan **`better-seo.js/node`** (inference, zero npm deps, Node builtins) and/or **`better-seo.js/dev`** export for **`validateSEO`**—exact split decided at implementation time; track so Edge bundle never pulls `fs`.
+**Optional build surface (ARCHITECTURE §10, §12):** plan **`@better-seo/core/node`** (inference, zero npm deps, Node builtins) and/or **`@better-seo/core/dev`** export for **`validateSEO`**—exact split decided at implementation time; track so Edge bundle never pulls `fs`.
 
 ---
 
 ### Wave 2 — OG generator (**HOOK**)
 
-| Deliverable                                | Feature IDs |
-| ------------------------------------------ | ----------- |
-| `better-seo-assets` OG (Satori, templates) | A1          |
-| CLI **`og`**                               | L2          |
-| Built-in light/dark templates              | A1          |
+| Deliverable                                 | Feature IDs |
+| ------------------------------------------- | ----------- |
+| `@better-seo/assets` OG (Satori, templates) | A1          |
+| CLI **`og`**                                | L2          |
+| Built-in light/dark templates               | A1          |
 
 ---
 
@@ -279,7 +279,7 @@ These are **not** a separate wave; they gate **quality** on every release.
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **[`FEATURES.md`](./FEATURES.md)** — all IDs **N\***, **C\***, **V\***, **P\***, **NX\***, **A\***, **L\***, **W\***, **D\***, §6 adapters                                  | **Yes**        | **§3–§4** + **§4 traceability**. **N5/N6** now explicit in Wave **1**; **D7** expanded in Wave **4**.                                                                               |
 | **[`PRD.md`](./PRD.md)** — Voilà §0, goals §2, arch §3, API §4, waves §5, metrics §6, GTM §8, risks §9, later §10                                                           | **Yes**        | Waves mirror **PRD §5**; **§6 metrics → §8**; **§7 later = PRD §10**. Non-code items (positioning, competitive table) stay in PRD only—by design.                                   |
-| **[`ARCHITECTURE.md`](./ARCHITECTURE.md)** — zero-dep, serializer, adapter contract, **getAdapter**, TagDescriptor, node/dev entry, runtime matrix, Workers, testing, build | **Yes**        | **§1 gates**, **§5 checklist** updated for **§7–§8, §13**; optional **`better-seo.js/node`** / **`dev`** called out in Wave **1**.                                                  |
+| **[`ARCHITECTURE.md`](./ARCHITECTURE.md)** — zero-dep, serializer, adapter contract, **getAdapter**, TagDescriptor, node/dev entry, runtime matrix, Workers, testing, build | **Yes**        | **§1 gates**, **§5 checklist** updated for **§7–§8, §13**; optional **`@better-seo/core/node`** / **`dev`** called out in Wave **1**.                                               |
 | **Residual naming / spec tension**                                                                                                                                          | **Documented** | **`TechArticle`** (PRD §2.5 vs 7 helpers) → **Wave 12** in **§3**; **import paths** for **`fromMDX`** (PRD example vs **C17** package) → follow **ARCHITECTURE** at implement time. |
 
 **Conclusion:** All **cataloged features** and **architectural constraints** are **represented** on the roadmap; **product narrative-only** sections remain in PRD. The four docs are **aligned** when this file’s **§3–§4** and **§9** stay updated alongside PRD/FEATURES/ARCHITECTURE changes.
@@ -305,7 +305,7 @@ The repository implements the **Wave 1 skeleton** so work stays traceable to [**
 
 | Path                      | Role                                                                                                                                                                                                                                                     |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`packages/core`**       | npm **`better-seo.js`**: zero runtime `dependencies`, **§4** module layout (`types`, `core`, `serialize`, `registry`, `plugins`, `context`, `voila`, …), **Vitest** + **size-limit**.                                                                    |
+| **`packages/core`**       | npm **`@better-seo/core`**: zero runtime `dependencies`, **§4** module layout (`types`, `core`, `serialize`, `registry`, `plugins`, `context`, `voila`, …), **Vitest** + **size-limit**.                                                                 |
 | **`packages/next`**       | **`@better-seo/next`**: `seo()`, `prepareNextSeo`, `toNextMetadata`, **`registerAdapter("next")`**; JSON-LD UI via **`@better-seo/next/json-ld`** (`NextJsonLd`) so App Router metadata stays serializable (no `undefined` fields in static `Metadata`). |
 | **`examples/nextjs-app`** | Golden App Router app + **Playwright** (**N10**).                                                                                                                                                                                                        |
 | **`docs/recipes/`**       | **N5** / **N6** recipes (`n5-layout-page-merge.md`, `n6-generate-metadata-async.md`) + index.                                                                                                                                                            |

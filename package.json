@@ -11,7 +11,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build -w better-seo.js && npm run build -w better-seo-assets && npm run build -w better-seo-cli && npm run build -w @better-seo/next && npm run build -w nextjs-app",
+    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w nextjs-app",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
@@ -30,7 +30,7 @@
     "release:version": "changeset version",
     "release:publish": "npm run ci && changeset publish",
     "prepare": "husky",
-    "size": "npm run size -w better-seo.js"
+    "size": "npm run size -w @better-seo/core"
   },
   "config": {
     "commitizen": {
@@ -39,17 +39,17 @@
     }
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@eslint/js": "^9.21.0",
-    "@size-limit/file": "^11.1.6",
-    "commitizen": "^4.3.1",
-    "cz-git": "^1.12.0",
-    "eslint": "^9.21.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.4.3",
-    "prettier": "^3.5.3",
+    "@changesets/cli": "^2.30.0",
+    "@commitlint/cli": "20.5.0",
+    "@commitlint/config-conventional": "20.5.0",
+    "@eslint/js": "10.0.1",
+    "@size-limit/file": "12.0.1",
+    "commitizen": "4.3.1",
+    "cz-git": "1.12.0",
+    "eslint": "10.1.0",
+    "husky": "9.1.7",
+    "lint-staged": "16.4.0",
+    "prettier": "3.5.3",
     "size-limit": "^11.1.6",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
