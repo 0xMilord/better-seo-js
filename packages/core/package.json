@@ -30,7 +30,7 @@
     "test:coverage": "npm exec -- vitest run --coverage",
     "lint": "npm exec -- eslint .",
     "typecheck": "npm exec -- tsc -p tsconfig.json --noEmit",
-    "size": "npm exec -- size-limit",
+    "size": "node ../../scripts/run-size-limit.mjs",
     "audit": "npm audit --audit-level=high"
   },
   "publishConfig": {

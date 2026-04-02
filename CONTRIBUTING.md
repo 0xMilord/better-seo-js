@@ -21,6 +21,10 @@ npm run test
 
 Keep **`size-limit`** and **`@size-limit/file`** on the **same major** (npm `peer`); mismatched versions break **`npm ci`** in GitHub Actions (**Security**, **Release**, **CI**).
 
+### `package-lock.json` and CI
+
+**Release** and **CI** run **`npm ci`**, which requires **`package-lock.json`** to match **every** workspace **`package.json`**. If you add or bump dependencies, run **`npm install`** at the repo root and **commit the updated lockfile** in the same PR. Otherwise Actions fails with errors like `Invalid: lock file's @types/node@…` or `picomatch@… does not satisfy`.
+
 ## Documentation site (Nextra)
 
 - **Markdown source:** repository-root **`docs/`** (getting started, concepts, API stubs, recipes, CLI, etc.).
