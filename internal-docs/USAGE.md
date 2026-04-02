@@ -111,12 +111,12 @@ Default is both **on** (merge + bridge), matching the PRD “lazy defaults” pa
 
 Enterprise callers can branch on **`code`** (stable) and log **`message`** (human-readable).
 
-| Code                      | When                                               |
-| ------------------------- | -------------------------------------------------- |
-| `VALIDATION`              | Invalid input (e.g. missing `title`)               |
-| `ADAPTER_NOT_FOUND`       | `seoForFramework(id)` with no `registerAdapter`    |
-| `MIGRATE_NOT_IMPLEMENTED` | `fromNextSeo` until Wave 12                        |
-| `USE_SEO_NOT_AVAILABLE`   | `useSEO()` stub until `@better-seo/react` (Wave 5) |
+| Code                    | When                                                            |
+| ----------------------- | --------------------------------------------------------------- |
+| `VALIDATION`            | Invalid input (e.g. missing `title`)                            |
+| `ADAPTER_NOT_FOUND`     | `seoForFramework(id)` with no `registerAdapter`                 |
+| `VALIDATION`            | `fromNextSeo` input could not be mapped (see CLI **`migrate`**) |
+| `USE_SEO_NOT_AVAILABLE` | `useSEO()` stub until `@better-seo/react` (Wave 5)              |
 
 ```ts
 import { isSEOError, SEOError } from "@better-seo/core"

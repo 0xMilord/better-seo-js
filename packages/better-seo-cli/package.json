@@ -21,7 +21,9 @@
     "dist"
   ],
   "dependencies": {
-    "@better-seo/assets": "0.0.1"
+    "@better-seo/assets": "0.0.1",
+    "@clack/prompts": "^1.2.0",
+    "better-seo-crawl": "0.0.1"
   },
   "scripts": {
     "build": "tsup",

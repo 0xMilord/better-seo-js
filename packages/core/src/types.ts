@@ -20,6 +20,31 @@ export interface SEOPlugin {
   readonly id: string
   readonly beforeMerge?: (draft: SEOInput, ctx: { readonly config?: SEOConfig }) => SEOInput
   readonly afterMerge?: (seo: SEO, ctx: { readonly config?: SEOConfig }) => SEO
+  /**
+   * Runs after built-in `renderTags` output; only invoked when `renderTags(seo, config)` is called with `config` (plugins come from `config.plugins`).
+   */
+  readonly onRenderTags?: (
+    tags: readonly TagDescriptor[],
+    ctx: { readonly seo: SEO; readonly config?: SEOConfig },
+  ) => readonly TagDescriptor[]
+}
+
+/**
+ * Search-console verification tokens (aligned with Next.js `Metadata.verification`).
+ * Renders `<meta name="…" content="…">` via {@link renderTags}.
+ */
+export interface SEOVerification {
+  readonly google?: string
+  readonly yahoo?: string
+  readonly yandex?: string
+  readonly me?: string
+  readonly other?: Readonly<Record<string, string>>
+}
+
+/** Pagination `rel="prev"` / `rel="next"` (aligned with Next.js `Metadata.pagination`). */
+export interface SEOPagination {
+  readonly previous?: string
+  readonly next?: string
 }
 
 export interface SEOConfig {
@@ -46,6 +71,8 @@ export interface SEOMeta {
   readonly canonical?: string
   readonly robots?: string
   readonly alternates?: SEOAlternates
+  readonly verification?: SEOVerification
+  readonly pagination?: SEOPagination
 }
 
 export interface SEOImage {

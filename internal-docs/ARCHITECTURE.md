@@ -85,8 +85,8 @@ Partial<SEO> + SEOConfig
 | **`@better-seo/react`**                                                  | React Helmet / head props                                                                                                     | **peers: `@better-seo/core`, `react`, `react-helmet-async`** (exact peers TBD) |
 | **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same pattern: thin mapping + peers                                                                                            | Framework peers only                                                           |
 | **`@better-seo/assets`**                                                 | OG (Satori, etc.), Sharp-based icons — **heavy**                                                                              | Own deps OK; **not** imported by core                                          |
-| **`@better-seo/cli`**                                                    | Init, scan, migrate, doctor, calls into assets                                                                                | CLI deps OK (inquirer, etc.)                                                   |
-| **`better-seo-crawl`**                                                   | Sitemap, robots, RSS — may use Node APIs                                                                                      | May depend on **`@better-seo/core`** only                                      |
+| **`@better-seo/cli`**                                                    | **`og`**, **`icons`**, **`doctor`**, **`init`**, **`migrate`** (hints) + assets                                               | CLI deps OK; **not** imported by core                                          |
+| **`better-seo-crawl`**                                                   | Pure robots / sitemap XML builders (+ URL hint helper); RSS later                                                             | **`@better-seo/core`** only                                                    |
 
 **Rule:** `@better-seo/core` MUST NOT import from `@better-seo/next`, `@better-seo/assets`, or `@better-seo/cli`. The dependency arrow is **always toward core**.
 
@@ -110,7 +110,8 @@ packages/core/    # npm: @better-seo/core
 │   ├── singleton.ts       # initSEO, getGlobalConfig (Node-oriented; document limitations)
 │   ├── voila.ts           # seo(), thin orchestration → create + adapter
 │   ├── rules.ts           # applyRules (pure: glob + route string)
-│   ├── migrate.ts         # fromNextSeo (pure transforms preferred)
+│   ├── migrate.ts         # fromNextSeo (next-seo-shaped props → SEOInput)
+│   ├── node.ts            # optional entry: package.json / env inference (Node builtins)
 │   └── index.ts           # public exports only
 ├── package.json           # "dependencies": {}
 └── README.md
@@ -221,17 +222,17 @@ Plugins are **user-supplied** objects with stable **`id`** and optional hooks. T
 
 ## 10. Configuration & inference
 
-| Mode                           | Where config comes from        | Allowed mechanisms                                                                                                                                              |
-| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Explicit**                   | Caller passes `SEOConfig`      | Always allowed                                                                                                                                                  |
-| **`createSEOContext(config)`** | Per request / per tenant       | **Required** on Edge & multi-tenant                                                                                                                             |
-| **`initSEO()` global**         | Process-wide default           | **Node only**; acceptable for quick start                                                                                                                       |
-| **Inference**                  | `package.json` / `process.env` | Implemented in **`singleton.ts`** using **dynamic `require`/`fs`** only behind `typeof window === 'undefined'` checks **and** not bundled for Edge entry points |
+| Mode                           | Where config comes from        | Allowed mechanisms                                                                                                                                                            |
+| ------------------------------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Explicit**                   | Caller passes `SEOConfig`      | Always allowed                                                                                                                                                                |
+| **`createSEOContext(config)`** | Per request / per tenant       | **Required** on Edge & multi-tenant                                                                                                                                           |
+| **`initSEO()` global**         | Process-wide default           | **Node only**; acceptable for quick start                                                                                                                                     |
+| **Inference**                  | `package.json` / `process.env` | **`import "@better-seo/core/node"`** — `readPackageJsonForSEO` / `inferSEOConfigFromEnvAndPackageJson` / `initSEOFromPackageJson` (never import this entry from Edge bundles) |
 
 **Build-time rule:** publish **multiple entry points** if needed:
 
 - **`@better-seo/core`** — browser/Edge-safe subset (no `fs`, no `path` resolution of `package.json`).
-- **`@better-seo/core/node`** (optional) — inference + `initSEO` with filesystem (still **zero deps**, only Node builtins).
+- **`@better-seo/core/node`** — **published**: `readPackageJsonForSEO`, **`inferSEOConfigFromEnvAndPackageJson`**, **`initSEOFromPackageJson`** (still **zero npm deps**, Node builtins only).
 
 If a single entry is preferred, **tree-shaking** + guarded lazy `require` is acceptable only if proven safe for Next Edge bundles (tests required).
 

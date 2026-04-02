@@ -17,4 +17,4 @@ npm install
 npm run demo
 ```
 
-No bundler required — **ESM** + Node 20+. See **[`docs/recipes/README.md`](../../docs/recipes/README.md)** and **[`internal-docs/ARCHITECTURE.md`](../../internal-docs/ARCHITECTURE.md)** §8 (`TagDescriptor[]`).
+No bundler required — **ESM** + Node 20+. See **[`docs/recipes/README.md`](../../docs/recipes/README.md)** and **`@better-seo/core`** `renderTags` / `TagDescriptor` in the package source.

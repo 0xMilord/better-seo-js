@@ -57,6 +57,21 @@ describe("mergeSEO", () => {
     })
   })
 
+  it("deep-merges meta.verification.other", () => {
+    const parent = createSEO({
+      title: "P",
+      meta: { verification: { google: "g1", other: { aa: "1" } } },
+    })
+    const next = mergeSEO(parent, {
+      meta: { verification: { yandex: "y1", other: { bb: "2" } } },
+    })
+    expect(next.meta.verification).toEqual({
+      google: "g1",
+      yandex: "y1",
+      other: { aa: "1", bb: "2" },
+    })
+  })
+
   it("concatenates schema", () => {
     const parent = createSEO({
       title: "P",

@@ -1,8 +1,36 @@
-import type { SEO, TagDescriptor } from "./types.js"
+import type { SEO, SEOConfig, TagDescriptor } from "./types.js"
 import { serializeJSONLD } from "./serialize.js"
+import { runOnRenderTagPlugins } from "./plugins.js"
+
+/** Meta `name` for verification keys — aligned with Next.js output (see `metadata.generate/basic`). */
+function verificationMetaName(key: string): string {
+  if (key === "google") return "google-site-verification"
+  if (key === "yahoo") return "y_key"
+  if (key === "yandex") return "yandex-verification"
+  if (key === "me") return "me"
+  return key
+}
+
+function pushVerificationMeta(
+  tags: TagDescriptor[],
+  v: NonNullable<SEO["meta"]["verification"]>,
+): void {
+  const add = (name: string, content: string) => {
+    tags.push({ kind: "meta", name, content })
+  }
+  if (v.google) add(verificationMetaName("google"), v.google)
+  if (v.yahoo) add(verificationMetaName("yahoo"), v.yahoo)
+  if (v.yandex) add(verificationMetaName("yandex"), v.yandex)
+  if (v.me) add(verificationMetaName("me"), v.me)
+  if (v.other) {
+    for (const [k, val] of Object.entries(v.other)) {
+      add(verificationMetaName(k), val)
+    }
+  }
+}
 
 /** Vanilla tag list for snapshots and non-framework hosts (ARCHITECTURE §8). */
-export function renderTags(seo: SEO): TagDescriptor[] {
+export function renderTags(seo: SEO, config?: SEOConfig): TagDescriptor[] {
   const tags: TagDescriptor[] = []
   tags.push({ kind: "meta", name: "title", content: seo.meta.title })
   if (seo.meta.description) {
@@ -13,6 +41,16 @@ export function renderTags(seo: SEO): TagDescriptor[] {
   }
   if (seo.meta.robots) {
     tags.push({ kind: "meta", name: "robots", content: seo.meta.robots })
+  }
+  if (seo.meta.verification) {
+    pushVerificationMeta(tags, seo.meta.verification)
+  }
+  const pag = seo.meta.pagination
+  if (pag?.previous) {
+    tags.push({ kind: "link", rel: "prev", href: pag.previous })
+  }
+  if (pag?.next) {
+    tags.push({ kind: "link", rel: "next", href: pag.next })
   }
   const langs = seo.meta.alternates?.languages
   if (langs) {
@@ -60,5 +98,5 @@ export function renderTags(seo: SEO): TagDescriptor[] {
   for (const node of seo.schema) {
     tags.push({ kind: "script-jsonld", json: serializeJSONLD(node) })
   }
-  return tags
+  return runOnRenderTagPlugins(tags, seo, config)
 }

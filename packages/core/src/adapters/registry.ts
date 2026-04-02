@@ -68,3 +68,17 @@ export function getAdapter<T = unknown>(id: string): SEOAdapter<T> | undefined {
 export function listAdapterIds(): string[] {
   return [...adapters.keys()]
 }
+
+/**
+ * Best-effort only (e.g. `NEXT_RUNTIME` under Next). Prefer explicit `registerAdapter` / `@better-seo/<framework>` imports in production.
+ */
+export function detectFramework(): "next" | undefined {
+  if (typeof process === "undefined" || !process.env) return undefined
+  if (process.env.NEXT_RUNTIME) return "next"
+  return undefined
+}
+
+export function getDefaultAdapter<T = unknown>(): SEOAdapter<T> | undefined {
+  const id = detectFramework()
+  return id ? getAdapter<T>(id) : undefined
+}

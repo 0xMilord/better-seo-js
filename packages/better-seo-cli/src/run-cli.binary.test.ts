@@ -43,4 +43,31 @@ describe("built better-seo CLI (CJS bin)", () => {
     rmSync(outDir, { recursive: true, force: true })
     rmSync(src, { force: true })
   })
+
+  it("runs `crawl robots` and writes robots.txt", () => {
+    const out = join(tmpdir(), `better-seo-robots-${Date.now()}.txt`)
+    execFileSync(
+      process.execPath,
+      [cliCjs, "crawl", "robots", "--out", out, "--sitemap", "https://example.com/sitemap.xml"],
+      { stdio: "pipe" },
+    )
+    const text = readFileSync(out, "utf8")
+    expect(text).toContain("Sitemap: https://example.com/sitemap.xml")
+    rmSync(out, { force: true })
+  })
+
+  it("runs `crawl sitemap` and writes sitemap.xml", () => {
+    const out = join(tmpdir(), `better-seo-sitemap-${Date.now()}.xml`)
+    execFileSync(
+      process.execPath,
+      [cliCjs, "crawl", "sitemap", "--out", out, "--loc", "https://a.test/"],
+      {
+        stdio: "pipe",
+      },
+    )
+    const xml = readFileSync(out, "utf8")
+    expect(xml).toContain("<urlset")
+    expect(xml).toContain("https://a.test/</loc>")
+    rmSync(out, { force: true })
+  })
 })

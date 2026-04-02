@@ -6,7 +6,7 @@
 
 Framework-agnostic SEO **document model** for JavaScript and TypeScript: merge partial inputs into a canonical **`SEO`**, serialize HTML-safe **JSON-LD**, validate in development, render vanilla **tag descriptors**, and register framework adapters. **Zero runtime npm dependencies** so Node, Edge, and browser bundles stay light.
 
-**Docs:** [Monorepo README](../../README.md) · [Usage & errors](../../internal-docs/USAGE.md) · [Architecture](../../internal-docs/ARCHITECTURE.md) · [FEATURES — C\* IDs](../../internal-docs/FEATURES.md)
+**Docs:** [Monorepo README](../../README.md) · [Recipes](../../docs/recipes/) · [CONTRIBUTING](../../CONTRIBUTING.md)
 
 ---
 

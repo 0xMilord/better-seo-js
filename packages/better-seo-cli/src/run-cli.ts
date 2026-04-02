@@ -1,17 +1,38 @@
 import { mkdir, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
 import { parseArgs } from "node:util"
-import { generateIcons, generateOG } from "@better-seo/assets"
 import type { IconManifestConfig, OGTheme, PwaDisplay } from "@better-seo/assets"
+import { renderRobotsTxt, renderSitemapXml } from "better-seo-crawl"
+import { executeIcons, executeOg, parseDisplayString, parseThemeString } from "./cli-execute.js"
+import { runDoctor, runInit, runMigrate } from "./cli-subcommands.js"
+import { runInteractiveLauncher, shouldOfferTui } from "./launch-interactive.js"
 
 function printGlobalHelp(): void {
   console.log(`better-seo — CLI for @better-seo (optional packages)
 
-Usage:
-  better-seo og <title> [options]
-  better-seo icons <source> [options]
+Interactive: run better-seo with no subcommand in a TTY (not in CI) for a guided menu.
 
-Run better-seo og --help or better-seo icons --help for command options.
+Non-interactive: subcommands and flags. Use --no-interactive / -y before the subcommand, or set CI=true.
+
+Commands:
+  og <title>              Generate a 1200×630 Open Graph PNG
+  icons <file>            Generate favicon / PWA icons (+ optional manifest.json)
+  crawl robots|sitemap    Write robots.txt / sitemap.xml (better-seo-crawl)
+  doctor                  Basic environment check (--json)
+  init                    Print install + starter snippet (--framework next|react)
+  migrate                 Migration hints (e.g. from-next-seo)
+
+Usage:
+  better-seo
+  better-seo og <title> [options]
+  better-seo icons <source.{svg,png,...}> [options]
+  better-seo crawl robots [--out path] [--sitemap url]...
+  better-seo crawl sitemap [--out path] --loc url [--loc url]...
+  better-seo doctor [--json]
+  better-seo init [--framework next|react]
+  better-seo migrate from-next-seo
+
+Run:  better-seo og --help    or    better-seo icons --help
 `)
 }
 
@@ -61,16 +82,28 @@ Examples:
 `)
 }
 
-function parseTheme(s: string | undefined): OGTheme | undefined {
-  if (s === undefined) return undefined
-  if (s === "light" || s === "dark" || s === "auto") return s
-  throw new Error(`Invalid --theme "${s}". Use light, dark, or auto.`)
-}
+function printCrawlHelp(): void {
+  console.log(`Crawl helpers (better-seo-crawl) — write strings to disk.
 
-function parseDisplay(s: string | undefined): PwaDisplay {
-  if (s === undefined) return "standalone"
-  if (s === "standalone" || s === "minimal-ui" || s === "browser") return s
-  throw new Error(`Invalid --display "${s}". Use standalone, minimal-ui, or browser.`)
+Usage:
+  better-seo crawl robots [options]
+  better-seo crawl sitemap [options]
+
+robots options:
+  --out, -o           Output path (default: public/robots.txt)
+  --sitemap           Sitemap URL (repeatable)
+  --host              Optional Host: line
+  --help, -h
+
+sitemap options:
+  --out, -o           Output path (default: public/sitemap.xml)
+  --loc               Page URL (repeatable, required)
+  --help, -h
+
+Examples:
+  better-seo crawl robots -o public/robots.txt --sitemap https://example.com/sitemap.xml
+  better-seo crawl sitemap --loc https://example.com/ --loc https://example.com/about
+`)
 }
 
 const ogCommandOptions = {
@@ -95,7 +128,30 @@ const iconsCommandOptions = {
   help: { type: "boolean" as const, short: "h", default: false },
 }
 
+function asStringArray(v: string | string[] | undefined): string[] | undefined {
+  if (v === undefined) return undefined
+  return Array.isArray(v) ? v : [v]
+}
+
+function peelLeadingGlobalFlags(argv: readonly string[]): {
+  forceNonInteractive: boolean
+  rest: string[]
+} {
+  let forceNonInteractive = false
+  const rest: string[] = []
+  for (let i = 2; i < argv.length; i++) {
+    const a = argv[i]!
+    if (a === "--no-interactive" || a === "-y" || a === "--yes") {
+      forceNonInteractive = true
+      continue
+    }
+    rest.push(a)
+  }
+  return { forceNonInteractive, rest }
+}
+
 async function runOg(rest: string[]): Promise<number> {
+  let positionals: string[]
   let values: {
     out?: string
     "site-name"?: string
@@ -105,8 +161,6 @@ async function runOg(rest: string[]): Promise<number> {
     template?: string
     help?: boolean
   }
-  let positionals: string[]
-
   try {
     const parsed = parseArgs({
       args: rest,
@@ -133,34 +187,21 @@ async function runOg(rest: string[]): Promise<number> {
 
   let theme: OGTheme | undefined
   try {
-    theme = parseTheme(values.theme)
+    theme = parseThemeString(values.theme)
   } catch (e) {
     console.error(e instanceof Error ? e.message : e)
     return 1
   }
 
-  const out = values.out ?? "og.png"
-  const siteName = values["site-name"] ?? "@better-seo"
-
-  try {
-    const started = performance.now()
-    const png = await generateOG({
-      title,
-      siteName,
-      ...(values.description !== undefined ? { description: values.description } : {}),
-      ...(theme !== undefined ? { theme } : {}),
-      ...(values.logo !== undefined ? { logo: values.logo } : {}),
-      ...(values.template !== undefined ? { template: values.template } : {}),
-    })
-    await mkdir(dirname(out), { recursive: true })
-    await writeFile(out, png)
-    const ms = Math.round(performance.now() - started)
-    console.log(`Wrote ${out} (${png.byteLength} bytes) in ${ms}ms`)
-    return 0
-  } catch (e) {
-    console.error(e instanceof Error ? e.message : e)
-    return 1
-  }
+  return executeOg({
+    title,
+    out: values.out,
+    siteName: values["site-name"],
+    description: values.description,
+    theme,
+    logo: values.logo,
+    template: values.template,
+  })
 }
 
 async function runIcons(rest: string[]): Promise<number> {
@@ -203,13 +244,12 @@ async function runIcons(rest: string[]): Promise<number> {
 
   let display: PwaDisplay
   try {
-    display = parseDisplay(values.display)
+    display = parseDisplayString(values.display)
   } catch (e) {
     console.error(e instanceof Error ? e.message : e)
     return 1
   }
 
-  const outputDir = values.output ?? "public"
   const name = values.name ?? "App"
   const shortName = values["short-name"] ?? name
   const startUrl = values["start-url"] ?? "/"
@@ -223,19 +263,40 @@ async function runIcons(rest: string[]): Promise<number> {
     ...(values.bg !== undefined ? { backgroundColor: values.bg } : {}),
   }
 
+  return executeIcons({
+    source,
+    outputDir: values.output,
+    backgroundColor: values.bg,
+    omitManifest: values["no-manifest"] === true,
+    ...(values["no-manifest"] !== true ? { manifest: manifestBase } : {}),
+  })
+}
+
+async function runCrawlRobots(rest: string[]): Promise<number> {
   try {
-    const started = performance.now()
-    const written = await generateIcons({
-      source,
-      outputDir,
-      ...(values.bg !== undefined ? { backgroundColor: values.bg } : {}),
-      ...(values["no-manifest"] === true ? {} : { manifest: manifestBase }),
+    const { values } = parseArgs({
+      args: rest,
+      options: {
+        out: { type: "string" as const, short: "o", default: "public/robots.txt" },
+        sitemap: { type: "string" as const, multiple: true },
+        host: { type: "string" as const },
+        help: { type: "boolean" as const, short: "h", default: false },
+      },
+      allowPositionals: false,
     })
-    const ms = Math.round(performance.now() - started)
-    for (const f of written) {
-      console.log(`Wrote ${outputDir}/${f.fileName} (${f.bytesWritten} bytes)`)
+    if (values.help) {
+      printCrawlHelp()
+      return 0
     }
-    console.log(`Done in ${ms}ms`)
+    const out = values.out ?? "public/robots.txt"
+    const maps = asStringArray(values.sitemap)
+    const body = renderRobotsTxt({
+      ...(maps?.length ? { sitemap: maps.filter((u) => u.trim()) } : {}),
+      ...(values.host?.trim() ? { host: values.host.trim() } : {}),
+    })
+    await mkdir(dirname(out), { recursive: true })
+    await writeFile(out, body, "utf8")
+    console.log(`Wrote ${out} (${body.length} chars)`)
     return 0
   } catch (e) {
     console.error(e instanceof Error ? e.message : e)
@@ -243,13 +304,74 @@ async function runIcons(rest: string[]): Promise<number> {
   }
 }
 
+async function runCrawlSitemap(rest: string[]): Promise<number> {
+  try {
+    const { values } = parseArgs({
+      args: rest,
+      options: {
+        out: { type: "string" as const, short: "o", default: "public/sitemap.xml" },
+        loc: { type: "string" as const, multiple: true },
+        help: { type: "boolean" as const, short: "h", default: false },
+      },
+      allowPositionals: false,
+    })
+    if (values.help) {
+      printCrawlHelp()
+      return 0
+    }
+    const list = asStringArray(values.loc) ?? []
+    const trimmed = list.map((u) => u.trim()).filter(Boolean)
+    if (!trimmed.length) {
+      console.error(
+        "Missing --loc (repeat per URL). Example: better-seo crawl sitemap --loc https://example.com/",
+      )
+      return 1
+    }
+    const out = values.out ?? "public/sitemap.xml"
+    const xml = renderSitemapXml(trimmed.map((loc) => ({ loc })))
+    await mkdir(dirname(out), { recursive: true })
+    await writeFile(out, xml, "utf8")
+    console.log(`Wrote ${out} (${xml.length} chars)`)
+    return 0
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e)
+    return 1
+  }
+}
+
+async function runCrawl(rest: string[]): Promise<number> {
+  const sub = rest[0]
+  const tail = rest.slice(1)
+  if (sub === undefined || sub === "-h" || sub === "--help") {
+    printCrawlHelp()
+    return sub === undefined ? 1 : 0
+  }
+  if (sub === "robots") return runCrawlRobots(tail)
+  if (sub === "sitemap") return runCrawlSitemap(tail)
+  console.error(`Unknown crawl subcommand "${sub}". Use: robots | sitemap`)
+  return 1
+}
+
+/** Re-export for programmatic use / tests. */
+export { runDoctor, runInit, runMigrate }
+
+function printUnknown(program: string): void {
+  console.error(
+    `Unknown command "${program}". Expected: og | icons | crawl | doctor | init | migrate  (better-seo --help)`,
+  )
+}
+
 /**
  * Main entry for tests and the `better-seo` bin. Returns process exit code.
  */
 export async function runCli(argv: readonly string[]): Promise<number> {
-  const program = argv[2]
+  const { forceNonInteractive, rest } = peelLeadingGlobalFlags(argv)
+  const program = rest[0]
 
   if (program === undefined) {
+    if (shouldOfferTui(forceNonInteractive)) {
+      return runInteractiveLauncher()
+    }
     printGlobalHelp()
     return 1
   }
@@ -260,13 +382,29 @@ export async function runCli(argv: readonly string[]): Promise<number> {
   }
 
   if (program === "og") {
-    return runOg(argv.slice(3))
+    return runOg(rest.slice(1))
   }
 
   if (program === "icons") {
-    return runIcons(argv.slice(3))
+    return runIcons(rest.slice(1))
   }
 
-  console.error(`Unknown command "${program}". Run better-seo --help.`)
+  if (program === "crawl") {
+    return runCrawl(rest.slice(1))
+  }
+
+  if (program === "doctor") {
+    return runDoctor(rest.slice(1))
+  }
+
+  if (program === "init") {
+    return runInit(rest.slice(1))
+  }
+
+  if (program === "migrate") {
+    return runMigrate(rest.slice(1))
+  }
+
+  printUnknown(program)
   return 1
 }

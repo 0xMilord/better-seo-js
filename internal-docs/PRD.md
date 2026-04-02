@@ -32,17 +32,17 @@ If a dev can't go from _install → working SEO on a page_ in under **60 seconds
 ### The 60-Second Benchmark
 
 ```bash
-npm install @better-seo/core
+npm install @better-seo/core @better-seo/next
 ```
 
 ```ts
-// app/page.tsx
-import { seo } from "@better-seo/core"
+// app/page.tsx (Next.js App Router)
+import { seo } from "@better-seo/next"
 
 export const metadata = seo({ title: "Home" })
 ```
 
-**It must just work.**
+**It must just work.** (`@better-seo/core` is the zero-dep engine; **`@better-seo/next`** registers the adapter and exports the **`seo()`** voilà for `Metadata`.)
 
 No config ceremony. No mental overhead. No "where does this go?"
 
@@ -50,11 +50,11 @@ No config ceremony. No mental overhead. No "where does this go?"
 
 ### The 3 Levels of Effort (Same API, Different Depth)
 
-| Level         | Code                                                                            | Use Case               |
-| ------------- | ------------------------------------------------------------------------------- | ---------------------- |
-| 🟢 **Lazy**   | `export const metadata = seo()`                                                 | Auto-infers from route |
-| 🟡 **Normal** | `export const metadata = seo({ title: "Dashboard" })`                           | Override title         |
-| 🔴 **Power**  | `export const metadata = seo({ meta: {...}, openGraph: {...}, schema: [...] })` | Full control           |
+| Level         | Code                                                                                          | Use Case                                                                      |
+| ------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 🟢 **Lazy**   | `export const metadata = seo({ title: "…" })` with optional `@better-seo/core/node` inference | Defaults from env + **package.json** (Node); explicit title still recommended |
+| 🟡 **Normal** | `export const metadata = seo({ title: "Dashboard" })`                                         | Override title                                                                |
+| 🔴 **Power**  | `export const metadata = seo({ meta: {...}, openGraph: {...}, schema: [...] })`               | Full control                                                                  |
 
 ---
 

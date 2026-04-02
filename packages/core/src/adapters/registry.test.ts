@@ -1,11 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { createSEO } from "../core.js"
 import { SEOError } from "../errors.js"
-import { getAdapter, listAdapterIds, registerAdapter } from "./registry.js"
+import {
+  detectFramework,
+  getAdapter,
+  getDefaultAdapter,
+  listAdapterIds,
+  registerAdapter,
+} from "./registry.js"
 
 describe("adapter registry", () => {
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllEnvs()
   })
 
   it("registers and retrieves by id", () => {
@@ -40,6 +47,19 @@ describe("adapter registry", () => {
     expect(warn).toHaveBeenCalled()
     expect(getAdapter<{ v: number }>(id)?.toFramework(createSEO({ title: "x" }))).toEqual({
       v: 2,
+    })
+  })
+
+  it("detectFramework returns next when NEXT_RUNTIME is set", () => {
+    vi.stubEnv("NEXT_RUNTIME", "edge")
+    expect(detectFramework()).toBe("next")
+  })
+
+  it("getDefaultAdapter returns registered adapter for detected framework", () => {
+    registerAdapter({ id: "next", toFramework: () => ({ ok: true }) })
+    vi.stubEnv("NEXT_RUNTIME", "edge")
+    expect(getDefaultAdapter<{ ok: boolean }>()?.toFramework(createSEO({ title: "x" }))).toEqual({
+      ok: true,
     })
   })
 })

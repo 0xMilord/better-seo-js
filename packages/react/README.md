@@ -7,7 +7,7 @@
 
 **Peers:** `react` **≥ 18.2**, `react-dom`, `react-helmet-async` **≥ 2** (v **3** tested).
 
-**Docs:** [Recipe](../../docs/recipes/react-wave5.md) · [Usage — React](../../internal-docs/USAGE.md#react-spa--vite) · [Monorepo README](../../README.md)
+**Docs:** [Recipe](../../docs/recipes/react-wave5.md) · [Monorepo README](../../README.md) · [CONTRIBUTING](../../CONTRIBUTING.md) (contributor setup)
 
 ---
 

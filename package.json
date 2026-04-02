@@ -12,7 +12,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w @better-seo/react && npm run build -w nextjs-app && npm run build -w react-seo-vite-example",
+    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w better-seo-crawl && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w @better-seo/react && npm run build -w nextjs-app && npm run build -w react-seo-vite-example",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",

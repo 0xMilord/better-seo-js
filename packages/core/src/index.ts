@@ -8,8 +8,10 @@ export type {
   SEOImage,
   SEOInput,
   SEOMeta,
+  SEOPagination,
   SEOPlugin,
   SEORule,
+  SEOVerification,
   TagDescriptor,
 } from "./types.js"
 export type { SEOErrorCode } from "./errors.js"
@@ -35,7 +37,13 @@ export type {
   ValidationSeverity,
 } from "./validate.js"
 export { validateSEO } from "./validate.js"
-export { getAdapter, listAdapterIds, registerAdapter } from "./adapters/registry.js"
+export {
+  detectFramework,
+  getAdapter,
+  getDefaultAdapter,
+  listAdapterIds,
+  registerAdapter,
+} from "./adapters/registry.js"
 export { defineSEOPlugin } from "./plugins.js"
 export type { SEOContext } from "./context.js"
 export { createSEOContext } from "./context.js"

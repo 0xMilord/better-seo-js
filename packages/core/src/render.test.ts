@@ -84,6 +84,24 @@ describe("renderTags", () => {
     ).toBe(true)
   })
 
+  it("emits verification and pagination link tags", () => {
+    const seo = createSEO({
+      title: "T",
+      meta: {
+        verification: { google: "abc", other: { "custom-verify": "x" } },
+        pagination: { previous: "https://ex.test/p/1", next: "https://ex.test/p/3" },
+      },
+    })
+    const tags = renderTags(seo)
+    expect(
+      tags.some(
+        (t) => t.kind === "meta" && t.name === "google-site-verification" && t.content === "abc",
+      ),
+    ).toBe(true)
+    expect(tags.some((t) => t.kind === "link" && t.rel === "prev")).toBe(true)
+    expect(tags.some((t) => t.kind === "link" && t.rel === "next")).toBe(true)
+  })
+
   it("emits multiple og:image groups for multiple images", () => {
     const seo = createSEO({
       title: "T",

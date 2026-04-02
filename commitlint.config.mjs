@@ -7,13 +7,38 @@ export default {
     "header-max-length": [0],
     "body-max-line-length": [0],
     "footer-max-line-length": [0],
+    // Allow subjects ending with `.` (long / sentence-style subjects from cz-git).
+    "subject-full-stop": [0],
   },
   /* cz-git reads `prompt` from this file when using `npm run commit` */
   prompt: {
     alias: { fd: "docs: fix typos" },
+    /* Scopes mirror internal-docs/ARCHITECTURE.md (packages) + PRD waves / monorepo layout. */
+    scopes: [
+      {
+        value: "core",
+        name: "core — @better-seo/core (model, merge, JSON-LD, validate, registry)",
+      },
+      { value: "next", name: "next — @better-seo/next (Metadata, seo(), NextJsonLd)" },
+      { value: "react", name: "react — @better-seo/react (Helmet / SPA, planned)" },
+      { value: "assets", name: "assets — @better-seo/assets (OG PNG, icons, PWA manifest)" },
+      { value: "cli", name: "cli — @better-seo/cli (better-seo / better-seo-cli bins)" },
+      { value: "remix", name: "remix — @better-seo/remix adapter (planned)" },
+      { value: "astro", name: "astro — @better-seo/astro adapter (planned)" },
+      { value: "nuxt", name: "nuxt — @better-seo/nuxt adapter (planned)" },
+      { value: "crawl", name: "crawl — better-seo-crawl (sitemap/robots, planned)" },
+      { value: "examples-next", name: "examples-next — examples/nextjs-app (N10 E2E)" },
+      { value: "examples-vanilla", name: "examples-vanilla — examples/vanilla-render-tags" },
+      { value: "examples-react-vite", name: "examples-react-vite — examples/react-seo-vite" },
+      { value: "docs", name: "docs — docs/ recipes & public stubs" },
+      { value: "internal-docs", name: "internal-docs — PRD, ARCHITECTURE, FEATURES, Roadmap" },
+      { value: "repo", name: "repo — root package.json, tsconfig, scripts, workspaces" },
+      { value: "ci", name: "ci — .github/workflows, Actions" },
+      { value: "changesets", name: "changesets — .changeset, release.yml integration" },
+    ],
     messages: {
       type: "Select the type of change:",
-      scope: "Scope (optional, e.g. core, next, cli):",
+      scope: "Scope (affected area — pick package, example, or infra):",
       subject: "Short description:\n",
       body: 'Longer description (optional). Use "|" for new line:\n',
       breaking: "List BREAKING CHANGES (optional):\n",

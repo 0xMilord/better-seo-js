@@ -1,6 +1,8 @@
 # Contributing
 
-Thanks for helping improve **better-seo.js**. Product direction and architecture live in [`internal-docs/`](./internal-docs/); packaging and release flow in [**PACKAGE.md**](./PACKAGE.md).
+Thanks for helping improve **better-seo.js**. Packaging and release flow: [**PACKAGE.md**](./PACKAGE.md).
+
+**Maintainer specs** (same repo; not linked from published `docs/`): `internal-docs/` holds **PRD**, **ARCHITECTURE**, **FEATURES**, **Roadmap**, **PROGRESS**, **USAGE**, TUI/crawl plans, and similar — open those files locally after clone.
 
 ## Prerequisites
 

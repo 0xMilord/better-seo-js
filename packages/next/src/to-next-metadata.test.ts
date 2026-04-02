@@ -40,6 +40,42 @@ describe("toNextMetadata", () => {
     expect(m.robots).toEqual({ index: false, follow: false })
   })
 
+  it("preserves robots as raw string when value directives use colons (Google parity)", () => {
+    const raw = "max-snippet:20, max-image-preview:large"
+    const doc = createSEO({ title: "S", meta: { robots: raw } })
+    const m = toNextMetadata(doc)
+    expect(m.robots).toBe(raw)
+  })
+
+  it("maps simple extra flags (nosnippet) onto structured robots", () => {
+    const doc = createSEO({ title: "N", meta: { robots: "nosnippet, nofollow" } })
+    const m = toNextMetadata(doc)
+    expect(m.robots).toEqual({ index: true, follow: false, nosnippet: true })
+  })
+
+  it("falls back to raw string for unknown simple tokens", () => {
+    const raw = "noindex, totally-made-up"
+    const doc = createSEO({ title: "U", meta: { robots: raw } })
+    const m = toNextMetadata(doc)
+    expect(m.robots).toBe(raw)
+  })
+
+  it("maps verification and pagination", () => {
+    const doc = createSEO({
+      title: "V",
+      meta: {
+        verification: { google: "g-token", other: { "other-verify": "x" } },
+        pagination: { previous: "https://ex.test/p/1", next: "https://ex.test/p/3" },
+      },
+    })
+    const m = toNextMetadata(doc)
+    expect(m.verification).toMatchObject({ google: "g-token", other: { "other-verify": "x" } })
+    expect(m.pagination).toEqual({
+      previous: "https://ex.test/p/1",
+      next: "https://ex.test/p/3",
+    })
+  })
+
   it("maps twitter images from OG-derived twitter.image", () => {
     const doc = createSEO({
       title: "T",

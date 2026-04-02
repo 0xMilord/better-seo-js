@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { createSEO } from "./core.js"
 import { defineSEOPlugin } from "./plugins.js"
+import { renderTags } from "./render.js"
 import { webPage } from "./schema.js"
 
 describe("plugin hook order", () => {
@@ -69,5 +70,33 @@ describe("plugin hook order", () => {
       },
     )
     expect(seo.schema).toHaveLength(0)
+  })
+
+  it("onRenderTags runs in plugin order when renderTags gets config", () => {
+    const order: string[] = []
+    const seo = createSEO({ title: "T" })
+    const tags = renderTags(seo, {
+      plugins: [
+        defineSEOPlugin({
+          id: "a",
+          onRenderTags: (t, ctx) => {
+            order.push("a")
+            expect(ctx.seo.meta.title).toBe("T")
+            return [...t, { kind: "meta", name: "custom", content: "a" } as const]
+          },
+        }),
+        defineSEOPlugin({
+          id: "b",
+          onRenderTags: (t) => {
+            order.push("b")
+            return [...t, { kind: "meta", name: "custom", content: "b" } as const]
+          },
+        }),
+      ],
+    })
+    expect(order).toEqual(["a", "b"])
+    expect(tags.some((x) => x.kind === "meta" && x.name === "custom" && x.content === "b")).toBe(
+      true,
+    )
   })
 })

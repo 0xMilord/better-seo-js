@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Core runtime dependencies](https://img.shields.io/badge/core%20runtime%20deps-0-success?style=flat-square)](./internal-docs/ARCHITECTURE.md)
+[![Core runtime dependencies](https://img.shields.io/badge/core%20runtime%20deps-0-success?style=flat-square)](./packages/core/README.md)
 [![Security](https://img.shields.io/badge/security-audited-success?style=flat-square)](./SECURITY_COMPLETE_SUMMARY.md)
 [![ESM + CJS](https://img.shields.io/badge/modules-ESM%20%2B%20CJS-646CFF?style=flat-square)](./PACKAGE.md)
 
@@ -30,11 +30,8 @@ This repo is a **monorepo**: the published **`@better-seo/core`** package is the
 ---
 
 <p align="center">
-  <a href="./internal-docs/USAGE.md"><strong>Usage guide</strong></a> ·
-  <a href="./internal-docs/ARCHITECTURE.md"><strong>Architecture</strong></a> ·
-  <a href="./internal-docs/FEATURES.md"><strong>Feature catalog</strong></a> ·
-  <a href="./internal-docs/Roadmap.md"><strong>Roadmap</strong></a> ·
-  <a href="./internal-docs/PROGRESS.md"><strong>Progress tracker</strong></a> ·
+  <a href="./docs/recipes/README.md"><strong>Recipes</strong></a> ·
+  <a href="./docs/commands.md"><strong>CLI commands</strong></a> ·
   <a href="./CONTRIBUTING.md"><strong>Contributing</strong></a>
 </p>
 
@@ -101,6 +98,8 @@ The core stays free of OG renderers. Install **`@better-seo/assets`** in Node/bu
 ```bash
 npx @better-seo/cli og "Hello World" -o ./og.png --site-name "My site"
 ```
+
+In a **TTY**, **`npx better-seo`** with no subcommand opens an **interactive menu** (OG, icons, doctor, init, crawl hints). Set **`CI=true`**, **`BETTER_SEO_CI=1`**, **`BETTER_SEO_NO_TUI=1`**, or pass **`--no-interactive`** / **`-y`** before a subcommand to keep output non-interactive.
 
 Built-in **light** and **dark** card templates; **1200×630** PNG. Custom cards: pass **`--template ./my-og.mjs`** (compiled ESM module; props = **`OgCardProps`** from **`@better-seo/assets`**). See **`docs/recipes/og-wave2.md`**.
 
@@ -193,8 +192,8 @@ flowchart LR
 | **`packages/better-seo-assets`**   | npm **`@better-seo/assets`** — **[`packages/better-seo-assets/README.md`](./packages/better-seo-assets/README.md)**        |
 | **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — **[`packages/better-seo-cli/README.md`](./packages/better-seo-cli/README.md)**                 |
 | **`examples/vanilla-render-tags`** | **D7** — **`createSEO` + `renderTags`** in plain Node (**no React**).                                                      |
-| **`docs/recipes/`**                | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                               |
-| **`internal-docs/`**               | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                             |
+| **`docs/recipes/`**                | Copy-paste recipes (layout/page merge, async `generateMetadata`, OG, icons, sitemap/robots).                               |
+| **`internal-docs/`** (clone only)  | Maintainer specs: PRD, architecture, features, roadmap — index in **CONTRIBUTING.md** (not part of published docs site).   |
 
 Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
 
@@ -215,7 +214,7 @@ Per-call options: `baseUrl` (turns relative canonicals into absolute URLs), `tit
 All structured data that leaves the library for a `<script type="application/ld+json">` tag should go through **`serializeJSONLD`**. Adapters should not concatenate ad hoc JSON strings— that is how you get quoting bugs and XSS-adjacent foot-guns in HTML.
 
 **`SEOError`**  
-Typed errors with stable **`code`** values (`VALIDATION`, `ADAPTER_NOT_FOUND`, `MIGRATE_NOT_IMPLEMENTED`, `USE_SEO_NOT_AVAILABLE`). Details and **`isSEOError`** in **[`internal-docs/USAGE.md`](./internal-docs/USAGE.md)**.
+Typed errors with stable **`code`** values (`VALIDATION`, `ADAPTER_NOT_FOUND`, `USE_SEO_NOT_AVAILABLE`, `USE_SEO_NO_PROVIDER`). Use **`isSEOError`** from **`@better-seo/core`**; full install and error notes for contributors are in **CONTRIBUTING.md**.
 
 ---
 
@@ -275,16 +274,13 @@ Core has a **size budget** (see **`packages/core/package.json`** and `npm run si
 
 ## Documentation index
 
-| Doc                                                                                      | Purpose                                                        |
-| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **[`internal-docs/USAGE.md`](./internal-docs/USAGE.md)**                                 | Install, Next patterns, **`SEOError`**, **`withSEO` + config** |
-| **[`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)**                   | Boundaries, package topology, serializer rule, Edge safety     |
-| **[`internal-docs/FEATURES.md`](./internal-docs/FEATURES.md)**                           | Feature IDs and quality bar                                    |
-| **[`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md)**                             | Waves and traceability to FEATURES                             |
-| **[`internal-docs/PROGRESS.md`](./internal-docs/PROGRESS.md)**                           | What is done vs in flight vs not started                       |
-| **[`internal-docs/PRD.md`](./internal-docs/PRD.md)**                                     | Product intent and scope                                       |
-| **[`docs/compare/next-seo-vs-better-seo.md`](./docs/compare/next-seo-vs-better-seo.md)** | Compare stub (**D6**, Wave 4)                                  |
-| **[`PACKAGE.md`](./PACKAGE.md)**                                                         | Releases, Changesets, publishing                               |
+| Doc                                                                                      | Purpose                                      |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **[`docs/recipes/README.md`](./docs/recipes/README.md)**                                 | Next/React patterns and tutorials            |
+| **[`docs/commands.md`](./docs/commands.md)**                                             | **`@better-seo/cli`** command reference      |
+| **[`docs/compare/next-seo-vs-better-seo.md`](./docs/compare/next-seo-vs-better-seo.md)** | Comparison with next-seo                     |
+| **[`CONTRIBUTING.md`](./CONTRIBUTING.md)**                                               | Dev setup; maintainer `internal-docs/` index |
+| **[`PACKAGE.md`](./PACKAGE.md)**                                                         | Releases, Changesets, publishing             |
 
 ---
 

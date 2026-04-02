@@ -10,4 +10,4 @@
 | OG / icons      | External tooling   | **`@better-seo/assets`** + **`@better-seo/cli`** (`og`, `icons`)          |
 | Zero-dep core   | N/A                | **`@better-seo/core`** has **no runtime `dependencies`**                  |
 
-**Migration:** Roadmap **Wave 12** — **`fromNextSeo`** + **`npx better-seo migrate`** (when implemented). Until then, map title/description/canonical/OG fields manually using **[`internal-docs/USAGE.md`](../../internal-docs/USAGE.md)** and **[`docs/recipes/`](../recipes/README.md)**.
+**Migration:** **`fromNextSeo`** in **`@better-seo/core`** and **`npx better-seo migrate from-next-seo`** (hints today; codemods may expand later). Until then, map title/description/canonical/OG manually using **[`packages/core/README.md`](../../packages/core/README.md)**, **[`packages/next/README.md`](../../packages/next/README.md)**, and **[`docs/recipes/`](../recipes/README.md)**.

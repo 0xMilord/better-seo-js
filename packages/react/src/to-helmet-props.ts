@@ -1,5 +1,5 @@
 import { renderTags } from "@better-seo/core"
-import type { SEO, TagDescriptor } from "@better-seo/core"
+import type { SEO, SEOConfig, TagDescriptor } from "@better-seo/core"
 
 /**
  * Subset of react-helmet-async `Helmet` props produced from `SEO`.
@@ -43,7 +43,7 @@ function fromDescriptors(tags: readonly TagDescriptor[]): HelmetSEOProps {
   return out
 }
 
-/** Map canonical `SEO` → props for `<Helmet {...props} />` (react-helmet-async). */
-export function toHelmetProps(seo: SEO): HelmetSEOProps {
-  return fromDescriptors(renderTags(seo))
+/** Map canonical `SEO` → props for `<Helmet {...props} />` (react-helmet-async). Pass `config` when using `onRenderTags` plugins. */
+export function toHelmetProps(seo: SEO, config?: SEOConfig): HelmetSEOProps {
+  return fromDescriptors(renderTags(seo, config))
 }

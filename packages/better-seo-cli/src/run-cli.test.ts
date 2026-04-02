@@ -150,4 +150,122 @@ describe("runCli", () => {
     expect(await runCli(["node", "cli", "icons", "--help"])).toBe(0)
     log.mockRestore()
   })
+
+  it("doctor exits 0", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "doctor"])).toBe(0)
+    log.mockRestore()
+  })
+
+  it("doctor --json prints JSON", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "doctor", "--json"])
+    expect(log.mock.calls[0]?.[0]).toMatch(/"ok"\s*:\s*true/)
+    log.mockRestore()
+  })
+
+  it("init prints next snippet by default", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "init"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("@better-seo/next")
+    log.mockRestore()
+  })
+
+  it("migrate from-next-seo exits 0", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "migrate", "from-next-seo"])).toBe(0)
+    expect(log.mock.calls.join()).toContain("fromNextSeo")
+    log.mockRestore()
+  })
+
+  it("init --help", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "init", "--help"])).toBe(0)
+    log.mockRestore()
+  })
+
+  it("init rejects invalid framework", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "init", "--framework", "nuxt"])).toBe(1)
+    err.mockRestore()
+  })
+
+  it("migrate without subcommand fails", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "migrate"])).toBe(1)
+    err.mockRestore()
+  })
+
+  it("migrate --help", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "migrate", "--help"])).toBe(0)
+    log.mockRestore()
+  })
+
+  it("crawl robots writes robots.txt", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const out = join(tmpdir(), `robots-${Date.now()}.txt`)
+    created.push(out)
+    expect(
+      await runCli([
+        "node",
+        "cli",
+        "crawl",
+        "robots",
+        "--out",
+        out,
+        "--sitemap",
+        "https://example.com/sitemap.xml",
+        "--host",
+        "example.com",
+      ]),
+    ).toBe(0)
+    const text = readFileSync(out, "utf8")
+    expect(text).toContain("User-agent:")
+    expect(text).toContain("Sitemap: https://example.com/sitemap.xml")
+    expect(text).toContain("Host: example.com")
+    log.mockRestore()
+  })
+
+  it("crawl sitemap writes sitemap.xml", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const out = join(tmpdir(), `sitemap-${Date.now()}.xml`)
+    created.push(out)
+    expect(
+      await runCli([
+        "node",
+        "cli",
+        "crawl",
+        "sitemap",
+        "--out",
+        out,
+        "--loc",
+        "https://example.com/",
+        "--loc",
+        "https://example.com/about",
+      ]),
+    ).toBe(0)
+    const xml = readFileSync(out, "utf8")
+    expect(xml).toContain("<urlset")
+    expect(xml).toContain("https://example.com/</loc>")
+    expect(xml).toContain("https://example.com/about</loc>")
+    log.mockRestore()
+  })
+
+  it("crawl sitemap requires --loc", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {})
+    const out = join(tmpdir(), `sitemap-bad-${Date.now()}.xml`)
+    created.push(out)
+    expect(await runCli(["node", "cli", "crawl", "sitemap", "--out", out])).toBe(1)
+    err.mockRestore()
+  })
+
+  it("crawl without subcommand fails", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {})
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "crawl"])).toBe(1)
+    log.mockRestore()
+    err.mockRestore()
+  })
 })

@@ -44,12 +44,33 @@ export function createSEO(input: SEOInput, config?: SEOConfig): SEO {
   const alternates =
     langMap !== undefined && Object.keys(langMap).length > 0 ? { languages: langMap } : undefined
 
+  const verification = mergedInput.meta?.verification
+  const hasVer = Boolean(
+    verification &&
+      (verification.google ||
+        verification.yahoo ||
+        verification.yandex ||
+        verification.me ||
+        (verification.other !== undefined && Object.keys(verification.other).length > 0)),
+  )
+
+  const rawPag = mergedInput.meta?.pagination
+  const pagination =
+    rawPag?.previous !== undefined || rawPag?.next !== undefined
+      ? {
+          ...(rawPag.previous !== undefined ? { previous: rawPag.previous } : {}),
+          ...(rawPag.next !== undefined ? { next: rawPag.next } : {}),
+        }
+      : undefined
+
   const meta: SEO["meta"] = {
     title: applyTitleTemplate(title, config?.titleTemplate),
     ...(description !== undefined ? { description } : {}),
     ...(canonical !== undefined ? { canonical } : {}),
     ...(robots !== undefined ? { robots } : {}),
     ...(alternates !== undefined ? { alternates } : {}),
+    ...(hasVer ? { verification } : {}),
+    ...(pagination !== undefined ? { pagination } : {}),
   }
 
   const mergeOg = config?.features?.openGraphMerge !== false
@@ -127,13 +148,46 @@ export function withSEO(parent: SEO, child: SEOInput, config?: SEOConfig): SEO {
   return mergeSEO(parent, child, config)
 }
 
+function mergeVerification(
+  parent?: SEO["meta"]["verification"],
+  child?: SEO["meta"]["verification"],
+): SEO["meta"]["verification"] | undefined {
+  if (!parent && !child) return undefined
+  const o = {
+    ...parent,
+    ...child,
+    other:
+      parent?.other || child?.other
+        ? { ...(parent?.other ?? {}), ...(child?.other ?? {}) }
+        : undefined,
+  }
+  const has =
+    o.google || o.yahoo || o.yandex || o.me || (o.other && Object.keys(o.other).length > 0)
+  return has ? o : undefined
+}
+
+function mergePagination(
+  parent?: SEO["meta"]["pagination"],
+  child?: SEO["meta"]["pagination"],
+): SEO["meta"]["pagination"] | undefined {
+  if (!parent && !child) return undefined
+  const out = {
+    ...parent,
+    ...child,
+  }
+  if (out.previous === undefined && out.next === undefined) return undefined
+  return out
+}
+
 export function mergeSEO(parent: SEO, child: SEOInput, config?: SEOConfig): SEO {
   const pMeta = parent.meta
   const cMeta = child.meta ?? {}
-  const { alternates: pAlt, ...pRest } = pMeta
-  const { alternates: cAlt, ...cRest } = cMeta
+  const { alternates: pAlt, verification: pVer, pagination: pPag, ...pRest } = pMeta
+  const { alternates: cAlt, verification: cVer, pagination: cPag, ...cRest } = cMeta
   const mergedLang = mergeLanguageAlternates(pAlt?.languages, cAlt?.languages)
   const mergedAlternates = mergedLang !== undefined ? { languages: mergedLang } : undefined
+  const mergedVer = mergeVerification(pVer, cVer)
+  const mergedPag = mergePagination(pPag, cPag)
   const mergedChild: SEOInput = {
     ...child,
     meta: {
@@ -144,6 +198,8 @@ export function mergeSEO(parent: SEO, child: SEOInput, config?: SEOConfig): SEO 
       canonical: cRest.canonical ?? child.canonical ?? pMeta.canonical,
       robots: cRest.robots ?? child.robots ?? pMeta.robots,
       ...(mergedAlternates !== undefined ? { alternates: mergedAlternates } : {}),
+      ...(mergedVer !== undefined ? { verification: mergedVer } : {}),
+      ...(mergedPag !== undefined ? { pagination: mergedPag } : {}),
     },
     openGraph: { ...(parent.openGraph ?? {}), ...child.openGraph },
     twitter: { ...(parent.twitter ?? {}), ...child.twitter },

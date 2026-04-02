@@ -1,6 +1,6 @@
 # Recipes
 
-Next-first patterns with **FEATURES** traceability. Full wave list: [`Roadmap.md`](../../internal-docs/Roadmap.md).
+Next-first patterns. **CLI command matrix:** [`commands.md`](../commands.md). Maintainer roadmap and feature IDs live in-repo for contributors (see **CONTRIBUTING.md** at the repo root).
 
 | Topic                                           | File                                                                                           | FEATURES               |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------- |
@@ -11,3 +11,4 @@ Next-first patterns with **FEATURES** traceability. Full wave list: [`Roadmap.md
 | Compare vs next-seo (stub)                      | [`compare/next-seo-vs-better-seo.md`](../compare/next-seo-vs-better-seo.md)                    | **D6**                 |
 | Vanilla `renderTags` (Node)                     | [`../../examples/vanilla-render-tags/README.md`](../../examples/vanilla-render-tags/README.md) | **D7**                 |
 | React SPA + Helmet (Vite)                       | [`react-wave5.md`](./react-wave5.md)                                                           | **V3**, **§6 React**   |
+| Robots + sitemap (Next + crawl builders)        | [`sitemap-robots-next.md`](./sitemap-robots-next.md)                                           | crawl W*, CLI L*       |

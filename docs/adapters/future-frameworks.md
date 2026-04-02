@@ -11,4 +11,4 @@
 
 **Contract:** each adapter depends on **`@better-seo/core`**, registers a stable adapter id, and maps **`SEO` → framework head output** without reimplementing JSON-LD stringification (use **`serializeJSONLD`** only).
 
-See [**FEATURES.md**](../../internal-docs/FEATURES.md) §6 and [**ARCHITECTURE.md**](../../internal-docs/ARCHITECTURE.md) §8.
+New adapters should follow the same pattern as **`@better-seo/next`**: depend on **`@better-seo/core`**, take **`SEO`**, emit framework-specific metadata or head props, and keep JSON-LD on **`serializeJSONLD`**. See **`packages/next/README.md`** and **`packages/core/README.md`**.

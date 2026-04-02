@@ -8,7 +8,7 @@ Next.js integration for [**`@better-seo/core`**](../core/README.md): App Router 
 
 **Peers:** `next` **>= 14.2**, `react` **>= 18.2** (see **`package.json`**).
 
-**Docs:** [Monorepo README](../../README.md) · [Usage](../../internal-docs/USAGE.md) · [Recipes](../../docs/recipes/)
+**Docs:** [Monorepo README](../../README.md) · [Recipes](../../docs/recipes/) · [CONTRIBUTING](../../CONTRIBUTING.md)
 
 ---
 

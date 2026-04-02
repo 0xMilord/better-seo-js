@@ -353,4 +353,4 @@ Before deploying:
 
 - [SECURITY.md](../SECURITY.md) — Reporting vulnerabilities
 - [SECURITY_AUDIT.md](../SECURITY_AUDIT.md) — Full security assessment
-- [ARCHITECTURE.md](../internal-docs/ARCHITECTURE.md) — System design
+- [Monorepo README](../README.md) — Package overview; contributor architecture notes are linked from **CONTRIBUTING.md**

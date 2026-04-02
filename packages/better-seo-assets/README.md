@@ -6,7 +6,7 @@
 
 Optional **Node-side** helpers for Better SEO: **Open Graph** PNGs (**1200×630**) via Satori + Resvg (built-in card + optional **compiled `.js` / `.mjs` template**), and **icons + PWA manifest** from a source image (Sharp, **`to-ico`** favicon). Intended for **build scripts**, servers, and [**`@better-seo/cli`**](../better-seo-cli/README.md)—**not** for Edge or lightweight client bundles.
 
-**Docs:** [Monorepo README](../../README.md) · [OG recipe](../../docs/recipes/og-wave2.md) · [Icons recipe](../../docs/recipes/icons-wave3.md) · [FEATURES — A\*](../../internal-docs/FEATURES.md)
+**Docs:** [Monorepo README](../../README.md) · [OG recipe](../../docs/recipes/og-wave2.md) · [Icons recipe](../../docs/recipes/icons-wave3.md)
 
 ---
 

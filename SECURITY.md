@@ -50,7 +50,7 @@ We aim to:
 
 ### Core Package
 
-The **`@better-seo/core` package** is designed with **zero runtime npm dependencies** (see [`internal-docs/ARCHITECTURE.md`](./internal-docs/ARCHITECTURE.md)). This minimizes supply chain attack surface.
+The **`@better-seo/core` package** is designed with **zero runtime npm dependencies** (see the monorepo README and **CONTRIBUTING.md** for architecture boundaries). This minimizes supply chain attack surface.
 
 ### Optional Packages
 
