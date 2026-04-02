@@ -26,18 +26,18 @@ const jsonLd = serializeJSONLD(webPage({ name: "Settings", url: "https://x.com/s
 
 ## Reference surface (selected)
 
-| Area                | Symbols                                                                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Model               | **`createSEO`**, **`mergeSEO`**, **`withSEO`**, types **`SEO`**, **`SEOInput`**, **`SEOConfig`**, **`SEORule`**, **`SEOPlugin`**                            |
-| Schema              | **`webPage`**, **`article`**, **`product`**, **`organization`**, **`person`**, **`breadcrumbList`**, **`faqPage`**, **`techArticle`**, **`customSchema`**   |
-| JSON-LD / tags      | **`serializeJSONLD`**, **`renderTags`**                                                                                                                     |
-| Validation          | **`validateSEO`** (+ **`ValidationIssue`**, **`ValidationIssueCode`**)                                                                                      |
-| Rules               | **`applyRules`**, **`applyRulesToSEO`**, **`createSEOForRoute`**                                                                                            |
-| Context / globals   | **`createSEOContext`**, **`initSEO`**, **`getGlobalSEOConfig`** (prefer context on SSR / multi-tenant)                                                      |
-| Adapters registry   | **`registerAdapter`**, **`getAdapter`**, **`listAdapterIds`**, **`detectFramework`** (detection is best-effort; prefer explicit adapter imports in prod)    |
-| Plugins             | **`defineSEOPlugin`** (`beforeMerge`, `afterMerge`, `onRenderTags`)                                                                                         |
-| Migration / content | **`fromNextSeo`**, **`fromContent`**, **`fromMdxString`** (content helpers are baseline; full MDX compile is roadmap — see **`internal-docs/PROGRESS.md`**) |
-| Voilà (generic)     | **`seoForFramework`**, **`seoRoute`**, **`useSEO`** ( **`useSEO`** in SPA apps: use **`@better-seo/react`**)                                                |
+| Area                | Symbols                                                                                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model               | **`createSEO`**, **`mergeSEO`**, **`withSEO`**, types **`SEO`**, **`SEOInput`**, **`SEOConfig`**, **`SEORule`**, **`SEOPlugin`**                                                                                           |
+| Schema              | **`webPage`**, **`article`**, **`product`**, **`organization`**, **`person`**, **`breadcrumbList`**, **`faqPage`**, **`techArticle`**, **`customSchema`**                                                                  |
+| JSON-LD / tags      | **`serializeJSONLD`**, **`renderTags`**                                                                                                                                                                                    |
+| Validation          | **`validateSEO`** (+ **`ValidationIssue`**, **`ValidationIssueCode`**)                                                                                                                                                     |
+| Rules               | **`applyRules`**, **`applyRulesToSEO`**, **`createSEOForRoute`**                                                                                                                                                           |
+| Context / globals   | **`createSEOContext`**, **`initSEO`**, **`getGlobalSEOConfig`** (prefer context on SSR / multi-tenant)                                                                                                                     |
+| Adapters registry   | **`registerAdapter`**, **`getAdapter`**, **`listAdapterIds`**, **`detectFramework`** (detection is best-effort; prefer explicit adapter imports in prod)                                                                   |
+| Plugins             | **`defineSEOPlugin`** (`beforeMerge`, `afterMerge`, `onRenderTags`)                                                                                                                                                        |
+| Migration / content | **`fromNextSeo`**, **`fromContent`**, **`fromMdxString`** (**C16** — no MDX compile; strips leading MDX **`import`** lines). Rich frontmatter: use **`fromMdx`** in [**`@better-seo/compiler`**](./compiler.md) (**C17**). |
+| Voilà (generic)     | **`seoForFramework`**, **`seoRoute`**, **`useSEO`** ( **`useSEO`** in SPA apps: use **`@better-seo/react`**)                                                                                                               |
 
 ## Notes
 

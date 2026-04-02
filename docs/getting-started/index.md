@@ -29,6 +29,6 @@ export const metadata = seo({ title: "Home", description: "Voilà." })
 
 ## Notes
 
-- **`@better-seo/next`** registers the Next adapter; use **`@better-seo/core/node`** only on the server when you want `package.json` / env inference — never in Edge bundles. See [Config & context](../concepts/config-and-context.md).
+- **`@better-seo/next`** registers the Next adapter. Optional **`@better-seo/core/node`** adds **`readPackageJsonForSEO`**, **`inferSEOConfigFromEnvAndPackageJson`**, and **`initSEOFromPackageJson`** — **server / CLI only**, never in Edge or the browser. Production Edge and multi-tenant setups should use **`createSEOContext`**. See [Config & context](../concepts/config-and-context.md).
 
 Next: [Install (Next.js)](./install-next.md) · [First metadata](./first-metadata.md)

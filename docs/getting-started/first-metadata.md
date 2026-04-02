@@ -55,6 +55,8 @@ export default function Page() {
 ## Notes
 
 - Shorthand **`export const metadata = seo({ title: "Hello" })`** omits JSON-LD; use **`prepareNextSeo`** when you need **`schema`**.
+- **`prepareNextSeo`** / **`toNextMetadata`** use the same merge and feature flags as **`createSEO`**; for **layout + page** `SEO` objects, use **`mergeSEO`** from **`@better-seo/core`** for the document you pass to **`NextJsonLd`** (see [Layout & page](../concepts/layout-and-page.md)).
+- **Edge or per-request config:** prefer **`createSEOContext`** + **`toNextMetadata(ctx.createSEO(…))`** instead of globals — [Config & context](../concepts/config-and-context.md).
 - Runnable demo: monorepo **`examples/nextjs-app`**.
 
 Next: [Verify in the browser](./verify-in-browser.md)

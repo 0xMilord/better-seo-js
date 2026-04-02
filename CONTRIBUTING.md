@@ -48,6 +48,15 @@ Keep **`size-limit`** and **`@size-limit/file`** on the **same major** (npm `pee
 - **Site app:** **`apps/docs`** — Next.js + Nextra; syncs `docs/` → `content/` on **`predev`** / **`prebuild`**; **`@better-seo/next`** is used for default metadata + JSON-LD (dogfood).
 - **Local preview:** after `npm run build` from the root, run `npm run dev -w better-seo-docs-site` (port **3004**) or `cd apps/docs && npm run dev`.
 
+### USAGE ↔ public docs (contract)
+
+When behavior or guidance changes around **`initSEO`**, **`createSEOContext`**, **`@better-seo/core/node`**, Edge / multi-tenant boundaries, **`validateSEO`**, or structured errors, update **both**:
+
+1. **`internal-docs/USAGE.md`** (maintainer truth + error tables), and
+2. **`docs/concepts/config-and-context.md`** and any affected **`docs/getting-started/`** pages.
+
+The concept page links to **USAGE** on GitHub for readers who want the full depth; keep the story consistent so evaluators and contributors do not see conflicting advice.
+
 ## Commit messages (Conventional Commits)
 
 PRs are checked in CI so every commit follows **[Conventional Commits](https://www.conventionalcommits.org/)**. Locally, **Husky** runs **commitlint** on `commit-msg`.
@@ -77,7 +86,7 @@ Commit the generated `.changeset/*.md` with your PR. Maintainers merge **Version
 1. Branch from **`main`**: `feat/short-name` or `fix/short-name`
 2. Keep commits focused; prefer **one logical change** per PR
 3. Ensure **`npm run check`** passes before every push (build, **Prettier**, lint, types, **unit tests + coverage**). Run **`npm run ci`** when you can (adds **Playwright** on `examples/nextjs-app` and **size-limit** on core). Use **`npm run commitlint:last`** to lint the latest commit message.
-4. Update **internal docs** only when behavior or public API changes (see **PRD / ARCHITECTURE / FEATURES / Roadmap**)
+4. Update **internal docs** and **`docs/`** when behavior or public API changes (see **PRD / ARCHITECTURE / FEATURES / Roadmap** and **USAGE ↔ public docs** above)
 
 ## Code style
 

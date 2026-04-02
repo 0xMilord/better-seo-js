@@ -5,13 +5,18 @@ description: How partial input and SEOConfig become framework-native head output
 
 # Pipeline
 
-**What it does:** **Partial input + `SEOConfig` (+ optional rules/plugins)** → **`createSEO` / `mergeSEO`** → canonical **`SEO`** → **adapter** → Next **`Metadata`**, Helmet props, or tag descriptors.
+**What it does:** **Partial input + `SEOConfig` (+ optional rules/plugins)** → **`createSEO` / `mergeSEO`** → canonical **`SEO`** → **adapter** → Next **`Metadata`**, Helmet props, or tag descriptors. **Content** can become **`SEOInput`** first via **`fromContent`** / **`fromMdxString`** (core) or **`fromMdx`** (**`@better-seo/compiler`** + gray-matter).
 
 **When to use:** Debugging “why is my title wrong?” — walk the pipeline in order.
 
 ## Example (conceptual)
 
 ```txt
+.md / .mdx file
+  → fromMdx (optional; @better-seo/compiler)
+  — or —
+  → fromContent / fromMdxString (@better-seo/core)
+
 SEOInput + SEOConfig
   → applyRules (optional; needs route string)
   → createSEO (normalize + fallbacks)

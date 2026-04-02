@@ -18,4 +18,5 @@ Next-first patterns. **CLI:** [overview](../cli/index.md) · [full command matri
 | Compare vs next-seo                             | [compare/next-seo-vs-better-seo.md](../compare/next-seo-vs-better-seo.md)                                        | **D6**                  |
 | Vanilla `renderTags` (Node)                     | [examples/vanilla-render-tags](https://github.com/0xMilord/better-seo-js/tree/main/examples/vanilla-render-tags) | **D7**                  |
 | React SPA + Helmet (Vite)                       | [react-wave5.md](./react-wave5.md)                                                                               | **V3**, **§6 React**    |
+| MDX / Markdown → **`SEOInput`** (frontmatter)   | [mdx-frontmatter-wave7.md](./mdx-frontmatter-wave7.md)                                                           | **C16**, **C17**        |
 | Robots + sitemap (Next + crawl builders)        | [sitemap-robots-next.md](./sitemap-robots-next.md)                                                               | crawl W*, CLI L*        |

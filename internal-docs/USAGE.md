@@ -1,6 +1,8 @@
 # Usage & errors — better-seo.js
 
-**Scope:** **`@better-seo/core`**, **`@better-seo/next`**, **`@better-seo/react`** (Wave 5), and optional **Wave 2** packages **`@better-seo/assets`** / **`@better-seo/cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
+**Scope:** **`@better-seo/core`**, **`@better-seo/next`**, **`@better-seo/react`**, and optional **`@better-seo/assets`** / **`@better-seo/cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
+
+**Public mirror (user-facing):** **`docs/concepts/config-and-context.md`**, **`docs/getting-started/`**, **`docs/api/`**. When you change **global vs context**, **`@better-seo/core/node`**, or **Edge** rules here, update those pages in the same PR.
 
 ## Install (monorepo / local)
 
@@ -26,8 +28,17 @@ Recipe: [`docs/recipes/react-wave5.md`](../docs/recipes/react-wave5.md).
 ## Edge, Workers, and multi-tenant
 
 - **`initSEO()`** only sets an in-memory global. Treat it as **Node / local** convenience, not something to rely on in **Edge** or **multi-tenant** servers where requests must stay isolated.
-- In production Edge (middleware, Vercel Edge, Cloudflare Workers), use **`createSEOContext(explicitConfig)`** per request (or per tenant) and call **`ctx.createSEO`** / **`ctx.mergeSEO`**. Pass **`baseUrl`**, **`titleTemplate`**, and **`plugins`** explicitly—no filesystem or `package.json` reads.
-- The default **`@better-seo/core`** import path stays **Edge-safe** (no `fs`). A future **`@better-seo/core/node`** export (ARCHITECTURE §10) would carry Node-only inference; until then, keep inference out of hot paths.
+- In production Edge (middleware, Vercel Edge, Cloudflare Workers), use **`createSEOContext(explicitConfig)`** per request (or per tenant) and call **`ctx.createSEO`**, **`ctx.mergeSEO`**, or **`ctx.createSEOForRoute`**. Pass **`baseUrl`**, **`titleTemplate`**, **`rules`**, and **`plugins`** explicitly — no filesystem or **`package.json`** reads in Edge bundles.
+- The default **`@better-seo/core`** import path stays **Edge-safe** (no `fs`).
+- **Node-only inference** is a separate export, **`@better-seo/core/node`**, so bundlers do not pull **`readFileSync`** into Edge:
+
+| Symbol                                    | Role                                                                                                        |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **`readPackageJsonForSEO`**               | Read **`name`**, **`homepage`**, **`description`** from **`package.json`**.                                 |
+| **`inferSEOConfigFromEnvAndPackageJson`** | Build **`SEOConfig`** from **`NEXT_PUBLIC_SITE_URL`**, **`SITE_URL`**, **`VERCEL_URL`**, and package hints. |
+| **`initSEOFromPackageJson`**              | Calls **`infer…`** then **`initSEO`** (⚠️ still global — prefer **`createSEOContext`** for SSR isolation).  |
+
+**`@better-seo/core/node`** re-exports the full core public API; use it only in server / CLI code paths.
 
 ## Next.js App Router — quick start
 
@@ -111,12 +122,12 @@ Default is both **on** (merge + bridge), matching the PRD “lazy defaults” pa
 
 Enterprise callers can branch on **`code`** (stable) and log **`message`** (human-readable).
 
-| Code                    | When                                                            |
-| ----------------------- | --------------------------------------------------------------- |
-| `VALIDATION`            | Invalid input (e.g. missing `title`)                            |
-| `ADAPTER_NOT_FOUND`     | `seoForFramework(id)` with no `registerAdapter`                 |
-| `VALIDATION`            | `fromNextSeo` input could not be mapped (see CLI **`migrate`**) |
-| `USE_SEO_NOT_AVAILABLE` | `useSEO()` stub until `@better-seo/react` (Wave 5)              |
+| Code                    | When                                                                      |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `VALIDATION`            | Invalid input (e.g. missing `title`)                                      |
+| `ADAPTER_NOT_FOUND`     | `seoForFramework(id)` with no `registerAdapter`                           |
+| `VALIDATION`            | `fromNextSeo` input could not be mapped (see CLI **`migrate`**)           |
+| `USE_SEO_NOT_AVAILABLE` | `useSEO()` called on **`@better-seo/core`** — use **`@better-seo/react`** |
 
 ```ts
 import { isSEOError, SEOError } from "@better-seo/core"
@@ -130,9 +141,9 @@ try {
 }
 ```
 
-## `useSEO` (stub)
+## `useSEO` (core stub vs React)
 
-**`useSEO`** in core **throws** `USE_SEO_NOT_AVAILABLE`. For React SPAs, wait for **`@better-seo/react`** (Roadmap Wave 5 / **FEATURES V3**). App Router should use **`seo` / `prepareNextSeo` / `generateMetadata`**.
+**`useSEO`** on **`@better-seo/core`** is a **stub** that throws **`USE_SEO_NOT_AVAILABLE`**. For React SPAs, import **`useSEO`** from **`@better-seo/react`** inside **`SEOProvider`** (see **React SPA / Vite** above). Next.js App Router should use **`seo`**, **`prepareNextSeo`**, or **`generateMetadata`** — not the core hook.
 
 ## `validateSEO` (dev)
 
@@ -164,12 +175,35 @@ await writeFile("og.png", png)
 npx @better-seo/cli og "Hello World" -o ./public/og.png --site-name "Brand"
 ```
 
-Custom `template` paths are reserved (throws until a later release). Output is always **1200×630** PNG.
+Custom **`template`** must point to a compiled **`.js`** or **`.mjs`** module (see **`generateOG`** tests and **`docs/recipes/og-wave2.md`**). Output is **1200×630** PNG.
+
+## Content → SEO (Wave 7 — **C16** / **C17**)
+
+**Core** (**zero new deps**):
+
+- **`fromContent`** / **`fromMdxString`** — infer **`SEOInput`** from a string; optional simple `---` frontmatter; strips leading MDX **`import`** lines; does **not** compile MDX.
+
+**Compiler** (optional **`@better-seo/compiler`** — adds **gray-matter**):
+
+```ts
+import { readFileSync } from "node:fs"
+import { fromMdx } from "@better-seo/compiler"
+import { createSEO } from "@better-seo/core"
+
+const partial = fromMdx(readFileSync("post.mdx", "utf8"))
+const seo = createSEO(partial, { baseUrl: "https://example.com", defaultTitle: "Blog" })
+```
+
+```bash
+npx @better-seo/cli content from-mdx --input ./post.mdx --out ./seo-input.json
+```
+
+Details: **`docs/api/compiler.md`**, **`docs/recipes/mdx-frontmatter-wave7.md`**.
 
 ## Examples & recipes
 
 - **`examples/nextjs-app`** — Playwright E2E (**N10**)
-- **`docs/recipes/`** — **N5** / **N6** / **OG** (`og-wave2.md`)
+- **`docs/recipes/`** — **N5** / **N6** / **OG** / **MDX** (`og-wave2.md`, `mdx-frontmatter-wave7.md`)
 
 ## Progress across waves
 

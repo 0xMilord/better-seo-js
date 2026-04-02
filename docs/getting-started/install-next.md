@@ -23,6 +23,7 @@ Optional: **`@better-seo/assets`** and **`@better-seo/cli`** for OG PNG / icons 
 
 ## Notes
 
-- Set **`NEXT_PUBLIC_SITE_URL`** (or your deployment’s public URL) so canonicals and OG URLs resolve correctly.
+- Set **`NEXT_PUBLIC_SITE_URL`** (or your deployment’s public URL) so canonicals and OG URLs resolve correctly — this is what **`inferSEOConfigFromEnvAndPackageJson`** (`@better-seo/core/node`) prefers, alongside **`SITE_URL`** and **`VERCEL_URL`**.
+- **Edge / multi-tenant:** do not import **`@better-seo/core/node`** there; use **`createSEOContext`** with explicit **`SEOConfig`**. See [Config & context](../concepts/config-and-context.md) and [**internal-docs/USAGE.md**](https://github.com/0xMilord/better-seo-js/blob/main/internal-docs/USAGE.md).
 
 Next: [First metadata](./first-metadata.md)
