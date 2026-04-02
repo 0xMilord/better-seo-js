@@ -1,0 +1,27 @@
+{
+  "name": "better-seo-js-monorepo",
+  "private": true,
+  "description": "Monorepo for better-seo.js — see internal-docs/ and PACKAGE.md",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:e2e": "npm run test:e2e --workspaces --if-present",
+    "ci": "npm run build && npm run lint && npm run typecheck && npm run test",
+    "changeset": "changeset",
+    "release:version": "changeset version",
+    "release:publish": "npm run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8"
+  }
+}

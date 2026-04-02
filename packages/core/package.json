@@ -1,0 +1,13 @@
+{
+  "name": "better-seo.js",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Stub workspace until implementation. See internal-docs/ARCHITECTURE.md",
+  "license": "MIT",
+  "scripts": {
+    "build": "node -e \"console.log('[better-seo.js] build stub')\"",
+    "test": "node -e \"console.log('[better-seo.js] test stub')\"",
+    "lint": "node -e \"console.log('[better-seo.js] lint stub')\"",
+    "typecheck": "node -e \"console.log('[better-seo.js] typecheck stub')\""
+  }
+}

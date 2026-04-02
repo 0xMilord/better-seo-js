@@ -15,6 +15,12 @@ You're not just optimizing for Google. You're optimizing for:
 
 ---
 
+### Document convention
+
+This file is the **single source of truth for product intent and system architecture**. It does **not** carry revision history (no PRD “version” labels or changelog tables here). **Package releases** use semver only in `package.json` and `CHANGELOG.md`. **Feature catalog:** [`FEATURES.md`](./FEATURES.md). **Roadmap / waves ↔ features:** [`Roadmap.md`](./Roadmap.md). **System boundaries:** [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
+---
+
 ## 0. The "Voilà" Principle (Read This First)
 
 > **Time-to-value = everything**
@@ -97,6 +103,22 @@ Target audience: Next.js/React developers building production apps who need comp
 
 ---
 
+### 1.4 Enterprise & ecosystem scope
+
+**better-seo.js** is designed as **infrastructure**, not a page-level helper: the same core model must serve **startups and regulated enterprises**, **single-tenant and multi-tenant** layouts, and **multiple runtimes** (Node server, Edge, static export).
+
+| pillar | what it means |
+|--------|----------------|
+| **Next.js first** | The reference integration is **Next.js App Router** (`Metadata`, `generateMetadata`, layouts). Pages Router and route handlers are first-class in the **adapter** layer, not afterthoughts. |
+| **Framework breadth** | **React** (Vite, CRA-style), **Remix**, **Astro**, **Nuxt**, and **vanilla** outputs share one **pure core**; each framework gets a thin **adapter package** and documented “golden path.” |
+| **Industry templates** | Blog, docs, SaaS, commerce, and portfolio templates encode **defaults + rules + schema presets** so teams reuse patterns instead of one-off config. |
+| **Operational rigor** | **Typed public API**, **tests (unit + adapter + E2E)**, **CI-friendly CLI** (`--no-interactive`, exit codes), **safe defaults** for serialization and merging. |
+| **Extensibility** | **Plugins and hooks** (build/merge/render lifecycle) and a **registerAdapter** API so behavior is **explicit** where magic would break in monorepos or Edge. |
+
+**Rollout strategy:** ship and harden **Next.js** end-to-end first (core + `@better-seo/next` + `examples/nextjs-app` + E2E), then apply the same **adapter contract** to other frameworks without changing the SEO document model.
+
+---
+
 ## 2. Product Goals
 
 ### 2.1 Primary Goals
@@ -106,17 +128,19 @@ Target audience: Next.js/React developers building production apps who need comp
 | **Complete SEO coverage** | Supports meta, OG, Twitter, JSON-LD in one object |
 | **Zero configuration** | Works with inferred defaults from `package.json` + env |
 | **Framework agnostic** | Core engine + adapter pattern (React, Next.js, vanilla) |
-| **Extensible by design** | Supports any schema.org type without library updates |
+| **Extensible by design** | Supports any schema.org type without library updates; plugins extend channels and lifecycle |
 | **60-second voila** | Install → working SEO in under 60 seconds |
+| **Enterprise-ready** | Request-scoped config, safe JSON-LD embedding, optional dedup, crawl/syndication modules, E2E verification |
 
 ### 2.2 Non-Goals
 
 | Non-Goal | Rationale |
 |----------|-----------|
-| Analytics/tracking | Post-facto observation, not build-time infrastructure |
-| AI-generated content | Out of scope for v1 |
-| Visual UI components | This is a headless engine |
-| Sitemap generation | Separate concern, may add as extension later |
+| Analytics/tracking | Post-facto observation, not build-time SEO document construction |
+| Auto-written page copy | Headless SEO model only; no generative content product in-repo |
+| Visual marketing UI | Headless engine; previews are **debug/CLI**, not a CMS |
+
+**Note:** **Sitemaps, robots.txt, and RSS/Atom** are **in scope** as optional **modules** (`better-seo-crawl` or documented route recipes) so crawl/index behavior stays aligned with the same `SEO` model and `baseUrl` — they are not “someone else’s problem” at the infra layer.
 
 ### 2.3 Product Pyramid (Priority Order)
 
@@ -128,6 +152,86 @@ Target audience: Next.js/React developers building production apps who need comp
 | **Level 4 (Power)** | CLI automation | Lock them in |
 
 **Critical:** Ship Level 1 before Level 4. Most teams build backwards and die.
+
+### 2.4 Framework matrix (adapters)
+
+Adapters implement one **contract**: *normalized `SEO` in → framework-native head/metadata out*. **Runtime auto-detection** is a **convenience default** only; **production and enterprise setups** should pass **`adapter`** explicitly or import from **`@better-seo/<framework>`**.
+
+| Priority | Framework | Package / entry | Notes |
+|----------|-----------|-----------------|-------|
+| P0 | **Next.js (App Router)** | `@better-seo/next` | Reference implementation; `Metadata`, layouts, `generateMetadata` |
+| P0 | **Next.js (Pages Router)** | `@better-seo/next` | Shared package; pages `Head` / `_app` patterns documented |
+| P1 | **React (SPA / Vite)** | `@better-seo/react` | `react-helmet-async` or native head per recipe |
+| P1 | **Remix** | `@better-seo/remix` | `meta` / `links` exports |
+| P2 | **Astro** | `@better-seo/astro` | Frontmatter + layout integration |
+| P2 | **Nuxt** | `@better-seo/nuxt` | Module + `useHead` bridge |
+| — | **Vanilla / custom** | `better-seo.js` | `renderTags()`, JSON-LD strings |
+
+### 2.5 Industry presets (templates)
+
+Templates are **reusable bundles**: default `SEOConfig`, **SEORule** sets, schema presets (e.g. `SoftwareApplication` for SaaS), OG/icon defaults, and CLI `init` flows. They **do not** fork the core; they **compose** public APIs.
+
+| Template | Primary schema emphasis | Typical rules |
+|----------|-------------------------|---------------|
+| **Blog / media** | `Article`, `Person`, `BreadcrumbList` | `/posts/*` → article OG type |
+| **Docs** | `TechArticle`, `BreadcrumbList`, `FAQPage` | Drafts → `noindex` |
+| **SaaS** | `SoftwareApplication`, `Organization`, `FAQPage` | Marketing vs app shell splits |
+| **E-commerce** | `Product`, `Offer`, `Review`, `BreadcrumbList` | Product listing vs PDP |
+| **Portfolio** | `Person`, `CreativeWork`, `ImageObject` | Case study routes |
+
+### 2.6 Adoption-first strategy & commercial posture
+
+**Principle:** the product wins on **unavoidability** (default, low-friction behavior at the moment devs are tired of the alternative)—not on an early **pricing framework**. Monetization is deferred until **pain at scale** appears; **adoption and dependence** come first.
+
+#### How winning dev tools actually compound
+
+1. **Become the default, not the mythic “best.”** Distribution follows **removing friction** at the decision point (e.g. “I just need this to work on this page”), not perfection on every axis.
+2. **Give away the obvious value.** Installing, experimenting, and **basic usage** must feel **free and instant** so the internal monologue is only: *“I’ll just try it.”* That doorway is the whole acquisition funnel.
+3. **Charge when pain appears.** Revenue aligns with **scale**, **team coordination**, and **infra criticality**—not with cloning the README into an invoice.
+
+#### Translate this to better-seo.js
+
+| Stage | User thought | Product move |
+|-------|----------------|----------------|
+| **Try** | “Let me test this.” | **Free**, zero ceremony (§0). |
+| **Use** | “This is nicer than what I had.” | **Still free**; depth optional (merge, schema, assets). |
+| **Depend** | “We rely on this in the app.” | Introduce **optional** paid/hosted surfaces only when clearly incremental (see below). |
+| **Scale** | “This is production-critical.” | **Charge** for things that map to cost + governance (hosted rendering, org features, SLA)—not for `seo()` itself. |
+
+#### Free tier (must be insanely good)
+
+Ship excellence without a paywall on the **evaluable** path:
+
+- **`seo()`**, **`createSEO` / `mergeSEO`**, schema helpers, adapters (especially **Next**).
+- **Local** OG generation and icons CLI (or clearly free tiers of those flows).
+- Docs and examples that make the above **one copy-paste** away.
+
+**Goal:** installs, GitHub stars, and **“oh this saves me time”**—not a pricing conversation on day one.
+
+#### Paid surfaces (later, not now)
+
+Only after organic **dependence** is credible, consider paid offers that sit **beside** the open core—for example:
+
+- **Hosted** OG / asset generation (compute + caching you pay for).
+- **Dashboard** / team workflows (optional product layer).
+- **Enterprise** packaging (support, SLAs, not “JSON-LD tax”).
+
+**Rule:** if a **solo dev** won’t adopt the core **for free**, a **company** won’t pay later.
+
+#### Immediate sequencing (non-negotiable)
+
+1. **`export const metadata = seo({ title: "Home" })`** works **immediately** on the golden Next.js path.
+2. **`npx better-seo og "Hello World"`** produces a **visibly great** asset (demo shock).
+3. **Usage spreads** via docs, examples, and CLI—still no monetization homework.
+4. **Months later:** optional hosted / team layers, only if (1)–(3) are already true.
+
+#### Single gate
+
+> **Would a dev switch to this *today* for the free path?**
+
+If **no**, pricing is irrelevant. If **yes**, monetization can stay boring until scale hurts.
+
+**Order of operations:** **product → usage → dependence → monetization**—never the reverse.
 
 ---
 
@@ -203,17 +307,31 @@ type SEO = {
 
 ### 3.2 JSON-LD System
 
-#### Base Type
+#### Base types (strict public surface)
+
+The public API must **not** expose `any`. Arbitrary schema.org shapes use a **recursive JSON-safe value** type; unknown third-party payloads can be narrowed at integration boundaries.
 
 ```ts
-type JSONLD = {
+/** JSON-serializable values allowed inside JSON-LD (public API). */
+type JSONLDValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONLDValue[]
+  | { readonly [key: string]: JSONLDValue }
+
+/** One node in a JSON-LD graph. */
+type JSONLD = Readonly<{
   "@context": "https://schema.org"
   "@type": string
-  [key: string]: any
-}
+}> &
+  Readonly<{ [key: string]: JSONLDValue | undefined }>
 ```
 
-#### Schema Helpers (v1)
+#### Schema helpers (shipped with core)
+
+Helpers return **validated** nodes (required `@context` / `@type`); they accept `Partial<...>`-style input for ergonomics and normalize missing fields.
 
 ```ts
 WebPage(data: Partial<JSONLD>): JSONLD
@@ -233,8 +351,14 @@ CustomSchema({ "@type": "Dataset", ...data }): JSONLD
 
 **Design rationale:**
 - Cover 80% of use cases with helpers
-- Allow 20% edge cases via escape hatch
-- No need to update library for new schema types
+- Allow 20% edge cases via escape hatch (`CustomSchema`) without forking types
+- No need to update the library for new schema.org `@type` values
+
+#### Security & embedding (production requirement)
+
+- **Never** interpolate untrusted strings into raw `<script>` tags without **JSON.stringify** on the **whole** graph (or a hardened serializer). A `U+2028` / `U+2029` or premature `</script>` in user content can break markup.
+- Core provides **`serializeJSONLD(graph: JSONLD | JSONLD[]): string`** (or adapter-level equivalent) that applies **safe JSON serialization** suitable for `application/ld+json`. Adapters must use this path, not ad-hoc string concat.
+- CMS-driven fields (titles, descriptions, reviews) are **untrusted input** for HTML context; treat them like any other escaped text in tags.
 
 ---
 
@@ -254,6 +378,9 @@ type SEOConfig = {
   
   // Default robots
   defaultRobots?: string
+
+  /** How child + parent schema arrays combine (enterprise). */
+  schemaMerge?: "concat" | "dedupeByIdAndType"  // default: "concat"
 }
 ```
 
@@ -269,7 +396,7 @@ type SEOConfig = {
 ### 3.4 Merge Strategy (Layout + Page Composition)
 
 ```ts
-function mergeSEO(parent: SEO, child: Partial<SEO>): SEO
+function mergeSEO(parent: SEO, child: Partial<SEO>, config?: Pick<SEOConfig, "schemaMerge">): SEO
 ```
 
 **Merge rules:**
@@ -277,10 +404,12 @@ function mergeSEO(parent: SEO, child: Partial<SEO>): SEO
 |-------|----------|
 | `meta.title` | Child overrides |
 | `meta.description` | Child overrides |
-| `meta.alternates.languages` | Deep merge |
-| `openGraph.images` | Child overrides |
-| `schema` | Concatenate (no dedup by default) |
+| `meta.alternates.languages` | Deep merge (including `x-default` when provided) |
+| `openGraph.images` | Child overrides (full array replace) |
+| `schema` | Default: **concatenate** in order (parent → rules → child). Optional **`dedupeByIdAndType`**: keep last occurrence per stable `@id` + `@type` pair when `@id` present; otherwise concat |
 | All other scalars | Child overrides |
+
+**Enterprise note:** Duplicate `FAQPage` / `Product` nodes in the same URL commonly **hurt** rich-result eligibility. Prefer **`dedupeByIdAndType`** for tenant-wide Organization / WebSite `@id` injection from plugins.
 
 **Use case:**
 ```ts
@@ -340,6 +469,61 @@ type ValidationError = {
 | **Next.js** | `Metadata` object for `generateMetadata()` |
 | **React** | `<Helmet>` component props |
 | **Vanilla** | Array of `{ type, content }` for manual injection |
+
+#### Platform & runtime matrix (enterprise)
+
+| Surface | Config inference (`package.json`, env) | Recommended integration |
+|---------|----------------------------------------|-------------------------|
+| **Node (SSR / server builds)** | Full inference supported | `initSEO()` / `createSEOContext()` |
+| **Edge (Middleware / Workers)** | **No** filesystem reads; pass explicit `SEOConfig` | `createSEOContext(envConfig)` per request |
+| **Browser-only** | No `process.env` / file reads | Explicit config or injected `window.__SEO_CONFIG__` |
+| **CI / CLI** | Full inference + `--no-interactive` | Same as Node |
+
+**Rule:** anything that **`readFileSync`'s** the repo is **CLI-only** or **build-time** — never a hard dependency of the **5KB core** in Edge bundles.
+
+#### Adapter registry (explicit over magic)
+
+```ts
+// Core exposes registration for adapters and plugins (exact shape TBD in implementation).
+registerAdapter(id: "next-app" | "next-pages" | "react" | "vanilla" | string, impl: SEOAdapter): void
+```
+
+Consumers should **`registerAdapter`** in app bootstrap or import **`@better-seo/next`** which self-registers. **Optional** `detectFramework()` may call **`getDefaultAdapter()`** only when no adapter is registered — documented as **dev convenience**, not a guarantee in monorepos.
+
+#### Extensibility: plugins & lifecycle hooks (“better-auth–class”)
+
+Plugins are **pure functions** that extend the engine without forking core. Minimum lifecycle:
+
+| Hook | When | Use |
+|------|------|-----|
+| `beforeMerge` | Rules + layout + page merged | Strip tracking params from URLs, normalize trailing slashes, inject `@baseUrl` |
+| `afterMerge` | Final `SEO` before adapters | Enforce tenant `Organization` `@id`, default `WebSite`, locale fallbacks |
+| `onRenderTags` | Vanilla / string paths | Extra `<link rel="alternate">`, `dns-prefetch`, `preconnect` |
+| `extendChannels` | Future meta namespaces | New preview surfaces (e.g. additional `meta` keys) without breaking types |
+
+Plugins ship as **`better-seo-plugin-*`** or in-app **`defineSEOPlugin({ id, ... })`**. **Capability flags** in config (`features: { jsonLd: true, ... }`) let hosts pin behavior across versions.
+
+```ts
+// Illustrative — exact signatures finalized during implementation
+interface SEOPlugin {
+  id: string
+  beforeMerge?: (ctx: { route?: string; acc: Partial<SEO>; next: Partial<SEO> }) => Partial<SEO> | void
+  afterMerge?: (ctx: { seo: SEO }) => SEO | void
+}
+```
+
+#### Crawl, robots, and syndication (optional module)
+
+**Package:** `better-seo-crawl` (optional; shares types with core)
+
+| Capability | Description |
+|------------|-------------|
+| **robots.txt** | Build static or dynamic robots from config (sitemap URLs, `Allow` / `Disallow`, crawl-delay hints where allowed) |
+| **sitemap.xml** | Generate from route manifest or user-supplied URL list; honors `lastmod`, `hreflang` alternates when available |
+| **RSS / Atom** | Feeds for blog/docs templates; same canonical URLs as `meta.canonical` |
+| **llms.txt** | Optional static generator for AI discovery surfaces (simple text index linking to public URLs) |
+
+The **SEO document model** remains the authority for **titles, descriptions, and URLs**; crawl outputs **derive** from it to avoid drift.
 
 ---
 
@@ -449,14 +633,26 @@ better-seo.js/
     types.ts        ← SEO + JSONLD types
     core.ts         ← createSEO(), mergeSEO()
     schema.ts       ← helpers (WebPage, Article, etc.)
-    adapters.ts     ← next/react bindings
-    render.ts       ← schema injection, tag rendering
+    adapters.ts     ← adapter registry + default bindings
+    plugins.ts      ← defineSEOPlugin(), hook runner
+    context.ts      ← createSEOContext() (request-scoped config)
+    render.ts       ← schema injection, tag serialization
     validate.ts     ← dev warnings & validation
     migrate.ts      ← migration utilities (fromNextSeo)
     voila.ts        ← Quick attach API (seo(), withSEO(), useSEO())
-    singleton.ts    ← Global config (initSEO)
+    singleton.ts    ← process-wide initSEO (Node convenience)
     compiler.ts     ← fromContent, fromMDX
     index.ts        ← public API
+
+packages/@better-seo/next/   ← Next.js adapter (reference)
+packages/@better-seo/react/  ← React / Vite
+examples/nextjs-app/         ← Golden-path app + Playwright E2E
+
+better-seo-crawl/            ← optional: sitemap, robots, RSS, llms.txt
+  sitemap.ts
+  robots.ts
+  rss.ts
+  index.ts
 
 better-seo-assets/
   og/
@@ -483,7 +679,8 @@ better-seo-cli/
     scan.ts         ← Scan & fix
     snapshot.ts     ← Time-travel debugging
     preview.ts      ← Platform previews
-    migrate.ts      ← Version migrations
+    migrate.ts      ← Codemods for upgrades
+    doctor.ts       ← CI health checks (config + adapters)
   templates/
     nextjs/
       blog.ts       ← Blog SEO templates
@@ -514,21 +711,37 @@ better-seo-cli/
 
 To support the 60-second experience:
 
-#### 1. Zero-Config Mode (True Zero)
+#### 1. Zero-Config Mode (True Zero) + Request-Scoped Context (Enterprise)
+
+**Dual path:** keep the **60-second** story for solo devs, and give enterprises **no hidden globals** on the server.
 
 ```ts
-// singleton.ts - with fallback inference
+// singleton.ts — Node / local dev convenience ONLY
 let globalConfig: SEOConfig | null = null
 
-export function initSEO(config?: SEOConfig) {
+export function initSEO(config?: Partial<SEOConfig> & { rules?: SEORule[]; plugins?: SEOPlugin[] }) {
   globalConfig = {
     defaultTitle: config?.defaultTitle ?? inferFromPackageJson(),
     baseUrl: config?.baseUrl ?? inferFromEnv(),
     titleTemplate: config?.titleTemplate ?? "%s",
-    ...config
+    ...config,
   }
 }
 
+// context.ts — preferred for SSR, multi-tenant, tests, Edge
+export function createSEOContext(config: SEOConfig & { rules?: SEORule[]; plugins?: SEOPlugin[] }) {
+  return {
+    seo: (input: Partial<SEO> = {}, options?: { adapter?: string }) =>
+      renderVoila(input, config, options),
+    merge: (parent: SEO, child: Partial<SEO>) => mergeSEO(parent, child, config),
+    create: (input: Partial<SEO>) => createSEO(input, config),
+  }
+}
+```
+
+*`renderVoila` stands in for the internal pipeline (`applyRules` → `createSEO` → hooks → `renderForAdapter`); final export names may differ.*
+
+```ts
 function inferFromPackageJson(): string {
   // Reads package.json → name field
   // Falls back to "My App"
@@ -540,12 +753,14 @@ function inferFromEnv(): string {
   // Falls back to "http://localhost:3000"
 }
 
-// Usage: NO config needed for basic usage
+// Usage: NO config needed for basic usage (global path)
 import { seo } from 'better-seo.js'
-export const metadata = seo({ title: "Home" })  // Just works
+export const metadata = seo({ title: "Home" })  // Just works when initSEO ran or inference is allowed
 ```
 
-**Design rationale:** If you force config upfront, you lose 50% of users instantly.
+**Design rationale:** Globals are acceptable for **DX** on the happy path; **`createSEOContext`** prevents **cross-request leakage**, makes **tests deterministic**, and matches **Edge** constraints when combined with explicit config.
+
+**Design rationale (adoption):** If you force config upfront for the first run, you lose evaluators — so **inference stays opt-out** on Node, not on Edge.
 
 ---
 
@@ -572,21 +787,19 @@ export function seo(
   const config = getGlobalConfig()
   const seoObject = createSEO(input, config)
 
-  // Auto-detect framework
-  const adapter = options?.adapter ?? detectFramework()
+  // Prefer explicit adapter; optional detect only as fallback (document limitations)
+  const adapter = options?.adapter ?? getRegisteredAdapter() ?? detectFramework()
 
   return renderForAdapter(seoObject, adapter)
 }
 
 function detectFramework(): string {
-  // Check for next.config.js → Next.js
-  // Check for vite.config.js → Vite
-  // Check for remix.config.js → Remix
+  // Heuristic checks (next.config, vite.config, etc.) — MAY WRONG in monorepos
   // Fallback to vanilla
 }
 ```
 
-**Design rationale:** Auto-detect works 95% of the time. Escape hatch for edge cases.
+**Design rationale:** **Explicit adapters** win in production; **detection** is a **dev shortcut** and must be documented as **best-effort** (see §2.4).
 
 ---
 
@@ -602,11 +815,12 @@ async function addSEOToPage(route: string, options: {
   const filePath = findPageFile(route)
   const existingContent = readFile(filePath)
 
-  // Check if already has SEO (idempotency)
-  if (existingContent.includes('seo(')) {
-    console.log('SEO already exists in', filePath)
+  // Idempotency: prefer AST / framework-specific detectors (generateMetadata, metadata export, Helmet)
+  if (await fileAlreadyHasSEOHooks(filePath, { framework: detectedFramework })) {
+    console.log('SEO already present in', filePath)
     return
   }
+  // Fallback heuristic only when AST path unavailable — document false +/- rates in CLI docs
 
   const injectCode = `
 import { seo } from 'better-seo.js'
@@ -648,13 +862,9 @@ async function scanForMissingSEO() {
   const missing = []
 
   for (const page of pages) {
-    const content = readFile(page)
-
-    // Check for existing SEO (idempotency)
-    if (content.includes('seo(') || content.includes('metadata')) {
-      continue  // Skip, already has SEO
+    if (await fileAlreadyHasSEOHooks(page, { framework: detectedFramework })) {
+      continue
     }
-
     missing.push(page)
   }
 
@@ -699,32 +909,15 @@ export default defineSEO({
 
 ---
 
-#### 7. Versioning & Migration Strategy
+#### 7. Release discipline & migrations
 
-```ts
-// Package follows strict semver
-{
-  "name": "better-seo.js",
-  "version": "1.0.0"  // MAJOR.MINOR.PATCH
-}
+**npm packages** follow **strict semver**; **breaking changes** ship with **`CHANGELOG.md` entries** and, when possible, a **`npx better-seo migrate`** codemod. This PRD does not track release numbers — only **contracts** (types, adapter surfaces, hook shapes).
 
-// Migration logs for breaking changes
-// CHANGELOG.md
-## [2.0.0] - 2024-01-01
-### Breaking
-- `seo()` now requires `initSEO()` for custom config
-- `og.image` renamed to `og.images` (array)
-
-### Migration
-Run `npx better-seo migrate` for automatic updates
-```
-
-**CLI Migration Command:**
 ```bash
-npx better-seo migrate  # Auto-updates code for breaking changes
+npx better-seo migrate   # Applies codemods for supported upgrades
 ```
 
-**Design rationale:** Touching file system + metadata = users get SEO regressions if API breaks. Strict semver + migration logs are mandatory.
+**Design rationale:** Teams version **SEO as code**; predictable semver + codemods reduce production regressions.
 
 ---
 
@@ -790,6 +983,7 @@ npx better-seo snapshot --compare          # Show diff from last snapshot
 // singleton.ts
 export function initSEO(config: SEOConfig & {
   rules?: SEORule[]
+  plugins?: SEOPlugin[]
 }) {
   globalConfig = config
 }
@@ -800,29 +994,27 @@ export type SEORule = {
   priority?: number  // For overlapping rules
 }
 
-// voila.ts
-export function seo(input: Partial<SEO> = {}): Metadata {
+// voila.ts — rules path requires a route key (framework-specific)
+export function seo(input: Partial<SEO> = {}, routeContext?: { pathname: string }): Metadata {
   const config = getGlobalConfig()
-  const route = getCurrentRoute()
+  const route = routeContext?.pathname ?? getCurrentRouteFromAdapter()
 
-  // Apply matching rules
-  const rulesSEO = applyRules(route, config.rules)
+  const rulesSEO = applyRules(route, config.rules ?? [])
 
-  // Merge: rules → input (input wins)
   const merged = mergeSEO(rulesSEO, input)
-
   const seoObject = createSEO(merged, config)
-  return renderForAdapter(seoObject, detectFramework())
+  return renderForAdapter(seoObject, getRegisteredAdapter() ?? detectFramework())
 }
 
 function applyRules(route: string, rules: SEORule[]): Partial<SEO> {
   const matching = rules.filter(rule => matchesGlob(route, rule.match))
   const sorted = matching.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
-  // Merge all matching rules
   return sorted.reduce((acc, rule) => mergeSEO(acc, rule.seo), {})
 }
 ```
+
+`getCurrentRouteFromAdapter()` is implemented per **`@better-seo/next`** / **`@better-seo/remix`** (e.g. request URL or segment context). **Static export** and **SPA** builds may require passing **`routeContext`** explicitly — document per adapter.
 
 **Usage:**
 ```ts
@@ -1044,9 +1236,9 @@ npx better-seo preview / --open            # Auto-open browser
 │                                                         │
 │   ⚙️  Generating configuration...                        │
 │   ✓ Created better-seo.config.ts                        │
-│   ✓ Installed @better-seo/core                          │
+│   ✓ Installed better-seo.js (core)                      │
 │   ✓ Installed @better-seo/next (adapter)                │
-│   ✓ Installed @better-seo/assets (optional)             │
+│   ✓ Installed better-seo-assets (optional)             │
 │                                                         │
 │   🎉 Setup complete!                                    │
 │                                                         │
@@ -1263,8 +1455,9 @@ import { generateOG, generateIcons, generateManifest, generateSplash } from 'bet
 // Voilà API (Quick Attach)
 import { seo, withSEO, useSEO, initSEO } from 'better-seo.js'
 
-// Types
-import type { SEORule } from 'better-seo.js'
+// Types & extensibility
+import type { SEORule, SEOPlugin } from 'better-seo.js'
+import { registerAdapter, defineSEOPlugin, serializeJSONLD, createSEOContext } from 'better-seo.js'
 ```
 
 ### 4.2 Voilà API (Quick Attach)
@@ -1385,6 +1578,9 @@ npx better-seo preview / --open              # Auto-open browser
 
 # Migration (for breaking changes)
 npx better-seo migrate               # Auto-updates code for new versions
+
+# CI / health (optional)
+npx better-seo doctor                # Validates config + adapter registration; non-zero exit on errors
 ```
 
 ---
@@ -1442,7 +1638,7 @@ npx better-seo fix
 
 **Design rationale:** You're selling aesthetics + automation. Without visual proof, your biggest differentiator is invisible.
 
-### 4.3 Usage Examples
+### 4.5 Usage Examples
 
 #### Next.js (App Router) — Full Example
 
@@ -1623,29 +1819,34 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-## 5. Implementation Phases
+## 5. Implementation waves (dependency order)
 
-### Phase 1: Core Engine + Voilà (Week 1-2) **SHIP OR DIE**
+Waves are **sequenced for risk reduction**, not "MVP vs enterprise": **all capabilities listed elsewhere in this PRD remain in scope** — only **delivery order** changes. **Wave 1–2** must prove the **Next.js golden path + E2E** before breadth.
+
+### Wave 1: Core engine + Next adapter + E2E gate **SHIP OR DIE**
 
 | Task | Deliverable | Priority |
 |------|-------------|----------|
-| Define TypeScript types | `types.ts` (with alternates, verification, OG images array) | 🔴 Critical |
-| Implement `createSEO()` | `core.ts` (with titleTemplate support) | 🔴 Critical |
-| Implement `mergeSEO()` | `core.ts` (layout + page composition) | 🔴 Critical |
+| Define TypeScript types | `types.ts` (SEO, strict `JSONLD`, alternates, verification, OG images array) | 🔴 Critical |
+| Safe JSON-LD serialization | `serializeJSONLD()` + adapter use | 🔴 Critical |
+| Implement `createSEO()` / `mergeSEO()` | `core.ts` (`titleTemplate`, `schemaMerge`) | 🔴 Critical |
 | Schema helpers (7 types) | `schema.ts` | 🟡 High |
-| **Voilà API** | `voila.ts` (seo(), withSEO(), useSEO()) | 🔴 Critical |
-| **Zero-config mode** | `singleton.ts` with package.json + env inference | 🔴 Critical |
-| **Adapter escape hatch** | Explicit `adapter` option | 🟡 High |
-| Basic tests | Vitest suite | 🔴 Critical |
+| **Voilà API** | `voila.ts` (`seo()`, `withSEO()`, `useSEO()`) | 🔴 Critical |
+| **Context API** | `createSEOContext()` for SSR / tenants / Edge | 🔴 Critical |
+| **Adapter registry** | `registerAdapter()` + **`@better-seo/next`** (App Router first) | 🔴 Critical |
+| **Zero-config path** | `singleton.ts` + inference (**Node only**; documented) | 🔴 Critical |
+| Plugin skeleton | `defineSEOPlugin()` + hook runner (minimal `afterMerge`) | 🟡 High |
+| Unit tests | Vitest, >90% core | 🔴 Critical |
+| **E2E tests** | Playwright against `examples/nextjs-app` (head tags, OG, JSON-LD parse) | 🔴 Critical |
 
 **Exit criteria:** 
-- `npm install better-seo.js` → `export const metadata = seo({ title: "Home" })` works in 60 seconds
-- Zero config required for basic usage
-- Next.js adapter works flawlessly
+- `npm install` + **Next.js App Router** example: `export const metadata = seo({ title: "Home" })` in **under 60 seconds** on Node
+- **CI runs E2E** on the reference example
+- No `any` in **published** type declarations for public exports
 
 ---
 
-### Phase 2: OG Generator (Week 3) **HOOK USERS**
+### Wave 2: OG Generator (Week 3) **HOOK USERS**
 
 | Task | Deliverable | Priority |
 |------|-------------|----------|
@@ -1659,7 +1860,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 3: Icon Generator (Week 4) **LOCK THEM IN**
+### Wave 3: Icon Generator (Week 4) **LOCK THEM IN**
 
 | Task | Deliverable | Priority |
 |------|-------------|----------|
@@ -1673,7 +1874,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 4: Launch Core (Week 5)
+### Wave 4: Publication & distribution (Week 5)
 
 | Task | Deliverable |
 |------|-------------|
@@ -1686,7 +1887,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 5: Adapters + Validation (Week 6-7)
+### Wave 5: More adapters + validation (Week 6-7)
 
 | Task | Deliverable |
 |------|-------------|
@@ -1699,20 +1900,20 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 6: SEO Middleware (Week 8) **SCALE UNLOCK**
+### Wave 6: SEO rules / middleware (Week 8) **SCALE UNLOCK**
 
 | Task | Deliverable |
 |------|-------------|
 | Rule engine | `applyRules()` with glob matching |
 | SEORule type | `{ match, seo, priority }` |
-| Route detection | `getCurrentRoute()` for SSR/SSG |
+| Route detection | `getCurrentRouteFromAdapter()` per framework; explicit `routeContext` where needed |
 | Merge priority | Rules → input (input wins) |
 
 **Exit criteria:** `initSEO({ rules: [...] })` auto-applies SEO to matching routes.
 
 ---
 
-### Phase 7: Content Compiler (Week 9) **INTELLIGENCE LAYER**
+### Wave 7: Content compiler (Week 9) **INTELLIGENCE LAYER**
 
 | Task | Deliverable |
 |------|-------------|
@@ -1725,7 +1926,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 8: Snapshots + Preview (Week 10-11) **TRUST + DEBUGGING**
+### Wave 8: Snapshots + preview (Week 10-11) **TRUST + DEBUGGING**
 
 | Task | Deliverable |
 |------|-------------|
@@ -1740,7 +1941,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 9: CLI TUI + Installation Wizard (Week 12-13)
+### Wave 9: CLI TUI + installation wizard (Week 12-13)
 
 | Task | Deliverable |
 |------|-------------|
@@ -1758,7 +1959,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 10: CLI Automation (Week 14)
+### Wave 10: CLI automation — add / scan / fix (Week 14)
 
 | Task | Deliverable |
 |------|-------------|
@@ -1772,7 +1973,7 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 11: Design System Integration (Week 15-16)
+### Wave 11: Design-system integration (Week 15-16)
 
 | Task | Deliverable |
 |------|-------------|
@@ -1784,30 +1985,29 @@ export const metadata = toNextMetadata(seo)
 
 ---
 
-### Phase 12: Migration + Polish (Week 17)
+### Wave 12: Crawl module + migration + docs polish (Week 17+)
 
 | Task | Deliverable |
 |------|-------------|
-| Migration utility | `fromNextSeo()` auto-converter |
-| `migrate` CLI command | Auto-update code for breaking changes |
-| API documentation | `/docs/api.md` |
-| Schema reference | `/docs/schemas.md` |
-| Migration guide | `/docs/migration.md` |
+| **`better-seo-crawl`** | `robots.txt`, `sitemap.xml`, RSS/Atom helpers, optional `llms.txt` |
+| Migration | `fromNextSeo()` + `npx better-seo migrate` (codemods) |
+| Docs | API, schema reference, **Next-first** integration guides, per-adapter recipes |
 
-**Exit criteria:** A stranger can migrate from next-seo in 10 minutes without asking questions.
+**Exit criteria:** **Next.js** migration path documented end-to-end; crawl outputs share **`baseUrl` / canonical** with core; a new adopter completes **next-seo → better-seo.js** in **≤10 minutes** using docs alone.
 
 ---
 
-**Critical Note:** Phases 1-4 are the **minimum viable product**. Phases 5-12 are retention features. Do not build Phase 10 before Phase 1 works.
+**Critical path:** **Wave 1** (core + **`@better-seo/next`** + **E2E**) gates everything else. Do not ship broad CLI automation (**Wave 10**) until the **golden example app** is stable in CI.
 
-**Unfair Leverage Features** (Phases 6-9):
+**High-leverage layers** (see §2.3 for product pyramid):
 | Feature | Category | Why it wins |
 |---------|----------|-------------|
-| **SEO Middleware** | Scale | Scales to 1000s of pages without repetition |
-| **Content Compiler** | Intelligence | Devs provide content, you provide SEO |
-| **SEO Snapshots** | Trust | Testable + version-controlled SEO |
-| **SEO Preview** | Debugging | Instant feedback, demo magic |
+| **SEO rules** | Scale | 1000s of pages without repetition |
+| **Content compiler** | Intelligence | Content in → SEO model out |
+| **SEO snapshots** | Trust | Testable + version-controlled SEO |
+| **SEO preview** | Debugging | Instant feedback, demo magic |
 | **CLI TUI** | UX | First impression, guided setup, templates |
+| **Plugins + adapter registry** | Extensibility | Enterprise-safe customization |
 
 ---
 
@@ -1818,13 +2018,14 @@ export const metadata = toNextMetadata(seo)
 | Metric | Target |
 |--------|--------|
 | Core bundle size | < 5KB gzipped |
-| Type safety | 100% typed, no `any` in public API |
-| Test coverage | > 90% |
+| Type safety | No `any` in **published** `.d.ts` for public exports; JSON-LD uses `JSONLDValue` |
+| Test coverage | > 90% core; adapters exercise merge + render |
+| **E2E** | Playwright smoke on `examples/nextjs-app` in default CI pipeline |
 | Zero dependencies (core) | No runtime deps |
 | Asset generation time | < 2s per OG image |
 | CLI startup time | < 500ms |
-| **Time-to-first-SEO** | < 60 seconds (install → working) |
-| **CLI injection success rate** | > 95% (files correctly modified) |
+| **Time-to-first-SEO** | < 60 seconds (install → working, **Node** reference path) |
+| **CLI injection success rate** | > 95% when AST-based detection enabled; heuristics documented as lower confidence |
 
 ### 6.2 Adoption KPIs (First 90 Days)
 
@@ -1870,7 +2071,11 @@ export const metadata = toNextMetadata(seo)
 | **SEO Preview** | ✅ | ❌ | ❌ |
 | **Interactive CLI TUI** | ✅ | ❌ | ❌ |
 | **Template system** | ✅ | ❌ | ❌ |
-| **Framework adapters** | ✅ (specialized pkgs) | ❌ | N/A |
+| **Framework adapters** | ✅ (`@better-seo/*`, explicit registration) | ❌ | N/A |
+| **Plugin / hook model** | ✅ | ❌ | ❌ |
+| **Crawl / robots / sitemap (module)** | ✅ | ❌ | ❌ |
+| **SSR-safe context API** | ✅ (`createSEOContext`) | ❌ | N/A |
+| **E2E golden path** | ✅ (reference app) | — | — |
 | **Time-to-first-SEO** | < 60s | 5-10 min | 5-10 min |
 | Bundle size (core) | ~5KB | ~15KB | N/A (built-in) |
 
@@ -1943,6 +2148,75 @@ The CLI itself becomes:
 - A tutorial (interactive setup)
 - A reason to share ("just run `npx better-seo`")
 
+### 8.6 Documentation as distribution (monorepo)
+
+> **Docs are not “support”—docs are the onboarding UI** and a primary **distribution** channel—the thing that converts evaluators who never read marketing sites.
+
+#### First principle
+
+The **60-second promise** (§0) must hold **inside the docs**: one page, one snippet, **working SEO**—or users go back to incremental fixes and never return.
+
+#### Three layers (keep the IA small)
+
+| Layer | Job | Must deliver |
+|-------|-----|----------------|
+| **1. Get started (~60s)** | Acquisition | Install + `seo({ title })` + proof (preview of Google / OG / zero-config). Immediately after: `npx better-seo og "Hello World"` + **visual** output. This page is a **conversion funnel**, not a wiki front door. |
+| **2. Core concepts** | Mental model | What the unified `SEO` object is; **meta / social / schema**; pipeline **Input → SEO → Adapter → Output**; **layout vs page** (critical for Next); zero-config philosophy (inference boundaries from §3). |
+| **3. API + recipes** | Usage | Short, typed **API reference** (`seo`, `createSEO`, `mergeSEO`, `initSEO`, `createSEOContext`, …). **Recipes** are the main retention surface: blog PDP, product page, i18n, article JSON-LD, custom OG—**copy-paste over prose**. |
+
+**Reality:** most devs **copy patterns**; they do not read long explanations. Recipes beat brilliance.
+
+#### Monorepo layout (docs + examples)
+
+Keep docs **in-repo** first; treat the website as a **publish target** for the same content when needed.
+
+```txt
+/docs
+  /getting-started      ← Layer 1
+  /concepts             ← Layer 2
+  /api                  ← Layer 3 reference
+  /recipes              ← Layer 3 patterns (primary)
+  /cli
+  /assets
+  /compare              ← e.g. next-seo vs better-seo — SEO + conversion
+
+/examples
+  nextjs-app            ← Golden path + E2E (see §5)
+  react-app
+  blog-seo
+  ecommerce-seo
+```
+
+**Examples > explanations.** Each major recipe should link to a **runnable** example directory.
+
+#### AI- and IDE-ready content
+
+- **Page skeleton** (repeat everywhere): *What it does → When to use → Example → Output → Notes.*
+- **Stable identity line** (repeat verbatim where natural): *better-seo.js is a programmable SEO engine for Next.js and modern apps*—aids LLM and search recall.
+- **Clarity over hype** in prose; **maximize fenced code blocks** (models and humans index them).
+- **API surface:** clear names (`seo` not `generateMetaConfigEngine`), **JSDoc** on public exports with `@example`, types that **suggest usage** where possible—so “add SEO to this page” in Cursor/Copilot resolves to this library.
+
+#### High-leverage doc pages
+
+| Page type | Purpose |
+|-----------|---------|
+| **Comparison** (`/compare/next-seo` or similar) | Converts skeptics; drives organic and LLM citations. |
+| **Playground (nice later)** | Interactive title → preview metadata/OG; docs become a **demo**, not only text. |
+
+#### Tone & anti-patterns
+
+- **Tone:** crisp, direct, slightly opinionated—matching “remove thinking,” not academic density.
+- **Do not** over-document v1 before ship: ship the golden path, then widen.
+- **Do not** split docs into a separate silo **too early**; monorepo truth → publish.
+- **Do not** optimize for “explaining architecture” over **removing decisions** from the reader.
+
+#### Checklist
+
+**Must-have for launch narrative:** Quick start, core concepts, API reference, recipes, CLI, examples.  
+**Nice later:** Playground, deep schema encyclopedia, extended comparison matrix.
+
+If the reader hits **one page, copies one block, sees it work**, docs did their job. If they **scroll, hesitate, and compare in the abstract**, the funnel failed.
+
 ---
 
 ## 9. Risks & Mitigations
@@ -1956,20 +2230,22 @@ The CLI itself becomes:
 | Asset bloat | Keep assets in separate package, optional install |
 | CLI complexity | Start minimal, add commands based on user demand |
 | Design system parsing fails | Graceful fallback to defaults, warn user |
+| Hidden global config on server | Document `createSEOContext`; forbid implicit globals in Edge |
+| Monorepo mis-detection | Adapter registration + explicit `adapter` option in CI |
 
 ---
 
-## 10. Future Extensions (Post-v1)
+## 10. Later extensions (optional modules / research)
+
+Ship list for **crawl + dedupe + plugins** lives in §3 and **Wave 12**. The following are **intentionally later** or partner-tier to avoid diluting the core:
 
 | Extension | Description |
 |-----------|-------------|
-| Sitemap Generator | Complementary tool for sitemap.xml |
-| Robots.txt Generator | Pair with sitemap tool |
-| CMS Integrations | Sanity, Contentful, WordPress adapters |
-| Analytics Hooks | Track SEO performance over time |
-| Schema Deduplication | Smart merge for schema arrays |
-| Internal Linking Helper | Suggest relevant internal links (non-magical) |
-| Multi-language OG | Generate OG images per locale |
+| **CMS connectors** | Sanity, Contentful, Strapi, WordPress — map CMS models → `SEO` / `JSONLD` |
+| **Analytics bridges** | Optional telemetry hooks (out of core; enterprise agreements) |
+| **Advanced schema dedupe** | Graph-aware merges beyond `@id` + `@type` (e.g. sameAs consolidation) |
+| **Internal linking advisor** | Non-magical suggestions from route graph |
+| **Per-locale OG** | Asset pipeline generates OG images per language |
 
 ---
 
@@ -1980,6 +2256,8 @@ The CLI itself becomes:
 | Package | Name | Import |
 |---------|------|--------|
 | Core | `better-seo.js` | `better-seo.js` |
+| Adapters | `@better-seo/next`, `@better-seo/react`, … | Scoped packages |
+| Crawl (optional) | `better-seo-crawl` | Sitemap, robots, RSS |
 | Assets | `better-seo-assets` | `better-seo-assets` |
 | CLI | `better-seo-cli` | N/A (CLI only) |
 | GitHub repo | `better-seo-js` | — |
@@ -2012,6 +2290,8 @@ MIT — maximize adoption, allow commercial use.
 20. **Sleek TUI** — First impression matters, guided setup reduces friction
 21. **Templates over blank slate** — Opinionated starting points beat config hell
 22. **Framework specialization** — Core agnostic, adapters specialized per ecosystem
+23. **Explicit beats magic in prod** — Register adapters; treat auto-detect as a dev shortcut
+24. **Safe serialization** — JSON-LD and meta strings never bypass hardened escape paths
 
 ### 11.4 Mental Model
 
@@ -2029,7 +2309,15 @@ And now:
 
 ---
 
-## 12. Sign-Off
+## 12. Closing
+
+**One-liner:** *Make your app look and rank like a finished product in 60 seconds.*
+
+**Acquisition hook:** `export const metadata = seo({ title: "Home" })` on **Next.js App Router** first; other frameworks reuse the same `SEO` model via `@better-seo/*`.
+
+**Retention moat:** Asset automation, rules engine, compiler, snapshots, and CLI — all **layers on one document model** (see §2.3).
+
+**Sign-off (optional):**
 
 | Role | Name | Date |
 |------|------|------|
@@ -2037,115 +2325,8 @@ And now:
 | Engineering | — | — |
 | Design | — | — |
 
----
-
-**Version:** 4.0 (Final)  
-**Last updated:** 2026-04-02  
-**Status:** Ready for Implementation
+*Last reviewed: 2026-04-02.*
 
 ---
 
-## Summary: What Changed in v5
-
-| Area | v1 | v2 | v3 | v4 | v5 (Final) |
-|------|----|----|----|----|------------|
-| **Scope** | SEO library | SEO + Discovery Surface Engine | Discovery Infrastructure | SEO Compiler + Infrastructure | SEO Platform + Ecosystem |
-| **Packages** | Single | Core + Assets + CLI | Core + Assets + CLI (phased) | Core + Assets + CLI (phased) | Core + Adapters + Assets + CLI |
-| **OG Images** | Manual | Auto-generated | Auto + visual proof | Auto + visual proof | Auto + visual proof + templates |
-| **Icons** | Manual | CLI generator | CLI + before/after | CLI + before/after | CLI + before/after + manifest |
-| **Positioning** | "Next SEO but better" | "SEO + Brand Surface Automation" | "Make your app look pro in 60s" | "SEO that feels like a compiler" | "SEO platform with guided setup" |
-| **Bundle** | ~5KB | ~5KB core + optional assets | ~5KB core + optional assets | ~5KB core + optional assets | ~5KB core + adapter pkgs + assets |
-| **Distribution** | npm + GitHub | npm + GitHub + CLI | npm + GitHub + CLI + demo shock | npm + GitHub + CLI + demo shock | npm + GitHub + CLI + TUI + templates |
-| **Voilà API** | ❌ | ✅ | ✅ + zero-config | ✅ + zero-config | ✅ + zero-config |
-| **CLI Auto-Inject** | ❌ | ✅ | ✅ + idempotent + safe flags | ✅ + idempotent + safe flags | ✅ + idempotent + safe flags + TUI |
-| **Time-to-first-SEO** | 5-10 min | < 60 seconds | < 60 seconds (true zero-config) | < 60 seconds (true zero-config) | < 60 seconds (wizard + templates) |
-| **Config Required** | Yes | Yes | No (inferred) | No (inferred) | No (inferred + template defaults) |
-| **Safety Flags** | ❌ | ❌ | ✅ (`--dry-run`, `--safe`, `--interactive`) | ✅ (`--dry-run`, `--safe`, `--interactive`) | ✅ (`--dry-run`, `--safe`, `--interactive`) |
-| **Escape Hatches** | Partial | Partial | Complete (asset disable, adapter override) | Complete (asset disable, adapter override) | Complete (asset disable, adapter override) |
-| **Versioning** | ❌ | ❌ | ✅ (semver + migrate command) | ✅ (semver + migrate command) | ✅ (semver + migrate command) |
-| **SEO Middleware** | ❌ | ❌ | ❌ | ✅ (rules auto-apply at scale) | ✅ (rules auto-apply at scale) |
-| **Content Compiler** | ❌ | ❌ | ❌ | ✅ (fromContent, fromMDX) | ✅ (fromContent, fromMDX) |
-| **SEO Snapshots** | ❌ | ❌ | ❌ | ✅ (time-travel + debugging) | ✅ (time-travel + debugging) |
-| **SEO Preview** | ❌ | ❌ | ❌ | ✅ (Google, Twitter, LinkedIn previews) | ✅ (Google, Twitter, LinkedIn previews) |
-| **CLI TUI** | ❌ | ❌ | ❌ | ❌ | ✅ (sleek wizard, progress, prompts) |
-| **Template System** | ❌ | ❌ | ❌ | ❌ | ✅ (blog, docs, saas, ecommerce, portfolio) |
-| **Framework Adapters** | ❌ | ❌ | ❌ | ❌ | ✅ (@better-seo/next, react, astro, etc.) |
-| **Auto-Detect** | ❌ | ❌ | ❌ | ❌ | ✅ (framework + router detection) |
-
----
-
-**The One-Liner:**
-
-> Make your app look and rank like a finished product in 60 seconds.
-
----
-
-**The Acquisition Hook:**
-
-> `export const metadata = seo({ title: "Home" })` — done in 60 seconds, zero config.
-
----
-
-**The Retention Moat:**
-
-> OG generators, icon automation, design system integration, scan & fix.
-
----
-
-**The Unfair Leverage** (v5 differentiators):
-
-| Feature | Category | Why it wins |
-|---------|----------|-------------|
-| **SEO Middleware** | Scale | 1000s of pages, zero repetition |
-| **Content Compiler** | Intelligence | Devs provide content, you provide SEO |
-| **SEO Snapshots** | Trust | Testable + version-controlled SEO |
-| **SEO Preview** | Debugging | Instant feedback, demo magic |
-| **CLI TUI** | UX | First impression, guided setup |
-| **Templates** | Opinionation | Blog, docs, saas — pre-configured best practices |
-| **Framework Adapters** | Ecosystem | Core agnostic, specialized per framework |
-
----
-
-**The Product Pyramid:**
-
-| Level | Feature | Purpose |
-|-------|---------|---------|
-| **Level 1 (Acquisition)** | `seo({ title })` | Get them in the door |
-| **Level 2 (Trust)** | merge + defaults + correctness | Keep them confident |
-| **Level 3 (Delight)** | OG + icons generator | Make them say "wow" |
-| **Level 4 (Power)** | CLI automation | Lock them in |
-| **Level 5 (Unfair)** | Middleware + Compiler + Snapshots | Category-defining |
-| **Level 6 (Ecosystem)** | TUI + Templates + Adapters | Platform lock-in |
-
-**Critical:** Ship Level 1 before Level 6. Most teams build backwards and die.
-
----
-
-**The Real Risk:**
-
-> Not competitors. Not features. **Overbuilding and dying mid-flight.**
-
----
-
-**The Win Condition:**
-
-> Ship the "voilà moment" before the "perfect system".
-
-Because users forgive missing features. They do NOT forgive confusion.
-
----
-
-**The Endgame:**
-
-You're not competing with:
-- next-seo
-- Next.js Metadata API
-
-You're competing with:
-> **how people think about SEO entirely**
-
-SEO that feels like a **compiler**, not config.
-
-SEO that **guides you** from install, not abandons you after npm.
-
-SEO that **scales** from 1 page to 10,000 without rewriting.
+> **North star:** Ship the "voilà moment" (**Wave 1** + **E2E** green) before expanding breadth — without sacrificing **enterprise guarantees** (typed JSON-LD, safe serialization, explicit adapters, Playwright on the golden app).
