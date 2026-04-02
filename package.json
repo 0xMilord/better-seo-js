@@ -16,12 +16,27 @@
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
-    "ci": "npm run build && npm run lint && npm run typecheck && npm run test",
+    "ci": "npm run build && npm run lint && npm run typecheck && npm run test && npm run commitlint:ci",
+    "commit": "czg",
+    "commitlint": "commitlint --edit",
+    "commitlint:ci": "commitlint --from ${COMMITLINT_FROM:-HEAD~1} --to ${COMMITLINT_TO:-HEAD} --verbose",
     "changeset": "changeset",
     "release:version": "changeset version",
-    "release:publish": "npm run build && changeset publish"
+    "release:publish": "npm run build && changeset publish",
+    "prepare": "husky"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git",
+      "useEmoji": true
+    }
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8"
+    "@changesets/cli": "^2.29.8",
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.11.1",
+    "husky": "^9.1.7"
   }
 }
