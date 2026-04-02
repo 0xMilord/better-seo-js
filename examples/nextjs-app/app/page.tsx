@@ -19,6 +19,8 @@ const { metadata, seo } = prepareNextSeo(
     },
     openGraph: {
       type: "website",
+      siteName: "better-seo.js demo",
+      locale: "en_US",
       images: [
         {
           url: `${site.replace(/\/$/, "")}/og-example.png`,
@@ -27,6 +29,10 @@ const { metadata, seo } = prepareNextSeo(
           alt: "better-seo.js",
         },
       ],
+    },
+    twitter: {
+      site: "@better_seo_js",
+      creator: "@better_seo_js",
     },
     schema: [
       webPage({

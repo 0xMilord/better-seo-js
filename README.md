@@ -57,12 +57,13 @@ Shipping focus follows the internal roadmap; this table matches **[`internal-doc
 | **12** (partial) | Crawl + migrate                                              | **Partial** — **`better-seo-crawl`** (`renderRobotsTxt`, `renderSitemapXml`, …) + CLI wrappers; RSS / codemod **`migrate`** TBD                                                                                |
 | **6–8, 10–11**   | Rules scale, compiler, snapshot/preview, scan/fix, design OG | **Not started or early** — see PROGRESS                                                                                                                                                                        |
 
-Public guides: **[`docs/recipes/`](./docs/recipes/README.md)** · **[`docs/commands.md`](./docs/commands.md)** (CLI + TUI) · **[`docs/adapters/future-frameworks.md`](./docs/adapters/future-frameworks.md)** (Remix / Astro / Nuxt — future).
+Public guides: **[`docs/`](./docs/index.md)** (including **Nextra site** in **`apps/docs`**) · **[`docs/recipes/`](./docs/recipes/index.md)** · **[`docs/commands.md`](./docs/commands.md)** (CLI + TUI) · **[`docs/adapters/future-frameworks.md`](./docs/adapters/future-frameworks.md)** (Remix / Astro / Nuxt — future).
 
 ---
 
 <p align="center">
-  <a href="./docs/recipes/README.md"><strong>Recipes</strong></a> ·
+  <a href="./docs/recipes/index.md"><strong>Recipes</strong></a> ·
+  <a href="./apps/docs/README.md"><strong>Docs site dev</strong></a> ·
   <a href="./docs/commands.md"><strong>CLI commands</strong></a> ·
   <a href="./CONTRIBUTING.md"><strong>Contributing</strong></a>
 </p>
@@ -228,7 +229,7 @@ flowchart LR
 | **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — TUI launcher, **`og`**, **`icons`**, **`crawl`**, **`doctor`**, **`init`**, **`migrate`** — **[README](./packages/better-seo-cli/README.md)** |
 | **`packages/better-seo-crawl`**    | **`better-seo-crawl`** — **`renderRobotsTxt`**, **`renderSitemapXml`** (optional **`@better-seo/core`** type helper) — use from CLI, recipes, or build scripts            |
 | **`examples/vanilla-render-tags`** | **`createSEO` + `renderTags`** in plain Node (**no React**).                                                                                                              |
-| **`docs/recipes/`**                | Copy-paste recipes (layout/page merge, async `generateMetadata`, OG, icons, sitemap/robots).                                                                              |
+| **`docs/`** / **`apps/docs`**      | Canonical docs markdown + Nextra site (getting started, concepts, API, recipes).                                                                                          |
 | **`internal-docs/`** (clone only)  | Maintainer specs: PRD, architecture, features, roadmap — index in **CONTRIBUTING.md** (not part of published docs site).                                                  |
 
 Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
@@ -312,7 +313,9 @@ Core has a **size budget** (see **`packages/core/package.json`** and `npm run si
 
 | Doc                                                                                      | Purpose                                      |
 | ---------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **[`docs/recipes/README.md`](./docs/recipes/README.md)**                                 | Next/React patterns and tutorials            |
+| **[`docs/index.md`](./docs/index.md)**                                                   | Docs hub (markdown source for the site)      |
+| **[`apps/docs/README.md`](./apps/docs/README.md)**                                       | Nextra docs app — `npm run dev` (port 3004)  |
+| **[`docs/recipes/index.md`](./docs/recipes/index.md)**                                   | Next/React patterns and tutorials            |
 | **[`docs/commands.md`](./docs/commands.md)**                                             | **`@better-seo/cli`** command reference      |
 | **[`docs/compare/next-seo-vs-better-seo.md`](./docs/compare/next-seo-vs-better-seo.md)** | Comparison with next-seo                     |
 | **[`docs/adapters/future-frameworks.md`](./docs/adapters/future-frameworks.md)**         | Planned adapters (Remix, Astro, Nuxt, …)     |

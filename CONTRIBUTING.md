@@ -2,7 +2,7 @@
 
 Thanks for helping improve **better-seo.js**. Packaging and release flow: [**PACKAGE.md**](./PACKAGE.md).
 
-**Maintainer specs** (same repo; not linked from published `docs/`): `internal-docs/` holds **PRD**, **ARCHITECTURE**, **FEATURES**, **Roadmap**, **PROGRESS**, **USAGE**, TUI/crawl plans, and similar — open those files locally after clone.
+**Maintainer specs** (same repo): public guides live under **`docs/`** (and the **Nextra** site in **`apps/docs`**). **`internal-docs/`** holds **PRD**, **ARCHITECTURE**, **FEATURES**, **Roadmap**, **PROGRESS**, **USAGE**, TUI/crawl plans, and similar — open those files locally after clone.
 
 ## Prerequisites
 
@@ -18,6 +18,12 @@ npm ci
 npm run build
 npm run test
 ```
+
+## Documentation site (Nextra)
+
+- **Markdown source:** repository-root **`docs/`** (getting started, concepts, API stubs, recipes, CLI, etc.).
+- **Site app:** **`apps/docs`** — Next.js + Nextra; syncs `docs/` → `content/` on **`predev`** / **`prebuild`**; **`@better-seo/next`** is used for default metadata + JSON-LD (dogfood).
+- **Local preview:** after `npm run build` from the root, run `npm run dev -w better-seo-docs-site` (port **3004**) or `cd apps/docs && npm run dev`.
 
 ## Commit messages (Conventional Commits)
 

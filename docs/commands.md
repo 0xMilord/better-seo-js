@@ -1,8 +1,13 @@
+---
+title: CLI commands
+description: better-seo CLI reference — TUI, og, icons, crawl, doctor, init, migrate.
+---
+
 # `better-seo` CLI — command reference & implementation matrix
 
 This document is the **published CLI reference** for the monorepo: commands that ship in [`@better-seo/cli`](../packages/better-seo-cli/), what they do, suggested onboarding order, and what is covered by automated tests vs interactive-only paths.
 
-**Related:** [`@better-seo/cli` README](../packages/better-seo-cli/README.md) · [Recipes](./recipes/README.md) · [Monorepo README](../README.md)
+**Related:** [`@better-seo/cli` README](../packages/better-seo-cli/README.md) · [Recipes](./recipes/index.md) · [Monorepo README](../README.md)
 
 ---
 
@@ -160,5 +165,5 @@ When this file and the CLI disagree, treat **`better-seo --help`** and the sourc
 
 ## 6. See also
 
-- [Recipes index](./recipes/README.md) — OG, icons, Next.js sitemap/robots
+- [Recipes index](./recipes/index.md) — OG, icons, Next.js sitemap/robots
 - [`docs/compare/next-seo-vs-better-seo.md`](./compare/next-seo-vs-better-seo.md) — migration context

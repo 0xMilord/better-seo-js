@@ -9,10 +9,11 @@
   },
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w better-seo-crawl && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w @better-seo/react && npm run build -w nextjs-app && npm run build -w react-seo-vite-example",
+    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w better-seo-crawl && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w @better-seo/react && npm run build -w nextjs-app && npm run build -w react-seo-vite-example && npm run build -w better-seo-docs-site",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
@@ -52,7 +53,7 @@
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
     "prettier": "3.5.3",
-    "size-limit": "^11.1.6",
+    "size-limit": "12.0.1",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
@@ -64,6 +65,9 @@
       "prettier --write"
     ],
     "examples/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "apps/docs/**/*.{ts,tsx}": [
       "prettier --write"
     ],
     "*.{md,json,yml,yaml,mjs,cjs}": [

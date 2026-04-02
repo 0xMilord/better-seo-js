@@ -36,4 +36,17 @@ describe("fromNextSeo", () => {
     expect(seo.twitter?.card).toBe("summary")
     expect(seo.twitter?.image).toBe("https://ex.test/tw.jpg")
   })
+
+  it("maps twitter site/handle and openGraph site_name / locale", () => {
+    const input = fromNextSeo({
+      title: "P",
+      openGraph: { site_name: "Legacy site", locale: "de_DE" },
+      twitter: { site: "@corp", handle: "@author" },
+    })
+    const seo = createSEO(input)
+    expect(seo.openGraph?.siteName).toBe("Legacy site")
+    expect(seo.openGraph?.locale).toBe("de_DE")
+    expect(seo.twitter?.site).toBe("@corp")
+    expect(seo.twitter?.creator).toBe("@author")
+  })
 })

@@ -70,6 +70,36 @@ describe("validateSEO", () => {
     expect(issues.some((i) => i.code === "OG_IMAGE_NARROW")).toBe(true)
   })
 
+  it("warns when openGraph.type is article without publishedTime", () => {
+    process.env.NODE_ENV = "development"
+    const issues = validateSEO(
+      createSEO({
+        title: "t",
+        description: "d",
+        openGraph: { type: "article", url: "https://x.test/a" },
+      }),
+      { log: false },
+    )
+    expect(issues.some((i) => i.code === "ARTICLE_PUBLISHED_TIME_RECOMMENDED")).toBe(true)
+  })
+
+  it("does not warn article publishedTime when set", () => {
+    process.env.NODE_ENV = "development"
+    const issues = validateSEO(
+      createSEO({
+        title: "t",
+        description: "d",
+        openGraph: {
+          type: "article",
+          url: "https://x.test/a",
+          publishedTime: "2026-01-01T00:00:00.000Z",
+        },
+      }),
+      { log: false },
+    )
+    expect(issues.some((i) => i.code === "ARTICLE_PUBLISHED_TIME_RECOMMENDED")).toBe(false)
+  })
+
   it("flags empty title", () => {
     process.env.NODE_ENV = "development"
     const seo: SEO = {

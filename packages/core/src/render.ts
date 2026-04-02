@@ -70,6 +70,65 @@ export function renderTags(seo: SEO, config?: SEOConfig): TagDescriptor[] {
   if (seo.openGraph?.type) {
     tags.push({ kind: "meta", property: "og:type", content: seo.openGraph.type })
   }
+  if (seo.openGraph?.siteName) {
+    tags.push({ kind: "meta", property: "og:site_name", content: seo.openGraph.siteName })
+  }
+  if (seo.openGraph?.locale) {
+    tags.push({ kind: "meta", property: "og:locale", content: seo.openGraph.locale })
+  }
+  if (seo.openGraph?.publishedTime) {
+    tags.push({
+      kind: "meta",
+      property: "article:published_time",
+      content: seo.openGraph.publishedTime,
+    })
+  }
+  if (seo.openGraph?.modifiedTime) {
+    tags.push({
+      kind: "meta",
+      property: "article:modified_time",
+      content: seo.openGraph.modifiedTime,
+    })
+  }
+  if (seo.openGraph?.expirationTime) {
+    tags.push({
+      kind: "meta",
+      property: "article:expiration_time",
+      content: seo.openGraph.expirationTime,
+    })
+  }
+  if (seo.openGraph?.section) {
+    tags.push({ kind: "meta", property: "article:section", content: seo.openGraph.section })
+  }
+  const authors = seo.openGraph?.authors
+  if (authors?.length) {
+    for (const a of authors) {
+      if (a?.trim()) tags.push({ kind: "meta", property: "article:author", content: a.trim() })
+    }
+  }
+  const ogTags = seo.openGraph?.tags
+  if (ogTags?.length) {
+    for (const t of ogTags) {
+      if (t?.trim()) tags.push({ kind: "meta", property: "article:tag", content: t.trim() })
+    }
+  }
+  const ogVideos = seo.openGraph?.videos
+  if (ogVideos?.length) {
+    for (const v of ogVideos) {
+      if (!v?.url) continue
+      tags.push({ kind: "meta", property: "og:video", content: v.url })
+      if (v.secureUrl) {
+        tags.push({ kind: "meta", property: "og:video:secure_url", content: v.secureUrl })
+      }
+      if (v.type) tags.push({ kind: "meta", property: "og:video:type", content: v.type })
+      if (v.width !== undefined) {
+        tags.push({ kind: "meta", property: "og:video:width", content: String(v.width) })
+      }
+      if (v.height !== undefined) {
+        tags.push({ kind: "meta", property: "og:video:height", content: String(v.height) })
+      }
+    }
+  }
   const ogImages = seo.openGraph?.images
   if (ogImages?.length) {
     for (const img of ogImages) {
@@ -91,6 +150,12 @@ export function renderTags(seo: SEO, config?: SEOConfig): TagDescriptor[] {
   }
   if (seo.twitter?.description) {
     tags.push({ kind: "meta", name: "twitter:description", content: seo.twitter.description })
+  }
+  if (seo.twitter?.site) {
+    tags.push({ kind: "meta", name: "twitter:site", content: seo.twitter.site })
+  }
+  if (seo.twitter?.creator) {
+    tags.push({ kind: "meta", name: "twitter:creator", content: seo.twitter.creator })
   }
   if (seo.twitter?.image) {
     tags.push({ kind: "meta", name: "twitter:image", content: seo.twitter.image })

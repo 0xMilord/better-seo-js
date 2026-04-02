@@ -7,6 +7,7 @@ export type {
   SEOConfig,
   SEOImage,
   SEOInput,
+  SEOOpenGraphVideo,
   SEOMeta,
   SEOPagination,
   SEOPlugin,

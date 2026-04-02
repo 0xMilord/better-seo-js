@@ -102,6 +102,48 @@ describe("renderTags", () => {
     expect(tags.some((t) => t.kind === "link" && t.rel === "next")).toBe(true)
   })
 
+  it("emits og:site_name, locale, article:*, og:video, twitter:site/creator", () => {
+    const seo = createSEO({
+      title: "Vid",
+      description: "D",
+      openGraph: {
+        type: "article",
+        siteName: "Ex",
+        locale: "en_GB",
+        publishedTime: "2026-01-01T00:00:00.000Z",
+        modifiedTime: "2026-01-02T00:00:00.000Z",
+        expirationTime: "2027-01-01T00:00:00.000Z",
+        section: "News",
+        authors: ["https://ex.test/a", ""],
+        tags: ["x", "y"],
+        videos: [
+          {
+            url: "https://ex.test/v.mp4",
+            secureUrl: "https://ex.test/vs.mp4",
+            type: "video/mp4",
+            width: 1280,
+            height: 720,
+          },
+        ],
+      },
+      twitter: { site: "@ex", creator: "@me" },
+    })
+    const tags = renderTags(seo)
+    expect(tags.filter((t) => t.kind === "meta" && t.property === "article:author")).toHaveLength(1)
+    expect(
+      tags.some((t) => t.kind === "meta" && t.property === "og:site_name" && t.content === "Ex"),
+    ).toBe(true)
+    expect(
+      tags.some((t) => t.kind === "meta" && t.name === "twitter:site" && t.content === "@ex"),
+    ).toBe(true)
+    expect(
+      tags.some(
+        (t) =>
+          t.kind === "meta" && t.property === "og:video" && t.content === "https://ex.test/v.mp4",
+      ),
+    ).toBe(true)
+  })
+
   it("emits multiple og:image groups for multiple images", () => {
     const seo = createSEO({
       title: "T",

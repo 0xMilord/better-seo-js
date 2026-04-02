@@ -4,6 +4,8 @@
 
 **Last updated:** 2026-04-02
 
+**Docs site:** Nextra 4 app in **`apps/docs`** (`better-seo-docs-site`): syncs repo-root **`docs/`** → `content/` on dev/build; root layout dogfoods **`prepareNextSeo`** + **`NextJsonLd`**. Root **`npm run build`** includes the docs site.
+
 ---
 
 ## At a glance — waves done vs left

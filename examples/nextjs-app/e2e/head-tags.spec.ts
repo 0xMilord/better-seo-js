@@ -28,6 +28,18 @@ test.describe("head tags (home)", () => {
 
     const twImage = page.locator('meta[name="twitter:image"]')
     await expect(twImage).toHaveAttribute("content", /og-example\.png/)
+
+    const ogSite = page.locator('meta[property="og:site_name"]')
+    await expect(ogSite).toHaveAttribute("content", /better-seo\.js demo/)
+
+    const ogLocale = page.locator('meta[property="og:locale"]')
+    await expect(ogLocale).toHaveAttribute("content", "en_US")
+
+    const twSite = page.locator('meta[name="twitter:site"]')
+    await expect(twSite).toHaveAttribute("content", "@better_seo_js")
+
+    const twCreator = page.locator('meta[name="twitter:creator"]')
+    await expect(twCreator).toHaveAttribute("content", "@better_seo_js")
   })
 
   test("JSON-LD is parseable with expected @type", async ({ page }) => {

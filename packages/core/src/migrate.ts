@@ -73,11 +73,18 @@ export function fromNextSeo(nextSeoExport: unknown): SEOInput {
   let openGraph: SEOInput["openGraph"]
   if (og) {
     const images = mapOgImages(og.images)
+    const siteName =
+      pickStr((og as { siteName?: unknown }).siteName) ??
+      pickStr((og as { site_name?: unknown }).site_name)
     openGraph = {
       ...(pickStr(og.title) !== undefined ? { title: pickStr(og.title) } : {}),
       ...(pickStr(og.description) !== undefined ? { description: pickStr(og.description) } : {}),
       ...(pickStr(og.url) !== undefined ? { url: pickStr(og.url) } : {}),
       ...(pickStr(og.type) !== undefined ? { type: pickStr(og.type) } : {}),
+      ...(siteName !== undefined ? { siteName } : {}),
+      ...(pickStr((og as { locale?: unknown }).locale) !== undefined
+        ? { locale: pickStr((og as { locale?: unknown }).locale) }
+        : {}),
       ...(images !== undefined ? { images } : {}),
     }
     if (Object.keys(openGraph).length === 0) openGraph = undefined
@@ -88,11 +95,16 @@ export function fromNextSeo(nextSeoExport: unknown): SEOInput {
     const cardRaw = pickStr(tw.card)
     const card = cardRaw === "summary" || cardRaw === "summary_large_image" ? cardRaw : undefined
     const twImage = pickStr(tw.image) ?? pickStr((tw as { imageSrc?: unknown }).imageSrc)
+    const twSite = pickStr((tw as { site?: unknown }).site)
+    const twCreator =
+      pickStr((tw as { handle?: unknown }).handle) ?? pickStr((tw as { creator?: unknown }).creator)
     twitter = {
       ...(card !== undefined ? { card } : {}),
       ...(pickStr(tw.title) !== undefined ? { title: pickStr(tw.title) } : {}),
       ...(pickStr(tw.description) !== undefined ? { description: pickStr(tw.description) } : {}),
       ...(twImage !== undefined ? { image: twImage } : {}),
+      ...(twSite !== undefined ? { site: twSite } : {}),
+      ...(twCreator !== undefined ? { creator: twCreator } : {}),
     }
     if (Object.keys(twitter).length === 0) twitter = undefined
   }

@@ -205,10 +205,10 @@ export async function runInteractiveLauncher(): Promise<number> {
     options: [
       { value: "og", label: "Generate OG image (1200×630)", hint: "Wave L2" },
       { value: "icons", label: "Generate favicon + PWA icons", hint: "Wave L3" },
-      { value: "crawl", label: "Robots / sitemap (commands + docs)", hint: "Wave W" },
-      { value: "doctor", label: "Run environment doctor", hint: "Wave 6" },
-      { value: "init", label: "Show install & snippet", hint: "Wave 7" },
-      { value: "migrate", label: "Migration hints (next-seo)", hint: "Wave 8" },
+      { value: "crawl", label: "Robots / sitemap (commands + docs)", hint: "Wave 12 + CLI" },
+      { value: "doctor", label: "Run environment doctor", hint: "Wave 9 · L8" },
+      { value: "init", label: "Show install & snippet", hint: "Wave 9" },
+      { value: "migrate", label: "Migration hints (next-seo)", hint: "Wave 12 · L7" },
       { value: "exit", label: "Exit" },
     ],
   })

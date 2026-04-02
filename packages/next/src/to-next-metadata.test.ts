@@ -34,6 +34,34 @@ describe("toNextMetadata", () => {
     expect(m.alternates?.languages?.de).toBe("https://ex.test/de/hi")
   })
 
+  it("maps openGraph siteName, locale, article times, twitter site/creator", () => {
+    const doc = createSEO({
+      title: "A",
+      description: "B",
+      openGraph: {
+        type: "article",
+        url: "https://ex.test/p",
+        siteName: "Ex News",
+        locale: "fr_FR",
+        publishedTime: "2026-02-01T08:00:00.000Z",
+        authors: ["Jane"],
+        section: "Tech",
+        tags: ["js"],
+      },
+      twitter: { site: "@exnews", creator: "@jane" },
+    })
+    const m = toNextMetadata(doc)
+    expect(m.openGraph).toMatchObject({
+      siteName: "Ex News",
+      locale: "fr_FR",
+      publishedTime: "2026-02-01T08:00:00.000Z",
+      authors: ["Jane"],
+      section: "Tech",
+      tags: ["js"],
+    })
+    expect(m.twitter).toMatchObject({ site: "@exnews", creator: "@jane" })
+  })
+
   it("maps restrictive robots", () => {
     const doc = createSEO({ title: "R", meta: { robots: "noindex, nofollow" } })
     const m = toNextMetadata(doc)

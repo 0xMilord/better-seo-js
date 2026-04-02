@@ -87,6 +87,15 @@ export interface SEOImage {
   readonly alt?: string
 }
 
+/** Open Graph `og:video` group — used when `openGraph.type` is `video.*` or for rich previews. */
+export interface SEOOpenGraphVideo {
+  readonly url: string
+  readonly secureUrl?: string
+  readonly type?: string
+  readonly width?: number
+  readonly height?: number
+}
+
 export interface SEO {
   readonly meta: SEOMeta
   readonly openGraph?: {
@@ -94,10 +103,31 @@ export interface SEO {
     readonly description?: string
     readonly url?: string
     readonly type?: string
+    /** `og:site_name` — brand shown in Facebook / LinkedIn / Slack previews. */
+    readonly siteName?: string
+    /** `og:locale` — e.g. `en_US`. */
+    readonly locale?: string
+    /** `article:published_time` (ISO-8601). */
+    readonly publishedTime?: string
+    /** `article:modified_time` */
+    readonly modifiedTime?: string
+    /** `article:expiration_time` */
+    readonly expirationTime?: string
+    /** `article:author` (repeat per entry). */
+    readonly authors?: readonly string[]
+    /** `article:section` */
+    readonly section?: string
+    /** `article:tag` (repeat per entry). */
+    readonly tags?: readonly string[]
     readonly images?: readonly SEOImage[]
+    readonly videos?: readonly SEOOpenGraphVideo[]
   }
   readonly twitter?: {
     readonly card?: "summary" | "summary_large_image"
+    /** `twitter:site` — @handle or numeric string per Twitter Card spec. */
+    readonly site?: string
+    /** `twitter:creator` */
+    readonly creator?: string
     readonly title?: string
     readonly description?: string
     readonly image?: string

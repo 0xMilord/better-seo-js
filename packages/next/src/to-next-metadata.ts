@@ -171,6 +171,14 @@ export function toNextMetadata(seo: SEO): Metadata {
       description: seo.openGraph.description,
       url: seo.openGraph.url,
       type: seo.openGraph.type,
+      siteName: seo.openGraph.siteName,
+      locale: seo.openGraph.locale,
+      publishedTime: seo.openGraph.publishedTime,
+      modifiedTime: seo.openGraph.modifiedTime,
+      expirationTime: seo.openGraph.expirationTime,
+      authors: seo.openGraph.authors?.length ? [...seo.openGraph.authors] : undefined,
+      section: seo.openGraph.section,
+      tags: seo.openGraph.tags?.length ? [...seo.openGraph.tags] : undefined,
       images: seo.openGraph.images?.map((img) =>
         omitUndefined({
           url: img.url,
@@ -179,6 +187,18 @@ export function toNextMetadata(seo: SEO): Metadata {
           alt: img.alt,
         }),
       ),
+      videos:
+        seo.openGraph.videos && seo.openGraph.videos.length > 0
+          ? seo.openGraph.videos.map((v) =>
+              omitUndefined({
+                url: v.url,
+                secureUrl: v.secureUrl,
+                type: v.type,
+                width: v.width,
+                height: v.height,
+              }),
+            )
+          : undefined,
     })
     if (Object.keys(og).length > 0) {
       m.openGraph = og as Metadata["openGraph"]
@@ -188,6 +208,8 @@ export function toNextMetadata(seo: SEO): Metadata {
   if (seo.twitter) {
     const tw = omitUndefined({
       card: seo.twitter.card,
+      site: seo.twitter.site,
+      creator: seo.twitter.creator,
       title: seo.twitter.title,
       description: seo.twitter.description,
       images: seo.twitter.image ? [seo.twitter.image] : undefined,

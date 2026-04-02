@@ -10,6 +10,7 @@ export type ValidationIssueCode =
   | "DESCRIPTION_REQUIRED"
   | "DESCRIPTION_TOO_LONG"
   | "OG_IMAGE_NARROW"
+  | "ARTICLE_PUBLISHED_TIME_RECOMMENDED"
   | "SCHEMA_MISSING_TYPE"
 
 export interface ValidationIssue {
@@ -95,6 +96,19 @@ export function validateSEO(seo: SEO, options?: ValidateSEOOptions): readonly Va
       code: "OG_IMAGE_NARROW",
       field: "openGraph.images[0].width",
       message: "OG image width under 1200px",
+      severity: "warning",
+    })
+  }
+
+  const ogType = seo.openGraph?.type
+  if (
+    ogType === "article" &&
+    !(seo.openGraph?.publishedTime && String(seo.openGraph.publishedTime).trim())
+  ) {
+    issues.push({
+      code: "ARTICLE_PUBLISHED_TIME_RECOMMENDED",
+      field: "openGraph.publishedTime",
+      message: "openGraph.type is article; set publishedTime (ISO-8601) for richer crawlers",
       severity: "warning",
     })
   }
