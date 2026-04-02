@@ -44,13 +44,13 @@
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "@vitest/coverage-v8": "^3.0.6",
-    "jsdom": "^26.0.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "jsdom": "^29.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-helmet-async": "^3.0.0",
     "tsup": "^8.3.6",
-    "typescript": "^5.7.3",
-    "vitest": "^3.0.6"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   }
 }
