@@ -17,7 +17,7 @@
   "dependencies": {
     "@better-seo/next": "0.0.1",
     "@better-seo/core": "0.0.1",
-    "next": "^15.1.6",
+    "next": "^16.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "styled-jsx": "^5.1.6"
