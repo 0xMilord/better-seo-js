@@ -2,20 +2,20 @@
 
 This document describes **how the system is built and bounded**. Product intent, adoption strategy, and roadmap live in [`PRD.md`](./PRD.md). Feature inventory: [`FEATURES.md`](./FEATURES.md). **Sequencing / waves:** [`Roadmap.md`](./Roadmap.md).
 
-**Naming:** the zero-dependency npm package is **`better-seo.js`**, not `@better-seo/core`. Scoped **`@better-seo/*`** packages are **adapters** (and similar) only.
+**Naming:** the zero-dependency **core** npm package is **`@better-seo/core`**. Additional **`@better-seo/*`** packages are **adapters**, **assets**, **CLI**, or other optional surfaces—core does not depend on them at runtime.
 
 ---
 
 ## 1. Goals & constraints
 
-| Goal                                | Architectural implication                                                                                                                                                                                                                     |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zero-dependency core**            | The published **`better-seo.js`** package has **no `dependencies`** (and no **`peerDependencies` required at install** for core). Only **standard library–style** TypeScript/JavaScript: pure data transforms, serializers, small registries. |
-| **Small browser/Edge-safe surface** | Anything that reads **`package.json`**, scans the filesystem, or shells out lives in **CLI** or **optional packages**, never in code paths imported by Edge bundles.                                                                          |
-| **Framework power**                 | Framework-specific behavior sits in **`@better-seo/*` adapters** that depend on **core** and (optionally) on framework packages as **their** `peerDependencies`.                                                                              |
-| **Enterprise correctness**          | JSON-LD and tags go through **one serialization path**; merging is **deterministic**; config can be **request-scoped** (`createSEOContext`) instead of global.                                                                                |
+| Goal                                | Architectural implication                                                                                                                                                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Zero-dependency core**            | The published **`@better-seo/core`** package has **no `dependencies`** (and no **`peerDependencies` required at install** for core). Only **standard library–style** TypeScript/JavaScript: pure data transforms, serializers, small registries. |
+| **Small browser/Edge-safe surface** | Anything that reads **`package.json`**, scans the filesystem, or shells out lives in **CLI** or **optional packages**, never in code paths imported by Edge bundles.                                                                             |
+| **Framework power**                 | Framework-specific behavior sits in **`@better-seo/*` adapters** that depend on **core** and (optionally) on framework packages as **their** `peerDependencies`.                                                                                 |
+| **Enterprise correctness**          | JSON-LD and tags go through **one serialization path**; merging is **deterministic**; config can be **request-scoped** (`createSEOContext`) instead of global.                                                                                   |
 
-**“Zero dependency” means:** no runtime npm packages shipped inside **`better-seo.js`**. Dev-time tools (TypeScript, Vitest, build bundlers) are **`devDependencies` of the repo**, not of the consumer’s runtime graph for `import "better-seo.js"`.
+**“Zero dependency” means:** no runtime npm packages shipped inside **`@better-seo/core`**. Dev-time tools (TypeScript, Vitest, build bundlers) are **`devDependencies` of the repo**, not of the consumer’s runtime graph for `import "@better-seo/core"`.
 
 ---
 
@@ -29,7 +29,7 @@ flowchart LR
     I3["Route context (optional)"]
   end
 
-  subgraph bscore ["better-seo.js (core, 0 deps)"]
+  subgraph bscore ["@better-seo/core (0 deps)"]
     C["createSEO / mergeSEO"]
     P["Plugin hooks"]
     S["serializeJSONLD"]
@@ -44,8 +44,8 @@ flowchart LR
   end
 
   subgraph optional [Optional packages]
-    A["better-seo-assets"]
-    L["better-seo-cli"]
+    A["@better-seo/assets"]
+    L["@better-seo/cli"]
     W["better-seo-crawl"]
   end
 
@@ -78,24 +78,24 @@ Partial<SEO> + SEOConfig
 
 ## 3. Package topology (monorepo)
 
-| Package                                                                  | Role                                                                                                                          | Runtime deps (target)                                                       |
-| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **`better-seo.js`**                                                      | Normalized model, merge, schema helpers, vanilla `renderTags`, serialization, validation (dev-flagged), registry, context API | **None**                                                                    |
-| **`@better-seo/next`**                                                   | Next.js `Metadata` / `generateMetadata` mapping                                                                               | **`better-seo.js` + `next` as peer**                                        |
-| **`@better-seo/react`**                                                  | React Helmet / head props                                                                                                     | **peers: `better-seo.js`, `react`, `react-helmet-async`** (exact peers TBD) |
-| **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same pattern: thin mapping + peers                                                                                            | Framework peers only                                                        |
-| **`better-seo-assets`**                                                  | OG (Satori, etc.), Sharp-based icons — **heavy**                                                                              | Own deps OK; **not** imported by core                                       |
-| **`better-seo-cli`**                                                     | Init, scan, migrate, doctor, calls into assets                                                                                | CLI deps OK (inquirer, etc.)                                                |
-| **`better-seo-crawl`**                                                   | Sitemap, robots, RSS — may use Node APIs                                                                                      | May depend on **`better-seo.js`** only                                      |
+| Package                                                                  | Role                                                                                                                          | Runtime deps (target)                                                          |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **`@better-seo/core`**                                                   | Normalized model, merge, schema helpers, vanilla `renderTags`, serialization, validation (dev-flagged), registry, context API | **None**                                                                       |
+| **`@better-seo/next`**                                                   | Next.js `Metadata` / `generateMetadata` mapping                                                                               | **`@better-seo/core` + `next` as peer**                                        |
+| **`@better-seo/react`**                                                  | React Helmet / head props                                                                                                     | **peers: `@better-seo/core`, `react`, `react-helmet-async`** (exact peers TBD) |
+| **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same pattern: thin mapping + peers                                                                                            | Framework peers only                                                           |
+| **`@better-seo/assets`**                                                 | OG (Satori, etc.), Sharp-based icons — **heavy**                                                                              | Own deps OK; **not** imported by core                                          |
+| **`@better-seo/cli`**                                                    | Init, scan, migrate, doctor, calls into assets                                                                                | CLI deps OK (inquirer, etc.)                                                   |
+| **`better-seo-crawl`**                                                   | Sitemap, robots, RSS — may use Node APIs                                                                                      | May depend on **`@better-seo/core`** only                                      |
 
-**Rule:** `better-seo.js` MUST NOT import from `@better-seo/next`, `better-seo-assets`, or `better-seo-cli`. The dependency arrow is **always toward core**.
+**Rule:** `@better-seo/core` MUST NOT import from `@better-seo/next`, `@better-seo/assets`, or `@better-seo/cli`. The dependency arrow is **always toward core**.
 
 ---
 
 ## 4. Core module layout (reference)
 
 ```
-better-seo.js/
+packages/core/    # npm: @better-seo/core
 ├── src/
 │   ├── types.ts           # SEO, SEOConfig, JSONLD, JSONLDValue, ValidationConfig, …
 │   ├── core.ts            # createSEO, mergeSEO, applyFallbacks, titleTemplate
@@ -119,7 +119,7 @@ better-seo.js/
 **Optional split (if MDX/compiler would violate zero-dep):**
 
 - Keep **`fromContent(title, bodyText)`** in core (string in / `SEO` out; no parsers).
-- Move **`fromMDX`** behind **`@better-seo/compiler`** or **`better-seo/compiler`** subpath with **optional peers** (`mdx-bundler`, `gray-matter`, etc.) so default **`npm install better-seo.js`** stays dependency-free.
+- Move **`fromMDX`** behind **`@better-seo/compiler`** or **`better-seo/compiler`** subpath with **optional peers** (`mdx-bundler`, `gray-matter`, etc.) so default **`npm install @better-seo/core`** stays dependency-free.
 
 Exact choice is an implementation detail; **ARCHITECTURE.md** requires: **default core install = zero third-party runtime modules**.
 
@@ -230,8 +230,8 @@ Plugins are **user-supplied** objects with stable **`id`** and optional hooks. T
 
 **Build-time rule:** publish **multiple entry points** if needed:
 
-- **`better-seo.js`** — browser/Edge-safe subset (no `fs`, no `path` resolution of `package.json`).
-- **`better-seo.js/node`** (optional) — inference + `initSEO` with filesystem (still **zero deps**, only Node builtins).
+- **`@better-seo/core`** — browser/Edge-safe subset (no `fs`, no `path` resolution of `package.json`).
+- **`@better-seo/core/node`** (optional) — inference + `initSEO` with filesystem (still **zero deps**, only Node builtins).
 
 If a single entry is preferred, **tree-shaking** + guarded lazy `require` is acceptable only if proven safe for Next Edge bundles (tests required).
 
@@ -257,7 +257,7 @@ If a single entry is preferred, **tree-shaking** + guarded lazy `require` is acc
 - **Default:** meaningful in **development** only (length hints, missing description warnings).
 - **Production:** stripped or no-op via:
   - build defines (`import.meta.env.DEV`), or
-  - separate export `better-seo.js/dev`.
+  - separate export `@better-seo/core/dev`.
 
 Must not pull in heavy deps; only comparisons on strings/arrays already in memory.
 
@@ -281,7 +281,7 @@ These packages **may** depend on:
 
 - **Filesystem**, **sharp**, **Satori**, **React** (for OG templates), etc.
 
-They consume the **`SEO`** model and/or generated files but **must not** become transitive deps of `import "better-seo.js"` in app code.
+They consume the **`SEO`** model and/or generated files but **must not** become transitive deps of `import "@better-seo/core"` in app code.
 
 ---
 
@@ -307,7 +307,7 @@ They consume the **`SEO`** model and/or generated files but **must not** become 
 
 ## 17. Summary
 
-1. **`better-seo.js`** is a **dependency-free runtime library**: pure model + merge + serialize + registry + optional validation.
+1. **`@better-seo/core`** is a **dependency-free runtime library**: pure model + merge + serialize + registry + optional validation.
 2. **Power** comes from **adapters** (framework output), **plugins** (policy), and **optional packages** (assets, CLI, crawl)—not from bloating core’s `node_modules`.
 3. **Edge and enterprise** are first-class by **forbidding hidden fs/env inference** on those paths and promoting **`createSEOContext`**.
 4. **Security-critical output** (JSON-LD) has **one serializer** used everywhere.

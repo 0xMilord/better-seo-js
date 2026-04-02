@@ -284,5 +284,5 @@ Internal specs stay in **`internal-docs/`**; public contributor path starts at *
 
 ## 12. Current repo state
 
-- **P0 / Wave 1 scaffold is present:** **`@better-seo/core`**, **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Versions start at **`0.0.0`** until you run Changesets and publish; **`examples/nextjs-app`** stays **`private: true`**.
+- **P0 / Wave 1 scaffold is present:** **`@better-seo/core`**, **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Publishable workspaces are aligned at **`0.0.1`** for the first release; **`examples/nextjs-app`** stays **`private: true`** (not published).
 - Replace **`OWNER`** in **SECURITY.md** / **CONTRIBUTING.md** clone URLs with your GitHub org or username after the remote exists.

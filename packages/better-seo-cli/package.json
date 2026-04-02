@@ -1,6 +1,6 @@
 {
   "name": "@better-seo/cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "CLI for better-seo.js — Wave 2: `og`, Wave 3: `icons` (+ manifest)",
   "license": "MIT",
   "type": "module",

@@ -161,8 +161,8 @@ flowchart LR
 | **`packages/core`**              | npm **`@better-seo/core`**: `createSEO`, `mergeSEO`, `withSEO`, schema builders, `serializeJSONLD`, `renderTags`, validation hooks, adapter registry, plugins, rules, `SEOError`. |
 | **`packages/next`**              | **`@better-seo/next`**: `seo`, `prepareNextSeo`, `withSEO`, `toNextMetadata`, **`@better-seo/next/json-ld`** (`NextJsonLd`). Registers the `"next"` adapter on import.            |
 | **`examples/nextjs-app`**        | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                                                                                 |
-| **`packages/better-seo-assets`** | **`generateOG`**: Satori + Resvg, light/dark templates (**A1** / PRD §3.7).                                                                                                       |
-| **`packages/better-seo-cli`**    | **`better-seo` / `better-seo-cli` bin**: `og` command (**L2**).                                                                                                                   |
+| **`packages/better-seo-assets`** | npm **`@better-seo/assets`**: **`generateOG`**, **`generateIcons`**, manifest helpers (**A1** / PRD §3.7).                                                                        |
+| **`packages/better-seo-cli`**    | npm **`@better-seo/cli`**: **`better-seo` / `better-seo-cli` bins**, **`og`** / **`icons`** (**L2**).                                                                             |
 | **`docs/recipes/`**              | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                                                                                      |
 | **`internal-docs/`**             | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                                                                                    |
 

@@ -1,6 +1,6 @@
 {
   "name": "@better-seo/next",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Next.js adapter for better-seo.js — Metadata, voilà `seo()` — see internal-docs/FEATURES.md N1–N10",
   "license": "MIT",
   "type": "module",

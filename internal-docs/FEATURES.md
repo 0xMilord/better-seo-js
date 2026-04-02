@@ -8,17 +8,17 @@ This document lists **planned features**, **where they live** in the monorepo, a
 
 | Package                                                                  | Role                                                                                                                                                                                |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`better-seo.js`**                                                      | Unified `SEO` model, merge, fallbacks, JSON-LD helpers, serialization, validation (dev), rules (pure), plugins, `createSEOContext`, vanilla `renderTags`, optional `initSEO` (Node) |
+| **`@better-seo/core`**                                                   | Unified `SEO` model, merge, fallbacks, JSON-LD helpers, serialization, validation (dev), rules (pure), plugins, `createSEOContext`, vanilla `renderTags`, optional `initSEO` (Node) |
 | **`@better-seo/next`**                                                   | **P0.** Next.js `Metadata` / App & Pages Router integration, `toNextMetadata`, route context patterns                                                                               |
 | **`@better-seo/react`**                                                  | Helmet / SPA head (P1)                                                                                                                                                              |
 | **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same adapter pattern (P2 / as needed)                                                                                                                                               |
-| **`better-seo-assets`**                                                  | OG, icons, splash, manifest (optional deps: Satori, Sharp, …)                                                                                                                       |
-| **`better-seo-cli`**                                                     | `init`, `og`, `icons`, `add`, `scan`, `fix`, `snapshot`, `preview`, `migrate`, `doctor`, templates, TUI                                                                             |
+| **`@better-seo/assets`**                                                 | OG, icons, splash, manifest (optional deps: Satori, Sharp, …)                                                                                                                       |
+| **`@better-seo/cli`**                                                    | `init`, `og`, `icons`, `add`, `scan`, `fix`, `snapshot`, `preview`, `migrate`, `doctor`, templates, TUI                                                                             |
 | **`better-seo-crawl`**                                                   | Sitemap, robots, RSS/Atom, optional `llms.txt`                                                                                                                                      |
 | **`examples/*`**                                                         | Golden paths + **E2E** (especially `examples/nextjs-app`)                                                                                                                           |
 | **`docs/*`**                                                             | Distribution & onboarding (per PRD §8.6)                                                                                                                                            |
 
-**Rule:** `better-seo.js` stays **runtime dependency-free**; heaviness lives in adapters (framework peers) or optional packages.
+**Rule:** `@better-seo/core` stays **runtime dependency-free**; heaviness lives in adapters (framework peers) or optional packages.
 
 ---
 
@@ -47,13 +47,13 @@ These ship and harden **before** other frameworks are considered complete.
 | #   | Feature                                  | User-facing surface                                | Primary location                                                                   | Enterprise notes                                                                                                                                                                                                      |
 | --- | ---------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | N1  | **Voilà: `seo()` → `Metadata`**          | `export const metadata = seo({ title })`           | `@better-seo/next` + core `voila.ts`                                               | Works App Router; document Edge: explicit config + context, no implicit `fs` inference.                                                                                                                               |
-| N2  | **`createSEO` / `mergeSEO` + fallbacks** | Imperative API + layout/page composition           | `better-seo.js` (`core.ts`)                                                        | Golden tests for title template, OG/Twitter fallbacks, canonical + `baseUrl`.                                                                                                                                         |
+| N2  | **`createSEO` / `mergeSEO` + fallbacks** | Imperative API + layout/page composition           | `@better-seo/core` (`core.ts`)                                                     | Golden tests for title template, OG/Twitter fallbacks, canonical + `baseUrl`.                                                                                                                                         |
 | N3  | **`toNextMetadata(seo)`**                | `generateMetadata`, root layout                    | `@better-seo/next`                                                                 | Fidelity table vs hand-written `Metadata`: alternates, openGraph, twitter, robots, verification.                                                                                                                      |
 | N4  | **JSON-LD in Next output**               | `metadata` / `other` JSON-LD fields                | `@better-seo/next/json-ld` → **`NextJsonLd`** uses **`serializeJSONLD`** from core | Single serializer; Next adapter does not reimplement stringify. App Router: keep static **`Metadata`** free of non-serializable fields — render JSON-LD via **`NextJsonLd`** (see monorepo baseline **Roadmap §11**). |
 | N5  | **Layout + page SEO merge**              | Root layout + nested `metadata`                    | App pattern + `mergeSEO` docs/recipes                                              | Document interaction with Next’s **default** metadata behavior so teams don’t double-apply.                                                                                                                           |
 | N6  | **`generateMetadata` + async data**      | Dynamic segments                                   | `@better-seo/next` recipes                                                         | Helpers stay sync; adapter documents composing `createSEO` with async `fetch` in Next.                                                                                                                                |
 | N7  | **Explicit adapter registration**        | `registerAdapter` / import `@better-seo/next`      | core registry + adapter package                                                    | Enterprise docs: **no reliance** on fragile auto-detect in CI.                                                                                                                                                        |
-| N8  | **Request-scoped SEO**                   | `createSEOContext` in server components / handlers | `better-seo.js` (`context.ts`)                                                     | Required story for multi-tenant + strict isolation; examples under `examples/nextjs-app`.                                                                                                                             |
+| N8  | **Request-scoped SEO**                   | `createSEOContext` in server components / handlers | `@better-seo/core` (`context.ts`)                                                  | Required story for multi-tenant + strict isolation; examples under `examples/nextjs-app`.                                                                                                                             |
 | N9  | **Rules + pathname**                     | `initSEO`/`context` + `routeContext` from Next     | `rules.ts` + Next recipes                                                          | `getCurrentRouteFromAdapter` lives in docs/adapter: `headers()`, `pathname` from segment props, etc.                                                                                                                  |
 | N10 | **E2E golden app**                       | Real HTML head                                     | `examples/nextjs-app` + Playwright                                                 | Assert OG tags, canonical, JSON-LD parseable JSON; run in default CI (PRD Wave 1).                                                                                                                                    |
 
@@ -61,7 +61,7 @@ These ship and harden **before** other frameworks are considered complete.
 
 ---
 
-## 4. Core library (`better-seo.js`) — features
+## 4. Core library (`@better-seo/core`) — features
 
 | ID  | Feature                                                                                                      | Module (target)                                                   | Maps to                                                                         |
 | --- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -134,7 +134,7 @@ Each adapter: **fixture tests** (`SEO` in → framework output snapshot).
 
 ---
 
-## 7. `better-seo-assets`
+## 7. `@better-seo/assets`
 
 | ID  | Feature                                            | Enterprise notes                                                     |
 | --- | -------------------------------------------------- | -------------------------------------------------------------------- |
@@ -146,7 +146,7 @@ Each adapter: **fixture tests** (`SEO` in → framework output snapshot).
 
 ---
 
-## 8. `better-seo-cli`
+## 8. `@better-seo/cli`
 
 | ID  | Command / capability                                   | Enterprise notes                                              |
 | --- | ------------------------------------------------------ | ------------------------------------------------------------- |
@@ -197,9 +197,9 @@ Docs are a **delivery surface** (PRD §8.6).
 ```txt
 Next app
   → @better-seo/next (toNextMetadata, seo() wiring)
-       → better-seo.js (createSEO, mergeSEO, serializeJSONLD, rules, plugins)
-  → optional: better-seo-cli (workflow)
-  → optional: better-seo-assets (OG/icons)
+       → @better-seo/core (createSEO, mergeSEO, serializeJSONLD, rules, plugins)
+  → optional: @better-seo/cli (workflow)
+  → optional: @better-seo/assets (OG/icons)
   → optional: better-seo-crawl (sitemap/robots/RSS)
 ```
 

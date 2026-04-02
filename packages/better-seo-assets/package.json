@@ -1,6 +1,6 @@
 {
   "name": "@better-seo/assets",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Optional OG images and PWA assets for better-seo.js — Roadmap Wave 2 (OG) + Wave 3 (icons)",
   "license": "MIT",
   "type": "module",
