@@ -24,6 +24,7 @@
 [![Coverage — cli](https://img.shields.io/badge/coverage-@better--seo%2Fcli%20≥80%25%20lines-informational?style=flat-square)](./packages/better-seo-cli/README.md#coverage)
 [![Coverage — react](https://img.shields.io/badge/coverage-@better--seo%2Freact%20≥85%25%20lines-informational?style=flat-square)](./packages/react/README.md)
 [![Coverage — crawl](https://img.shields.io/badge/coverage-@better--seo%2Fcrawl-Vitest-informational?style=flat-square)](./packages/better-seo-crawl/)
+[![Coverage — compiler](https://img.shields.io/badge/coverage-@better--seo%2Fcompiler-Vitest-informational?style=flat-square)](./packages/better-seo-compiler/)
 
 ### CI and test results (badges, tables, reports)
 

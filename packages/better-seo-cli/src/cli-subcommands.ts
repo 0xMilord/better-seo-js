@@ -6,7 +6,7 @@ import { getTemplateSEOInput } from "./cli-templates.js"
 function printDoctorHelp(): void {
   console.log(`Usage: better-seo doctor [--json] [--help]
 
-Checks Node and reads package.json for @better-seo/* adapters.`)
+Checks Node (JSON: nodeMeetsEngineRange vs repo engines Node 24+) and package.json for @better-seo/* adapters.`)
 }
 
 function printInitHelp(): void {
@@ -57,6 +57,8 @@ export async function runDoctor(rest: string[]): Promise<number> {
     const node = process.version
     const issues: string[] = []
     if (!node.startsWith("v")) issues.push("unexpected Node version string")
+    const nodeMajor = Number.parseInt(node.slice(1).split(".")[0] ?? "0", 10)
+    const nodeMeetsEngineRange = Number.isFinite(nodeMajor) && nodeMajor >= 24
 
     let hasCore: boolean | undefined
     let hasNext: boolean | undefined
@@ -84,12 +86,18 @@ export async function runDoctor(rest: string[]): Promise<number> {
     const out = {
       ok: issues.length === 0,
       node,
+      nodeMeetsEngineRange,
       issues,
       packages: { hasCore, hasNext, hasReact, hasCli, hasCompiler },
     }
     if (values.json) console.log(JSON.stringify(out, null, 2))
     else {
       console.log(`Node ${node}`)
+      if (!nodeMeetsEngineRange) {
+        console.warn(
+          `doctor: Node 24+ is required for this monorepo (see root package.json engines). Install: winget install -e --id OpenJS.NodeJS.LTS — CONTRIBUTING.md`,
+        )
+      }
       if (hasCore !== undefined) {
         console.log(
           `adapters: core=${hasCore} next=${Boolean(hasNext)} react=${Boolean(hasReact)} cli=${Boolean(hasCli)} compiler=${Boolean(hasCompiler)}`,

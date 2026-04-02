@@ -6,8 +6,25 @@ Thanks for helping improve **better-seo.js**. Packaging and release flow: [**PAC
 
 ## Prerequisites
 
-- **Node.js** LTS (see root `engines` in `package.json` when added)
-- **npm** (default for this repo)
+- **Node.js 24.x LTS** — root [`package.json`](./package.json) sets `"engines": { "node": ">=24.0.0" }`. CI uses **24** (see [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)). Local dev should match to avoid `EBADENGINE` warnings and subtle tooling drift.
+- **npm** (bundled with Node; default for this repo)
+
+### Install Node 24 (Windows — winget)
+
+Use the **OpenJS Node.js LTS** manifest (tracks current LTS, **24.x**):
+
+```powershell
+winget install -e --id OpenJS.NodeJS.LTS
+```
+
+Close and reopen the terminal, then confirm:
+
+```powershell
+node -v   # expects v24.x.x
+npm -v
+```
+
+Alternative: install [nodejs.org](https://nodejs.org/) **24 LTS**, or use **nvm-windows** / **fnm** with [`.nvmrc`](./.nvmrc) (`24`).
 
 ## Getting started
 

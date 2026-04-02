@@ -386,6 +386,19 @@ describe("runCli", () => {
     log.mockRestore()
   })
 
+  it("snapshot writes tags.json under --out-dir", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const input = join(tmpdir(), `snap-in-dir-${Date.now()}.json`)
+    const outDir = join(tmpdir(), `snap-dir-${Date.now()}`)
+    created.push(input)
+    createdDirs.push(outDir)
+    writeFileSync(input, JSON.stringify({ title: "Hi", description: "There" }, null, 2), "utf8")
+    expect(await runCli(["node", "cli", "snapshot", "--input", input, "--out-dir", outDir])).toBe(0)
+    const tagsPath = join(outDir, "tags.json")
+    expect(readFileSync(tagsPath, "utf8")).toContain("Hi")
+    log.mockRestore()
+  })
+
   it("snapshot compare identical exits 0", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
     const a = join(tmpdir(), `cmp-a-${Date.now()}.json`)
@@ -419,6 +432,60 @@ describe("runCli", () => {
     const html = readFileSync(out, "utf8")
     expect(html).toContain("<!DOCTYPE html>")
     expect(html).toContain("Preview title")
+    expect(html).toContain("Google")
+    log.mockRestore()
+  })
+
+  it("preview --open respects BETTER_SEO_NO_OPEN", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const input = join(tmpdir(), `prev-open-in-${Date.now()}.json`)
+    const out = join(tmpdir(), `prev-open-${Date.now()}.html`)
+    created.push(input, out)
+    writeFileSync(input, JSON.stringify({ title: "T", description: "D" }), "utf8")
+    process.env.BETTER_SEO_NO_OPEN = "1"
+    expect(await runCli(["node", "cli", "preview", "--input", input, "--out", out, "--open"])).toBe(
+      0,
+    )
+    delete process.env.BETTER_SEO_NO_OPEN
+    log.mockRestore()
+  })
+
+  it("template list exits 0", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "template", "list"])).toBe(0)
+    expect(log.mock.calls.map((c) => String(c[0])).join("\n")).toContain("blog")
+    log.mockRestore()
+  })
+
+  it("template print blog mentions defineSEO", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "template", "print", "blog"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("defineSEO")
+    expect(out).toContain("My blog")
+    log.mockRestore()
+  })
+
+  it("content from-mdx writes seo json", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const md = join(tmpdir(), `cmdx-${Date.now()}.md`)
+    const out = join(tmpdir(), `cmdx-out-${Date.now()}.json`)
+    created.push(md, out)
+    writeFileSync(
+      md,
+      `---
+title: From MD
+description: Hello
+---
+
+Body`,
+      "utf8",
+    )
+    expect(await runCli(["node", "cli", "content", "from-mdx", "--input", md, "--out", out])).toBe(
+      0,
+    )
+    const j = JSON.parse(readFileSync(out, "utf8")) as { title?: string }
+    expect(j.title).toBe("From MD")
     log.mockRestore()
   })
 
