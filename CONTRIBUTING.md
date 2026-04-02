@@ -19,6 +19,8 @@ npm run build
 npm run test
 ```
 
+Keep **`size-limit`** and **`@size-limit/file`** on the **same major** (npm `peer`); mismatched versions break **`npm ci`** in GitHub Actions (**Security**, **Release**, **CI**).
+
 ## Documentation site (Nextra)
 
 - **Markdown source:** repository-root **`docs/`** (getting started, concepts, API stubs, recipes, CLI, etc.).

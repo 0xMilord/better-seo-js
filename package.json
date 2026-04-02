@@ -19,8 +19,8 @@
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "npm exec -- prettier --write .",
+    "format:check": "npm exec -- prettier --check .",
     "check": "npm run build && npm run format:check && npm run lint && npm run typecheck && npm run test:coverage",
     "ci": "npm run check && npm run test:e2e && npm run size",
     "commit": "git-cz",
@@ -61,17 +61,17 @@
   },
   "lint-staged": {
     "packages/**/*.{ts,tsx}": [
-      "eslint --fix --max-warnings 0",
-      "prettier --write"
+      "npx --no-install eslint --fix --max-warnings 0",
+      "npx --no-install prettier --write"
     ],
     "examples/**/*.{ts,tsx}": [
-      "prettier --write"
+      "npx --no-install prettier --write"
     ],
     "apps/docs/**/*.{ts,tsx}": [
-      "prettier --write"
+      "npx --no-install prettier --write"
     ],
     "*.{md,json,yml,yaml,mjs,cjs}": [
-      "prettier --write"
+      "npx --no-install prettier --write"
     ]
   }
 }

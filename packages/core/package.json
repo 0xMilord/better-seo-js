@@ -25,12 +25,12 @@
   ],
   "dependencies": {},
   "scripts": {
-    "build": "tsup",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "size": "size-limit",
+    "build": "npm exec -- tsup",
+    "test": "npm exec -- vitest run",
+    "test:coverage": "npm exec -- vitest run --coverage",
+    "lint": "npm exec -- eslint .",
+    "typecheck": "npm exec -- tsc -p tsconfig.json --noEmit",
+    "size": "npm exec -- size-limit",
     "audit": "npm audit --audit-level=high"
   },
   "publishConfig": {
