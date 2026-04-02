@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["nextjs-app", "vanilla-render-tags-example"]
+  "ignore": ["nextjs-app", "vanilla-render-tags-example", "react-seo-vite-example"]
 }

@@ -10,3 +10,4 @@ Next-first patterns with **FEATURES** traceability. Full wave list: [`Roadmap.md
 | Favicon / PWA icons + manifest                  | [`icons-wave3.md`](./icons-wave3.md)                                                           | **A2**, **A3**, **L2** |
 | Compare vs next-seo (stub)                      | [`compare/next-seo-vs-better-seo.md`](../compare/next-seo-vs-better-seo.md)                    | **D6**                 |
 | Vanilla `renderTags` (Node)                     | [`../../examples/vanilla-render-tags/README.md`](../../examples/vanilla-render-tags/README.md) | **D7**                 |
+| React SPA + Helmet (Vite)                       | [`react-wave5.md`](./react-wave5.md)                                                           | **V3**, **§6 React**   |

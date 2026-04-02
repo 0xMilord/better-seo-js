@@ -1,15 +1,27 @@
 # Usage & errors — better-seo.js
 
-**Scope:** **`@better-seo/core`**, **`@better-seo/next`**, and optional **Wave 2** packages **`@better-seo/assets`** / **`@better-seo/cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
+**Scope:** **`@better-seo/core`**, **`@better-seo/next`**, **`@better-seo/react`** (Wave 5), and optional **Wave 2** packages **`@better-seo/assets`** / **`@better-seo/cli`**. Authoritative lists: **`FEATURES.md`**, **`ARCHITECTURE.md`**.
 
 ## Install (monorepo / local)
 
 ```bash
 npm install @better-seo/core
 npm install @better-seo/next
+npm install @better-seo/react react-helmet-async
 ```
 
-`@better-seo/next` declares `next` and `react` as peers.
+`@better-seo/next` declares `next` and `react` as peers. **`@better-seo/react`** declares **`react`**, **`react-dom`**, and **`react-helmet-async`** as peers.
+
+## React SPA / Vite
+
+Use **`@better-seo/react`** when you do **not** have the App Router **`metadata`** API (e.g. Vite SPA). Wrap the tree with **`HelmetProvider`** from **`react-helmet-async`**, then:
+
+- **`BetterSEOHelmet`** with a merged **`SEO`** from **`createSEO`**, or
+- **`toHelmetProps(seo)`** to pass into **`<Helmet {...} />`**.
+
+**`useSEO()`** comes from **`@better-seo/react`** inside **`SEOProvider`**. The **`useSEO`** export on **`@better-seo/core`** is still a **stub** that throws **`USE_SEO_NOT_AVAILABLE`** — import the hook from **`@better-seo/react`** instead.
+
+Recipe: [`docs/recipes/react-wave5.md`](../docs/recipes/react-wave5.md).
 
 ## Edge, Workers, and multi-tenant
 

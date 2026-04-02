@@ -34,12 +34,14 @@ better-seo-js/
 ├── packages/
 │   ├── core/                   # npm: @better-seo/core (zero runtime deps); P0 implementation + Vitest
 │   ├── next/                   # npm: @better-seo/next
-│   ├── react/                  # npm: @better-seo/react
+│   ├── react/                  # npm: @better-seo/react (Wave 5 — Helmet + useSEO)
 │   ├── assets/                 # npm: @better-seo/assets
 │   ├── cli/                    # npm: @better-seo/cli (bin)
 │   └── crawl/                  # npm: better-seo-crawl
 ├── examples/
-│   └── nextjs-app/             # Golden path + Playwright
+│   ├── nextjs-app/             # Golden path + Playwright (Next)
+│   ├── react-seo-vite/         # Vite + @better-seo/react + Playwright (Wave 5)
+│   └── vanilla-render-tags/    # Node renderTags demo (D7)
 ├── scripts/                    # Optional: release/version helpers
 ├── CHANGELOG.md                # Human-readable history (also fed by Changesets)
 ├── CODE_OF_CONDUCT.md
@@ -123,7 +125,7 @@ You can rename scripts (e.g. **`npm run version-packages`**) as long as **GitHub
 
 We use **[Changesets](https://github.com/changesets/changesets)** so version bumps stay **reviewable** and **`CHANGELOG.md`** stays **derived** from the same source as npm versions.
 
-**Config:** [`.changeset/config.json`](./.changeset/config.json) — `access: public`, `baseBranch: main`, **`ignore`**: **`nextjs-app`**, **`vanilla-render-tags-example`** (examples are never versioned). GitHub [**`release.yml`**](.github/workflows/release.yml) runs **`release:version`** / **`release:publish`** via [changesets/action](https://github.com/changesets/action); **`workflow_dispatch`** allows manual runs.
+**Config:** [`.changeset/config.json`](./.changeset/config.json) — `access: public`, `baseBranch: main`, **`ignore`**: **`nextjs-app`**, **`vanilla-render-tags-example`**, **`react-seo-vite-example`** (examples are never versioned). GitHub [**`release.yml`**](.github/workflows/release.yml) runs **`release:version`** / **`release:publish`** via [changesets/action](https://github.com/changesets/action); **`workflow_dispatch`** allows manual runs.
 
 **Internal workspace dependencies:** publishable packages and examples depend on **`@better-seo/*`** with the **same semver** as the workspace (e.g. **`"0.0.1"`**), not **`file:../…`**, so Changesets + `@manypkg` checks pass and `npm` still links to the local workspace copy.
 

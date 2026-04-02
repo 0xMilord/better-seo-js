@@ -2,7 +2,7 @@
   "name": "better-seo-js-monorepo",
   "version": "0.0.1",
   "private": true,
-  "description": "Development workspace for Better SEO (@better-seo): publishable packages for a typed SEO document model (@better-seo/core), Next.js Metadata and JSON-LD (@better-seo/next), OG image and PWA asset generation (@better-seo/assets), and a CLI (@better-seo/cli). Root scripts run build, test, lint, Playwright E2E, Changesets releases, and size limits. This package is private and is not published to npm.",
+  "description": "Development workspace for Better SEO (@better-seo): typed SEO core (@better-seo/core), Next.js adapter (@better-seo/next), React + react-helmet-async (@better-seo/react), assets + CLI (@better-seo/assets, @better-seo/cli). CI runs Vitest coverage, Playwright (Next + Vite examples), Changesets, and core size-limit. Private meta-package; not published to npm.",
   "license": "MIT",
   "engines": {
     "node": ">=20"
@@ -12,7 +12,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w nextjs-app",
+    "build": "npm run build -w @better-seo/core && npm run build -w @better-seo/assets && npm run build -w @better-seo/cli && npm run build -w @better-seo/next && npm run build -w @better-seo/react && npm run build -w nextjs-app && npm run build -w react-seo-vite-example",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",

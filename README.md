@@ -171,26 +171,30 @@ flowchart LR
   subgraph pkgs [Packages you ship or will ship]
     CORE["@better-seo/core\n0 runtime deps"]
     NEXT["@better-seo/next\npeers: next, react"]
-    FUTURE["Future: @better-seo/react,\nremix, astro, …"]
+    REACT["@better-seo/react\nHelmet, useSEO"]
+    FUTURE["Future: remix, astro, …"]
     ASSETS["@better-seo/assets\nOG (Wave 2)"]
     CLI["@better-seo/cli\nog command"]
   end
 
   CORE --> NEXT
+  CORE --> REACT
   CORE --> FUTURE
   CLI -.-> ASSETS
 ```
 
-| Location                           | Role                                                                                                                |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **`packages/core`**                | npm **`@better-seo/core`** — overview **[`packages/core/README.md`](./packages/core/README.md)**                    |
-| **`packages/next`**                | **`@better-seo/next`** — overview **[`packages/next/README.md`](./packages/next/README.md)**                        |
-| **`examples/nextjs-app`**          | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                   |
-| **`packages/better-seo-assets`**   | npm **`@better-seo/assets`** — **[`packages/better-seo-assets/README.md`](./packages/better-seo-assets/README.md)** |
-| **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — **[`packages/better-seo-cli/README.md`](./packages/better-seo-cli/README.md)**          |
-| **`examples/vanilla-render-tags`** | **D7** — **`createSEO` + `renderTags`** in plain Node (**no React**).                                               |
-| **`docs/recipes/`**                | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                        |
-| **`internal-docs/`**               | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                      |
+| Location                           | Role                                                                                                                       |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **`packages/core`**                | npm **`@better-seo/core`** — overview **[`packages/core/README.md`](./packages/core/README.md)**                           |
+| **`packages/next`**                | **`@better-seo/next`** — overview **[`packages/next/README.md`](./packages/next/README.md)**                               |
+| **`packages/react`**               | **`@better-seo/react`** — **[`packages/react/README.md`](./packages/react/README.md)** (Wave 5, **Helmet** + **`useSEO`**) |
+| **`examples/nextjs-app`**          | Production-shaped **App Router** app; **Playwright** tests guard the golden path.                                          |
+| **`examples/react-seo-vite`**      | **Vite + React** + **`BetterSEOHelmet`**; **Playwright** checks document title / meta.                                     |
+| **`packages/better-seo-assets`**   | npm **`@better-seo/assets`** — **[`packages/better-seo-assets/README.md`](./packages/better-seo-assets/README.md)**        |
+| **`packages/better-seo-cli`**      | npm **`@better-seo/cli`** — **[`packages/better-seo-cli/README.md`](./packages/better-seo-cli/README.md)**                 |
+| **`examples/vanilla-render-tags`** | **D7** — **`createSEO` + `renderTags`** in plain Node (**no React**).                                                      |
+| **`docs/recipes/`**                | Copy-paste recipes (e.g. **N5** layout/page merge, **N6** async `generateMetadata`, **OG**).                               |
+| **`internal-docs/`**               | PRD, architecture, features, roadmap, **PROGRESS** tracker, **USAGE** (install + error codes).                             |
 
 Dependency rule: **adapters always depend on core; core never depends on adapters.** If you only need JSON-LD in a non-Next stack, you can consume **`@better-seo/core`** and feed `serializeJSONLD` yourself—no Next required.
 
@@ -246,25 +250,26 @@ npm run ci       # check + Playwright e2e + core size-limit
 
 ### CI pipelines ([`.github/workflows`](./.github/workflows))
 
-| Workflow                                                   | When it runs        | What it gates                                                                                                                                                                                  |
-| ---------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **[`ci.yml`](./.github/workflows/ci.yml)**                 | PR + push to `main` | `npm audit` (artifact), **`npm run check`** (build, format, lint, typecheck, **Vitest + coverage thresholds**), Playwright **`examples/nextjs-app`**, **`npm run size`** on `@better-seo/core` |
-| **[`commitlint.yml`](./.github/workflows/commitlint.yml)** | Pull requests       | Conventional Commits on every commit in the PR                                                                                                                                                 |
-| **[`security.yml`](./.github/workflows/security.yml)**     | Push to `main`      | Security / supply-chain checks (see workflow)                                                                                                                                                  |
-| **[`release.yml`](./.github/workflows/release.yml)**       | Maintainers         | Changesets versioning / publish when configured                                                                                                                                                |
+| Workflow                                                   | When it runs        | What it gates                                                                                                                                                                                                        |
+| ---------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[`ci.yml`](./.github/workflows/ci.yml)**                 | PR + push to `main` | `npm audit` (artifact), **`npm run check`** (build, format, lint, typecheck, **Vitest + coverage thresholds**), Playwright **`nextjs-app`** + **`react-seo-vite-example`**, **`npm run size`** on `@better-seo/core` |
+| **[`commitlint.yml`](./.github/workflows/commitlint.yml)** | Pull requests       | Conventional Commits on every commit in the PR                                                                                                                                                                       |
+| **[`security.yml`](./.github/workflows/security.yml)**     | Push to `main`      | Security / supply-chain checks (see workflow)                                                                                                                                                                        |
+| **[`release.yml`](./.github/workflows/release.yml)**       | Maintainers         | Changesets versioning / publish when configured                                                                                                                                                                      |
 
 Coverage **LCov** is uploaded from **`@better-seo/core`** and **`@better-seo/next`** as CI artifacts (`coverage`); thresholds are enforced in each package’s **`vitest.config.ts`** (see per-package READMEs below).
 
 ### Package test & coverage targets
 
-| Package                  | README                                                                 | Unit tests         | Coverage focus (minimum lines / branches)  |
-| ------------------------ | ---------------------------------------------------------------------- | ------------------ | ------------------------------------------ |
-| **`@better-seo/core`**   | [`packages/core`](./packages/core/README.md)                           | Vitest             | **90%** / **80%** (see package README)     |
-| **`@better-seo/next`**   | [`packages/next`](./packages/next/README.md)                           | Vitest             | **82%** / **72%** on `to-next-metadata.ts` |
-| **`@better-seo/assets`** | [`packages/better-seo-assets`](./packages/better-seo-assets/README.md) | Vitest             | **85%** / **75%**                          |
-| **`@better-seo/cli`**    | [`packages/better-seo-cli`](./packages/better-seo-cli/README.md)       | Vitest + bin smoke | **80%** / **65%**                          |
+| Package                  | README                                                                 | Unit tests          | Coverage focus (minimum lines / branches)  |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------- | ------------------------------------------ |
+| **`@better-seo/core`**   | [`packages/core`](./packages/core/README.md)                           | Vitest              | **90%** / **80%** (see package README)     |
+| **`@better-seo/next`**   | [`packages/next`](./packages/next/README.md)                           | Vitest              | **82%** / **72%** on `to-next-metadata.ts` |
+| **`@better-seo/assets`** | [`packages/better-seo-assets`](./packages/better-seo-assets/README.md) | Vitest              | **85%** / **75%**                          |
+| **`@better-seo/cli`**    | [`packages/better-seo-cli`](./packages/better-seo-cli/README.md)       | Vitest + bin smoke  | **80%** / **65%**                          |
+| **`@better-seo/react`**  | [`packages/react`](./packages/react/README.md)                         | Vitest (jsdom, RTL) | **85%** / **75%**                          |
 
-Core has a **size budget** (see **`packages/core/package.json`** and `npm run size`). E2E lives under **`examples/nextjs-app/e2e`**.
+Core has a **size budget** (see **`packages/core/package.json`** and `npm run size`). E2E: **`examples/nextjs-app/e2e`**, **`examples/react-seo-vite/e2e`**.
 
 ---
 

@@ -26,17 +26,24 @@ export function renderTags(seo: SEO): TagDescriptor[] {
   if (seo.openGraph?.description) {
     tags.push({ kind: "meta", property: "og:description", content: seo.openGraph.description })
   }
+  if (seo.openGraph?.url) {
+    tags.push({ kind: "meta", property: "og:url", content: seo.openGraph.url })
+  }
+  if (seo.openGraph?.type) {
+    tags.push({ kind: "meta", property: "og:type", content: seo.openGraph.type })
+  }
   const ogImages = seo.openGraph?.images
   if (ogImages?.length) {
-    const first = ogImages[0]
-    if (first?.url) tags.push({ kind: "meta", property: "og:image", content: first.url })
-    if (first?.width !== undefined) {
-      tags.push({ kind: "meta", property: "og:image:width", content: String(first.width) })
+    for (const img of ogImages) {
+      if (img?.url) tags.push({ kind: "meta", property: "og:image", content: img.url })
+      if (img?.width !== undefined) {
+        tags.push({ kind: "meta", property: "og:image:width", content: String(img.width) })
+      }
+      if (img?.height !== undefined) {
+        tags.push({ kind: "meta", property: "og:image:height", content: String(img.height) })
+      }
+      if (img?.alt) tags.push({ kind: "meta", property: "og:image:alt", content: img.alt })
     }
-    if (first?.height !== undefined) {
-      tags.push({ kind: "meta", property: "og:image:height", content: String(first.height) })
-    }
-    if (first?.alt) tags.push({ kind: "meta", property: "og:image:alt", content: first.alt })
   }
   if (seo.twitter?.card) {
     tags.push({ kind: "meta", name: "twitter:card", content: seo.twitter.card })

@@ -67,4 +67,38 @@ describe("renderTags", () => {
     const tags = renderTags(seo)
     expect(tags.some((t) => t.kind === "meta" && t.property === "og:image")).toBe(false)
   })
+
+  it("emits og:url and og:type when set", () => {
+    const seo = createSEO({
+      title: "T",
+      openGraph: { url: "https://ex.test/page", type: "article" },
+    })
+    const tags = renderTags(seo)
+    expect(
+      tags.some(
+        (t) => t.kind === "meta" && t.property === "og:url" && t.content === "https://ex.test/page",
+      ),
+    ).toBe(true)
+    expect(
+      tags.some((t) => t.kind === "meta" && t.property === "og:type" && t.content === "article"),
+    ).toBe(true)
+  })
+
+  it("emits multiple og:image groups for multiple images", () => {
+    const seo = createSEO({
+      title: "T",
+      openGraph: {
+        images: [
+          { url: "https://ex.test/a.png", width: 100, height: 100 },
+          { url: "https://ex.test/b.png", width: 200, height: 200 },
+        ],
+      },
+    })
+    const ogImages = renderTags(seo).filter((t) => t.kind === "meta" && t.property === "og:image")
+    expect(ogImages).toHaveLength(2)
+    expect(ogImages.map((t) => (t as { kind: "meta"; content: string }).content)).toEqual([
+      "https://ex.test/a.png",
+      "https://ex.test/b.png",
+    ])
+  })
 })
