@@ -1,7 +1,7 @@
 {
   "name": "@better-seo/next",
   "version": "0.0.1",
-  "description": "Next.js adapter for better-seo.js — Metadata, voilà `seo()` — see internal-docs/FEATURES.md N1–N10",
+  "description": "Next.js integration for @better-seo/core on the App Router (and documented Pages Router patterns): turn your SEO model into Metadata and generateMetadata, use shorthand helpers like seo() and prepareNextSeo, merge layout and page SEO without duplicating logic, and stream JSON-LD through NextJsonLd from @better-seo/next/json-ld so structured data uses the same serializeJSONLD path as everywhere else. Peer dependencies: next >= 14.2 and react >= 18.2.",
   "license": "MIT",
   "type": "module",
   "sideEffects": true,

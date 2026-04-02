@@ -18,7 +18,10 @@ export interface OGConfig {
   readonly siteName: string
   readonly logo?: string
   readonly theme?: OGTheme
-  /** Reserved: custom Satori/React template path (not implemented in Wave 2). */
+  /**
+   * Absolute or cwd-relative path to a **compiled** ESM `.js` / `.mjs` module that default-exports
+   * a React function component — same props shape as the built-in card (see **`OgCardProps`** on **`@better-seo/assets`**).
+   */
   readonly template?: string
   /** Optional typeface hint; Wave 2 always embeds Inter from `@fontsource/inter`. */
   readonly font?: string

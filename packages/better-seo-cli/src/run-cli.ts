@@ -26,11 +26,13 @@ Options:
   --description, -d  Subtitle text
   --theme            light | dark | auto (default: light; auto → light in Node)
   --logo             Local file path or https URL for the logo image
+  --template         Path to compiled .js/.mjs Satori component (see @better-seo/assets OG docs)
   --help, -h         Show help
 
 Examples:
   npx @better-seo/cli og "Hello World"
   npx @better-seo/cli og "Ship faster" -o ./public/og.png --site-name "Acme"
+  npx @better-seo/cli og "Hi" --template ./my-og.mjs
   npx better-seo og "Hello World"
 `)
 }
@@ -76,6 +78,7 @@ const ogCommandOptions = {
   description: { type: "string" as const, short: "d" },
   theme: { type: "string" as const },
   logo: { type: "string" as const },
+  template: { type: "string" as const },
   help: { type: "boolean" as const, short: "h", default: false },
 }
 
@@ -98,6 +101,7 @@ async function runOg(rest: string[]): Promise<number> {
     description?: string
     theme?: string
     logo?: string
+    template?: string
     help?: boolean
   }
   let positionals: string[]
@@ -145,6 +149,7 @@ async function runOg(rest: string[]): Promise<number> {
       ...(values.description !== undefined ? { description: values.description } : {}),
       ...(theme !== undefined ? { theme } : {}),
       ...(values.logo !== undefined ? { logo: values.logo } : {}),
+      ...(values.template !== undefined ? { template: values.template } : {}),
     })
     await writeFile(out, png)
     const ms = Math.round(performance.now() - started)

@@ -1,6 +1,8 @@
 export type { OGColors, OGConfig, OGTheme } from "./types.js"
 export { OG_IMAGE_SIZE } from "./types.js"
 export { generateOG } from "./og/generate-og.js"
+/** Props contract for custom OG templates (same shape as the built-in card). */
+export type { OgCardPalette, OgCardProps } from "./og/templates/og-card.js"
 export type {
   IconGeneratorConfig,
   IconManifestConfig,
