@@ -11,19 +11,25 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w better-seo.js && npm run build -w better-seo-assets && npm run build -w better-seo-cli && npm run build -w @better-seo/next && npm run build -w nextjs-app",
     "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
-    "ci": "npm run build && npm run lint && npm run typecheck && npm run test && npm run commitlint:ci",
-    "commit": "czg",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run build && npm run format:check && npm run lint && npm run typecheck && npm run test:coverage",
+    "ci": "npm run check && npm run test:e2e && npm run size",
+    "commit": "git-cz",
     "commitlint": "commitlint --edit",
-    "commitlint:ci": "commitlint --from ${COMMITLINT_FROM:-HEAD~1} --to ${COMMITLINT_TO:-HEAD} --verbose",
+    "commitlint:last": "commitlint --last --verbose",
+    "commitlint:since-tag": "commitlint --from-last-tag --to HEAD --verbose",
     "changeset": "changeset",
     "release:version": "changeset version",
     "release:publish": "npm run build && changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "size": "npm run size -w better-seo.js"
   },
   "config": {
     "commitizen": {
@@ -35,8 +41,30 @@
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/js": "^9.21.0",
+    "@size-limit/file": "^11.1.6",
     "commitizen": "^4.3.1",
-    "cz-git": "^1.11.1",
-    "husky": "^9.1.7"
+    "cz-git": "^1.12.0",
+    "eslint": "^9.21.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.3",
+    "size-limit": "^11.1.6",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1",
+    "vitest": "^3.0.6"
+  },
+  "lint-staged": {
+    "packages/**/*.{ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "examples/**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.{md,json,yml,yaml,mjs,cjs}": [
+      "prettier --write"
+    ]
   }
 }

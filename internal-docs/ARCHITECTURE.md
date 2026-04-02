@@ -8,12 +8,12 @@ This document describes **how the system is built and bounded**. Product intent,
 
 ## 1. Goals & constraints
 
-| Goal | Architectural implication |
-|------|---------------------------|
-| **Zero-dependency core** | The published **`better-seo.js`** package has **no `dependencies`** (and no **`peerDependencies` required at install** for core). Only **standard library–style** TypeScript/JavaScript: pure data transforms, serializers, small registries. |
-| **Small browser/Edge-safe surface** | Anything that reads **`package.json`**, scans the filesystem, or shells out lives in **CLI** or **optional packages**, never in code paths imported by Edge bundles. |
-| **Framework power** | Framework-specific behavior sits in **`@better-seo/*` adapters** that depend on **core** and (optionally) on framework packages as **their** `peerDependencies`. |
-| **Enterprise correctness** | JSON-LD and tags go through **one serialization path**; merging is **deterministic**; config can be **request-scoped** (`createSEOContext`) instead of global. |
+| Goal                                | Architectural implication                                                                                                                                                                                                                     |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zero-dependency core**            | The published **`better-seo.js`** package has **no `dependencies`** (and no **`peerDependencies` required at install** for core). Only **standard library–style** TypeScript/JavaScript: pure data transforms, serializers, small registries. |
+| **Small browser/Edge-safe surface** | Anything that reads **`package.json`**, scans the filesystem, or shells out lives in **CLI** or **optional packages**, never in code paths imported by Edge bundles.                                                                          |
+| **Framework power**                 | Framework-specific behavior sits in **`@better-seo/*` adapters** that depend on **core** and (optionally) on framework packages as **their** `peerDependencies`.                                                                              |
+| **Enterprise correctness**          | JSON-LD and tags go through **one serialization path**; merging is **deterministic**; config can be **request-scoped** (`createSEOContext`) instead of global.                                                                                |
 
 **“Zero dependency” means:** no runtime npm packages shipped inside **`better-seo.js`**. Dev-time tools (TypeScript, Vitest, build bundlers) are **`devDependencies` of the repo**, not of the consumer’s runtime graph for `import "better-seo.js"`.
 
@@ -78,15 +78,15 @@ Partial<SEO> + SEOConfig
 
 ## 3. Package topology (monorepo)
 
-| Package | Role | Runtime deps (target) |
-|---------|------|------------------------|
-| **`better-seo.js`** | Normalized model, merge, schema helpers, vanilla `renderTags`, serialization, validation (dev-flagged), registry, context API | **None** |
-| **`@better-seo/next`** | Next.js `Metadata` / `generateMetadata` mapping | **`better-seo.js` + `next` as peer** |
-| **`@better-seo/react`** | React Helmet / head props | **peers: `better-seo.js`, `react`, `react-helmet-async`** (exact peers TBD) |
-| **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same pattern: thin mapping + peers | Framework peers only |
-| **`better-seo-assets`** | OG (Satori, etc.), Sharp-based icons — **heavy** | Own deps OK; **not** imported by core |
-| **`better-seo-cli`** | Init, scan, migrate, doctor, calls into assets | CLI deps OK (inquirer, etc.) |
-| **`better-seo-crawl`** | Sitemap, robots, RSS — may use Node APIs | May depend on **`better-seo.js`** only |
+| Package                                                                  | Role                                                                                                                          | Runtime deps (target)                                                       |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **`better-seo.js`**                                                      | Normalized model, merge, schema helpers, vanilla `renderTags`, serialization, validation (dev-flagged), registry, context API | **None**                                                                    |
+| **`@better-seo/next`**                                                   | Next.js `Metadata` / `generateMetadata` mapping                                                                               | **`better-seo.js` + `next` as peer**                                        |
+| **`@better-seo/react`**                                                  | React Helmet / head props                                                                                                     | **peers: `better-seo.js`, `react`, `react-helmet-async`** (exact peers TBD) |
+| **`@better-seo/remix`**, **`@better-seo/astro`**, **`@better-seo/nuxt`** | Same pattern: thin mapping + peers                                                                                            | Framework peers only                                                        |
+| **`better-seo-assets`**                                                  | OG (Satori, etc.), Sharp-based icons — **heavy**                                                                              | Own deps OK; **not** imported by core                                       |
+| **`better-seo-cli`**                                                     | Init, scan, migrate, doctor, calls into assets                                                                                | CLI deps OK (inquirer, etc.)                                                |
+| **`better-seo-crawl`**                                                   | Sitemap, robots, RSS — may use Node APIs                                                                                      | May depend on **`better-seo.js`** only                                      |
 
 **Rule:** `better-seo.js` MUST NOT import from `@better-seo/next`, `better-seo-assets`, or `better-seo-cli`. The dependency arrow is **always toward core**.
 
@@ -191,7 +191,8 @@ export function getAdapter(id: string): SEOAdapter | undefined
 **`@better-seo/next`** provides:
 
 - **`toNextMetadata(seo: SEO): Metadata`** (and helpers for `generateMetadata` async data if needed).
-- Registration: importing **`@better-seo/next`** calls **`registerAdapter`** once (side effect) **or** user calls it explicitly (prefer explicit in enterprise docs).
+- **JSON-LD:** consumers use **`@better-seo/next/json-ld`** (`NextJsonLd`) so **`serializeJSONLD`** output lands in `<script type="application/ld+json">` without polluting static **`Metadata`** with non-serializable or `undefined`-heavy shapes.
+- Registration: importing **`@better-seo/next`** runs **`registerAdapter("next")`** once (side effect); enterprise docs may still prefer explicit imports over auto-detect in CI.
 
 **Vanilla / tests:**
 
@@ -203,11 +204,11 @@ export function getAdapter(id: string): SEOAdapter | undefined
 
 Plugins are **user-supplied** objects with stable **`id`** and optional hooks. They run **inside core** but are **registered via config/context** (not auto-loaded from disk).
 
-| Hook | Approximate point in pipeline |
-|------|------------------------------|
-| `beforeMerge` | After rule merge accumulation, before final `createSEO` normalization (or between merge phases — finalize one ordering in code) |
-| `afterMerge` | On final `SEO` before adapter |
-| `onRenderTags` | Only on vanilla path / tag expansion |
+| Hook           | Approximate point in pipeline                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `beforeMerge`  | After rule merge accumulation, before final `createSEO` normalization (or between merge phases — finalize one ordering in code) |
+| `afterMerge`   | On final `SEO` before adapter                                                                                                   |
+| `onRenderTags` | Only on vanilla path / tag expansion                                                                                            |
 
 **Properties:**
 
@@ -220,12 +221,12 @@ Plugins are **user-supplied** objects with stable **`id`** and optional hooks. T
 
 ## 10. Configuration & inference
 
-| Mode | Where config comes from | Allowed mechanisms |
-|------|-------------------------|--------------------|
-| **Explicit** | Caller passes `SEOConfig` | Always allowed |
-| **`createSEOContext(config)`** | Per request / per tenant | **Required** on Edge & multi-tenant |
-| **`initSEO()` global** | Process-wide default | **Node only**; acceptable for quick start |
-| **Inference** | `package.json` / `process.env` | Implemented in **`singleton.ts`** using **dynamic `require`/`fs`** only behind `typeof window === 'undefined'` checks **and** not bundled for Edge entry points |
+| Mode                           | Where config comes from        | Allowed mechanisms                                                                                                                                              |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Explicit**                   | Caller passes `SEOConfig`      | Always allowed                                                                                                                                                  |
+| **`createSEOContext(config)`** | Per request / per tenant       | **Required** on Edge & multi-tenant                                                                                                                             |
+| **`initSEO()` global**         | Process-wide default           | **Node only**; acceptable for quick start                                                                                                                       |
+| **Inference**                  | `package.json` / `process.env` | Implemented in **`singleton.ts`** using **dynamic `require`/`fs`** only behind `typeof window === 'undefined'` checks **and** not bundled for Edge entry points |
 
 **Build-time rule:** publish **multiple entry points** if needed:
 
@@ -242,10 +243,10 @@ If a single entry is preferred, **tree-shaking** + guarded lazy `require` is acc
 
 `applyRules(route: string, rules: SEORule[]): Partial<SEO>`
 
-- Match **`rule.match`** with documented glob semantics (e.g. `picomatch`-compatible patterns).  
+- Match **`rule.match`** with documented glob semantics (e.g. `picomatch`-compatible patterns).
 - **Implementation note:** to keep core dependency-free, ship a **minimal internal glob** or copy a small permissive implementation **in-repo** (license-compliant). **Alternatively**, accept only a **restricted pattern subset** (prefix/suffix) v1. Exact choice is implementation detail; **do not add `micromatch` as an npm dependency** without changing the dependency policy for core.
 
-**Ordering:** sort by `priority` desc; merge rule outputs with same `mergeSEO` semantics.
+**Ordering:** merge matching rules in **ascending** `priority` so **higher numeric priority overwrites** earlier keys (tie-break: later rule in the array wins).
 
 **Framework bridge:** **`getCurrentRouteFromAdapter()`** is **not** in core — adapters or app code pass **`routeContext.pathname`** into `seo()`.
 
@@ -264,13 +265,13 @@ Must not pull in heavy deps; only comparisons on strings/arrays already in memor
 
 ## 13. Runtime matrix
 
-| Runtime | Core usage | Inference | Adapter |
-|---------|------------|-----------|---------|
-| **Node (Next server)** | Full | Optional | `@better-seo/next` |
-| **Edge (middleware)** | **`createSEOContext` + explicit config** | **Off** | Same adapter if compatible with Edge APIs |
-| **Browser** | `createSEOContext` or static config | **Off** | `react` / client metadata patterns |
-| **Workers** | Explicit config | **Off** | Vanilla tags or framework worker support |
-| **CLI** | N/A (uses Node) | Full | N/A |
+| Runtime                | Core usage                               | Inference | Adapter                                   |
+| ---------------------- | ---------------------------------------- | --------- | ----------------------------------------- |
+| **Node (Next server)** | Full                                     | Optional  | `@better-seo/next`                        |
+| **Edge (middleware)**  | **`createSEOContext` + explicit config** | **Off**   | Same adapter if compatible with Edge APIs |
+| **Browser**            | `createSEOContext` or static config      | **Off**   | `react` / client metadata patterns        |
+| **Workers**            | Explicit config                          | **Off**   | Vanilla tags or framework worker support  |
+| **CLI**                | N/A (uses Node)                          | Full      | N/A                                       |
 
 ---
 
@@ -286,11 +287,11 @@ They consume the **`SEO`** model and/or generated files but **must not** become 
 
 ## 15. Testing architecture
 
-| Layer | What proves |
-|-------|-------------|
-| **Unit (core)** | merge, fallbacks, schema helpers, serializeJSONLD safety, plugin order |
-| **Adapter contract** | golden fixtures: `SEO` snapshot → expected Next `Metadata` object |
-| **E2E (`examples/nextjs-app`)** | Real HTML head: OG tags, canonical, JSON-LD parseable |
+| Layer                           | What proves                                                            |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| **Unit (core)**                 | merge, fallbacks, schema helpers, serializeJSONLD safety, plugin order |
+| **Adapter contract**            | golden fixtures: `SEO` snapshot → expected Next `Metadata` object      |
+| **E2E (`examples/nextjs-app`)** | Real HTML head: OG tags, canonical, JSON-LD parseable                  |
 
 **CI:** E2E gated on main / release branches per PRD.
 

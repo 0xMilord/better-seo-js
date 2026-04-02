@@ -6,12 +6,12 @@ How to **build**, **version**, **publish**, and **operate** this repo. Product i
 
 ## 1. Tooling defaults
 
-| Choice | Default | Notes |
-|--------|---------|--------|
-| **Package manager** | **npm** (v9+) | Lockfile: `package-lock.json`. Documented commands use `npm run` / `npx`. |
-| **Alternates** | **pnpm** / **yarn** | Supported if the team adds `pnpm-workspace.yaml` or Yarn Berry; keep **one** lockfile policy per repo. |
-| **Registry** | **`https://registry.npmjs.org/`** | Scoped packages: `@better-seo/next`, … — publish with npm account + **npm automation token** (GitHub Actions). |
-| **Other registries** | GitHub Packages, Verdaccio, etc. | Set **`publishConfig.registry`** per package or **`NPM_CONFIG_REGISTRY`** in CI only when needed. |
+| Choice               | Default                           | Notes                                                                                                          |
+| -------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Package manager**  | **npm** (v9+)                     | Lockfile: `package-lock.json`. Documented commands use `npm run` / `npx`.                                      |
+| **Alternates**       | **pnpm** / **yarn**               | Supported if the team adds `pnpm-workspace.yaml` or Yarn Berry; keep **one** lockfile policy per repo.         |
+| **Registry**         | **`https://registry.npmjs.org/`** | Scoped packages: `@better-seo/next`, … — publish with npm account + **npm automation token** (GitHub Actions). |
+| **Other registries** | GitHub Packages, Verdaccio, etc.  | Set **`publishConfig.registry`** per package or **`NPM_CONFIG_REGISTRY`** in CI only when needed.              |
 
 ---
 
@@ -24,13 +24,15 @@ better-seo-js/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml              # Lint, typecheck, test, E2E
+│       ├── commitlint.yml      # Conventional Commits on PRs
 │       └── release.yml         # Changesets: version PR + npm publish
 ├── .changeset/
 │   ├── config.json
 │   └── README.md               # How contributors add a changeset
+├── docs/                       # Public-facing stubs (e.g. recipes for N5/N6)
 ├── internal-docs/              # PRD, ARCHITECTURE, FEATURES, Roadmap
 ├── packages/
-│   ├── core/                   # npm: better-seo.js (zero runtime deps); may ship as `private: true` stub until ready
+│   ├── core/                   # npm: better-seo.js (zero runtime deps); P0 implementation + Vitest
 │   ├── next/                   # npm: @better-seo/next
 │   ├── react/                  # npm: @better-seo/react
 │   ├── assets/                 # npm: better-seo-assets
@@ -46,7 +48,8 @@ better-seo-js/
 ├── PACKAGE.md                  # This file
 ├── SECURITY.md
 ├── package.json                # Root workspace + shared devDependencies
-└── tsconfig.json               # Base TS config (packages extend)
+├── eslint.config.mjs           # Flat ESLint (shared across TS packages)
+└── tsconfig.base.json          # Shared TS compiler defaults (packages extend)
 ```
 
 **Naming:** publish **`better-seo.js`** from `packages/core`, not `@better-seo/core` (see ARCHITECTURE header).
@@ -88,15 +91,22 @@ You can rename scripts (e.g. **`npm run version-packages`**) as long as **GitHub
 
 ## 4. Build & local commands
 
-| Command | Purpose |
-|---------|---------|
-| `npm install` | Install all workspaces |
-| `npm run build` | Build every package that defines `build` |
-| `npm run typecheck` | TypeScript across workspaces |
-| `npm run test` | Unit tests (e.g. Vitest) |
-| `npm run test:e2e` | Playwright on `examples/nextjs-app` |
-| `npm run lint` | ESLint / formatting (when configured) |
-| `npm run ci` | Full local gate before push |
+| Command                        | Purpose                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| `npm install`                  | Install all workspaces                                                             |
+| `npm run build`                | Build every package that defines `build`                                           |
+| `npm run typecheck`            | TypeScript across workspaces                                                       |
+| `npm run test`                 | Unit tests (Vitest, no coverage report)                                            |
+| `npm run test:coverage`        | Vitest with **v8** coverage + thresholds (`packages/core`, `to-next-metadata.ts`)  |
+| `npm run test:e2e`             | Playwright on `examples/nextjs-app`                                                |
+| `npm run lint`                 | ESLint in workspaces + `next lint` in the example                                  |
+| `npm run format`               | Prettier `--write` (whole repo)                                                    |
+| `npm run format:check`         | Prettier `--check` (runs inside **`npm run check`**)                               |
+| `npm run check`                | **Default gate:** build + **format:check** + lint + typecheck + **test:coverage**  |
+| `npm run ci`                   | **`check` + E2E** + core **`size-limit`**                                          |
+| `npm run commit`               | Interactive Conventional Commit (cz-git); Husky still validates plain `git commit` |
+| `npm run commitlint:last`      | Lint the latest commit (`--last`)                                                  |
+| `npm run commitlint:since-tag` | Lint commits since the last git tag (fails if there is no tag yet)                 |
 
 **Per-package** (`packages/core`, etc.): each has its own **`package.json`** with **`exports`**, **`types`**, **`files`** (publish allowlist), and **`build`** producing `dist/` (or publish `src/` only if policy allows—prefer `dist` for clear API surfaces).
 
@@ -172,25 +182,33 @@ Per **PRD**: breaking changes require **`CHANGELOG.md`** entries and, when possi
 Triggers: **pull_request** and **push** to `main`.
 
 - Checkout, **`npm ci`**
-- `npm run ci` (lint, typecheck, unit tests, E2E)
-- Upload Playwright report on failure (optional)
+- **`npm run check`:** build, **Prettier**, ESLint, typecheck, **Vitest coverage** (see workspaces).
+- Upload **lcov** artifacts (`packages/*/coverage/lcov.info`) for debugging regressions.
+- Install **Playwright** browsers, **`npm run test:e2e`**, then **`npm run size`** (core bundle budget).
+
+### Commitlint (`.github/workflows/commitlint.yml`)
+
+Triggers: **pull_request** to `main` (full history via `fetch-depth: 0`).
+
+- **`npx commitlint`** from base SHA to head SHA so every commit in the PR satisfies Conventional Commits
+- Local parity: **`npm install`** enables **Husky** `commit-msg`; contributors can use **`npm run commit`** (cz-git). See [`.github/COMMIT_CONVENTION.md`](./.github/COMMIT_CONVENTION.md).
 
 ### Release (`.github/workflows/release.yml`)
 
 Pattern: **official [Changesets + GitHub](https://github.com/changesets/action)** flow.
 
-1. **On push to `main`:**  
-   - If there are **new `.changeset/*.md` files**, the action creates or updates a PR **`chore: version packages`** (title configurable) that runs **`changeset version`**.  
+1. **On push to `main`:**
+   - If there are **new `.changeset/*.md` files**, the action creates or updates a PR **`chore: version packages`** (title configurable) that runs **`changeset version`**.
    - That PR updates versions + changelogs; **merge it** when ready (this is the “**merge version branch with main**” step).
 
-2. **After that PR is merged** (or on direct push to `main` if versions changed and no pending changesets):  
+2. **After that PR is merged** (or on direct push to `main` if versions changed and no pending changesets):
    - Second job runs **`npm run build`** and **`changeset publish`** (need **`NPM_TOKEN`** and `NODE_AUTH_TOKEN` for npm).
 
 **Secrets required**
 
-| Secret | Use |
-|--------|-----|
-| `NPM_TOKEN` | Publish to npm |
+| Secret         | Use                                                                 |
+| -------------- | ------------------------------------------------------------------- |
+| `NPM_TOKEN`    | Publish to npm                                                      |
 | `GITHUB_TOKEN` | Provided by Actions; used by `changesets/action` to open Version PR |
 
 **Optional:** **`workflow_dispatch`** to manually trigger publish after you merge the Version PR.
@@ -199,16 +217,22 @@ Pattern: **official [Changesets + GitHub](https://github.com/changesets/action)*
 
 ## 8. Serious-project file checklist
 
-| File | Purpose |
-|------|---------|
-| [**LICENSE**](./LICENSE) | **MIT** per PRD §11.2 |
-| [**SECURITY.md**](./SECURITY.md) | Vulnerability reporting |
-| [**CONTRIBUTING.md**](./CONTRIBUTING.md) | PRs, changesets, branch naming |
-| [**CODE_OF_CONDUCT.md**](./CODE_OF_CONDUCT.md) | Community expectations |
-| [**CHANGELOG.md**](./CHANGELOG.md) | Keep a Changelog style; maintained by Changesets |
-| [**README.md**](./README.md) | Quick start, links to docs (root hero—add when implementation exists) |
-| **`.github/PULL_REQUEST_TEMPLATE.md`** | Remind: “Have you run `npm run changeset`?” |
-| **`.github/ISSUE_TEMPLATE/`** | Bug / feature |
+| File                                           | Purpose                                                               |
+| ---------------------------------------------- | --------------------------------------------------------------------- |
+| [**LICENSE**](./LICENSE)                       | **MIT** per PRD §11.2                                                 |
+| [**SECURITY.md**](./SECURITY.md)               | Vulnerability reporting                                               |
+| [**CONTRIBUTING.md**](./CONTRIBUTING.md)       | PRs, changesets, branch naming                                        |
+| [**CODE_OF_CONDUCT.md**](./CODE_OF_CONDUCT.md) | Community expectations                                                |
+| [**CHANGELOG.md**](./CHANGELOG.md)             | Keep a Changelog style; maintained by Changesets                      |
+| [**README.md**](./README.md)                   | Quick start, links to docs (root hero—add when implementation exists) |
+| **`.github/PULL_REQUEST_TEMPLATE.md`**         | Remind: “Have you run `npm run changeset`?”                           |
+| **`.github/ISSUE_TEMPLATE/*.yml`**             | Bug + feature request forms                                           |
+| **`.github/COMMIT_CONVENTION.md`**             | Conventional Commits + `npm run commit`                               |
+| **`commitlint.config.mjs`**                    | commitlint rules + cz-git `prompt`                                    |
+| **`.husky/commit-msg`**                        | commitlint on every local commit                                      |
+| **`.husky/pre-commit`**                        | **lint-staged** (ESLint + Prettier on staged files)                   |
+| **`.prettierrc.json`** / **`.prettierignore`** | Repo-wide formatting; **`format:check`** in **`npm run check`**       |
+| **`dependabot.yml`**                           | Dependency update PRs (npm + Actions)                                 |
 
 Internal specs stay in **`internal-docs/`**; public contributor path starts at **README** + **CONTRIBUTING** + **PACKAGE**.
 
@@ -216,10 +240,10 @@ Internal specs stay in **`internal-docs/`**; public contributor path starts at *
 
 ## 9. Branching & merges
 
-| Branch | Role |
-|--------|------|
-| **`main`** | Always releasable; **CI green**; version + publish workflows run from here |
-| **Feature branches** | `feat/…`, `fix/…` → PR → squash/merge to `main` |
+| Branch                               | Role                                                                                |
+| ------------------------------------ | ----------------------------------------------------------------------------------- |
+| **`main`**                           | Always releasable; **CI green**; version + publish workflows run from here          |
+| **Feature branches**                 | `feat/…`, `fix/…` → PR → squash/merge to `main`                                     |
 | **Changesets “Version Packages” PR** | Created by bot/action; **merge to `main`** to record release; then publish job runs |
 
 **Rule:** do not publish from feature branches; only from **`main`** after Version PR is merged (or a tightly scoped **`release/*`** policy if you add it later).
@@ -243,5 +267,5 @@ Internal specs stay in **`internal-docs/`**; public contributor path starts at *
 
 ## 12. Current repo state
 
-- **`packages/core`** may exist as a **`private: true`** stub so **`npm run ci`** works before real implementation. Remove **`private`** and set **`version`** when you are ready for Changesets to publish **`better-seo.js`** to npm.
+- **P0 / Wave 1 scaffold is present:** **`better-seo.js`** (core), **`@better-seo/next`**, **`examples/nextjs-app`** + Playwright — see [`internal-docs/Roadmap.md`](./internal-docs/Roadmap.md) §11. Packages stay **`private: true`** at **`0.0.0`** until you cut a release; then remove **`private`** on publishable packages and add Changesets as needed.
 - Replace **`OWNER`** in **SECURITY.md** / **CONTRIBUTING.md** clone URLs with your GitHub org or username after the remote exists.

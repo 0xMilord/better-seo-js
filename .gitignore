@@ -28,6 +28,7 @@ pnpm-debug.log*
 Thumbs.db
 
 # IDE / editors
+.qwen/
 .idea/
 .vscode/*
 !.vscode/extensions.json

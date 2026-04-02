@@ -17,6 +17,20 @@ npm run build
 npm run test
 ```
 
+## Commit messages (Conventional Commits)
+
+PRs are checked in CI so every commit follows **[Conventional Commits](https://www.conventionalcommits.org/)**. Locally, **Husky** runs **commitlint** on `commit-msg`.
+
+- **Guide:** [`.github/COMMIT_CONVENTION.md`](./.github/COMMIT_CONVENTION.md)
+- **Interactive prompt** (type, scope, emoji via **cz-git**): `npm run commit` (prefer this over ad-hoc `git commit -m "…"`)
+
+**Version bumps** still come from **Changesets**, not from commit types—see below.
+
+## Formatting & git hooks
+
+- **Prettier:** `npm run format` (write) / `npm run format:check` (CI gate via `npm run check`).
+- **Pre-commit:** **lint-staged** runs **ESLint --fix** on `packages/*` and **Prettier** on staged `ts/tsx` + common config formats (see root **`package.json`** → `lint-staged`).
+
 ## Changesets (required for versioned packages)
 
 Any change that should appear in **CHANGELOG** and trigger a **semver** bump must include a **Changeset**:
@@ -31,7 +45,7 @@ Commit the generated `.changeset/*.md` with your PR. Maintainers merge **Version
 
 1. Branch from **`main`**: `feat/short-name` or `fix/short-name`
 2. Keep commits focused; prefer **one logical change** per PR
-3. Ensure **`npm run ci`** passes locally (lint, types, tests, E2E when applicable)
+3. Ensure **`npm run check`** passes before every push (build, **Prettier**, lint, types, **unit tests + coverage**). Run **`npm run ci`** when you can (adds **Playwright** on `examples/nextjs-app` and **size-limit** on core). Use **`npm run commitlint:last`** to lint the latest commit message.
 4. Update **internal docs** only when behavior or public API changes (see **PRD / ARCHITECTURE / FEATURES / Roadmap**)
 
 ## Code style

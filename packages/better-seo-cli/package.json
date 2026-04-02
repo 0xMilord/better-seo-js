@@ -1,0 +1,45 @@
+{
+  "name": "better-seo-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "CLI for better-seo.js (OG images, icons, …) — Wave 2: `og` command",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "better-seo": "./dist/cli.cjs",
+    "better-seo-cli": "./dist/cli.cjs"
+  },
+  "main": "./dist/run-cli.cjs",
+  "types": "./dist/run-cli.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/run-cli.d.ts",
+      "import": "./dist/run-cli.js",
+      "require": "./dist/run-cli.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "better-seo-assets": "file:../better-seo-assets"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@vitest/coverage-v8": "^3.0.6",
+    "image-size": "^2.0.2",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}

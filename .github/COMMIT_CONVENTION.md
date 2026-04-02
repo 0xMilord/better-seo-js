@@ -21,7 +21,7 @@ docs: update CONTRIBUTING for changesets
 chore(ci): add commitlint workflow
 ```
 
-For an interactive prompt (types, scope, emoji via **cz-git**):
+For an interactive prompt (types, scope, emoji): **`npm run commit`** runs **Commitizen** with the **cz-git** adapter (`git-cz` → reads `commitlint.config.mjs` `prompt`).
 
 ```bash
 npm run commit
@@ -29,22 +29,22 @@ npm run commit
 
 ## Types (common)
 
-| type | When |
-|------|------|
-| `feat` | New capability (user-visible) |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, no logic change |
-| `refactor` | Internal refactor |
-| `perf` | Performance |
-| `test` | Tests only |
-| `build` | Bundler, package layout |
-| `ci` | CI / automation |
-| `chore` | Maintenance, deps, tooling |
+| type       | When                          |
+| ---------- | ----------------------------- |
+| `feat`     | New capability (user-visible) |
+| `fix`      | Bug fix                       |
+| `docs`     | Documentation only            |
+| `style`    | Formatting, no logic change   |
+| `refactor` | Internal refactor             |
+| `perf`     | Performance                   |
+| `test`     | Tests only                    |
+| `build`    | Bundler, package layout       |
+| `ci`       | CI / automation               |
+| `chore`    | Maintenance, deps, tooling    |
 
 ## Breaking changes
 
- Put `BREAKING CHANGE:` in the footer **or** use a `!` after the type, e.g. `feat(core)!: drop Node 18`.
+Put `BREAKING CHANGE:` in the footer **or** use a `!` after the type, e.g. `feat(core)!: drop Node 18`.
 
 ## Versioning vs commits
 
