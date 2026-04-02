@@ -59,6 +59,9 @@
     "typescript-eslint": "^8.24.1",
     "vitest": "^3.0.6"
   },
+  "overrides": {
+    "@types/node": "^22.13.0"
+  },
   "lint-staged": {
     "packages/**/*.{ts,tsx}": [
       "npx --no-install eslint --fix --max-warnings 0",
