@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>i18n / Hreflang — better-seo.js</title>
+  <meta name="description" content="Multi-language SEO with hreflang alternates, localized metadata, and sitemap hreflang entries.">
+  <link rel="canonical" href="https://0xmilord.github.io/better-seo-js/recipes/i18n.html">
+  <meta property="og:type" content="article"><meta property="og:title" content="i18n / Hreflang — better-seo.js">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="i18n / Hreflang — better-seo.js">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="site-header">
+    <a href="../" class="site-logo">better-seo<span>.js</span></a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
+    <div class="header-right">
+      <nav class="header-links"><a href="https://github.com/0xMilord/better-seo-js">GitHub</a><a href="https://www.npmjs.com/package/@better-seo/core">npm</a></nav>
+      <button class="theme-toggle" aria-label="Toggle theme">&#9790;</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div class="site-layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Getting Started</div>
+        <a class="sidebar-link" href="../">Home</a>
+        <a class="sidebar-link" href="../getting-started/">Install &amp; Setup</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Core</div>
+        <a class="sidebar-link" href="../concepts/">Concepts</a>
+        <a class="sidebar-link" href="../api/">API Reference</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Guides</div>
+        <a class="sidebar-link" href="./">Recipes</a>
+        <a class="sidebar-link" href="../cli/">CLI</a>
+        <a class="sidebar-link" href="../commands.html">All Commands</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">More</div>
+        <a class="sidebar-link" href="../adapters/">Adapters</a>
+        <a class="sidebar-link" href="../assets/">Assets</a>
+        <a class="sidebar-link" href="../compare/">Compare</a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="breadcrumbs"><a href="../">Home</a> <span>›</span> <a href="./">Recipes</a> <span>›</span> i18n / Hreflang</div>
+      <h1>i18n / Hreflang</h1>
+      <p>Better SEO supports multi-language sites through <code>meta.alternates.languages</code> (hreflang) and sitemap alternates.</p>
+
+      <h2>App Router: Per-locale Pages</h2>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">// app/[locale]/page.tsx
+import { seo } from "@better-seo/next"
+import type { Metadata } from "next"
+
+export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
+  const { locale } = params
+  const baseUrl = "https://example.com"
+
+  return seo(
+    {
+      title: locale === "es" ? "Inicio" : "Home",
+      description: locale === "es" ? "Página principal" : "Main page",
+      meta: {
+        alternates: {
+          languages: {
+            en: `${baseUrl}/en`,
+            es: `${baseUrl}/es`,
+            "x-default": `${baseUrl}/en`,
+          },
+        },
+      },
+    },
+    { baseUrl, titleTemplate: "%s | My Site" },
+  )
+}
+
+export default function Page() {
+  return &lt;h1&gt;Home&lt;/h1&gt;
+}</code></pre></div>
+
+      <h2>Layout-level Hreflang</h2>
+      <p>Define alternates at the root layout and let pages override:</p>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">// app/layout.tsx
+import { seoLayout } from "@better-seo/next"
+
+export const metadata = seoLayout(
+  {
+    title: "Home",
+    meta: {
+      alternates: {
+        languages: {
+          en: "https://example.com/en",
+          es: "https://example.com/es",
+          fr: "https://example.com/fr",
+          "x-default": "https://example.com/en",
+        },
+      },
+    },
+  },
+  { baseUrl: "https://example.com" },
+)</code></pre></div>
+
+      <h2>Merge Strategy for Alternates</h2>
+      <p><code>meta.alternates.languages</code> is <strong>deep-merged</strong> (not replaced) when using <code>mergeSEO</code>:</p>
+      <div class="code-block-wrapper"><pre><code class="language-ts">import { createSEO, mergeSEO } from "@better-seo/core"
+
+const layout = createSEO(
+  { meta: { alternates: { languages: { en: "/en", es: "/es" } } } },
+  config,
+)
+const page = mergeSEO(
+  layout,
+  { meta: { alternates: { languages: { fr: "/fr" } } } },
+  config,
+)
+// page.meta.alternates.languages = { en, es, fr } — all three present</code></pre></div>
+
+      <h2>Sitemap Hreflang</h2>
+      <p>Use <code>@better-seo/crawl</code> to generate sitemap entries with hreflang alternates:</p>
+      <div class="code-block-wrapper"><pre><code class="language-ts">import { renderSitemapXml } from "@better-seo/crawl"
+
+const xml = renderSitemapXml([
+  {
+    loc: "https://example.com/en",
+    lastmod: "2026-04-04",
+    alternates: [
+      { hreflang: "en", href: "https://example.com/en" },
+      { hreflang: "es", href: "https://example.com/es" },
+      { hreflang: "x-default", href: "https://example.com/en" },
+    ],
+  },
+  {
+    loc: "https://example.com/es",
+    lastmod: "2026-04-04",
+    alternates: [
+      { hreflang: "en", href: "https://example.com/en" },
+      { hreflang: "es", href: "https://example.com/es" },
+      { hreflang: "x-default", href: "https://example.com/en" },
+    ],
+  },
+])</code></pre></div>
+
+      <h2>React SPA (Vite)</h2>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">import { BetterSEOHelmet } from "@better-seo/react"
+import { createSEO } from "@better-seo/core"
+
+const seo = createSEO(
+  {
+    title: "Inicio",
+    meta: {
+      alternates: {
+        languages: {
+          en: "https://example.com/en",
+          es: "https://example.com/es",
+        },
+      },
+    },
+  },
+  { baseUrl: "https://example.com" },
+)
+
+&lt;BetterSEOHelmet seo={seo} /&gt;</code></pre></div>
+
+      <h2>Next</h2>
+      <ul>
+        <li><a href="./">All recipes</a></li>
+        <li><a href="../api/crawl.md">Crawl API — sitemap with alternates</a></li>
+      </ul>
+
+      <div class="page-nav">
+        <a href="./"><span class="nav-label">← Back</span><span class="nav-title">Recipes</span></a>
+        <a class="next" href="../api/"><span class="nav-label">Next</span><span class="nav-title">API Reference →</span></a>
+      </div>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <div class="site-footer-links">
+      <a href="https://github.com/0xMilord/better-seo-js">GitHub</a>
+      <a href="https://www.npmjs.com/package/@better-seo/core">npm</a>
+      <a href="https://github.com/0xMilord/better-seo-js/blob/main/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/0xMilord/better-seo-js/blob/main/CONTRIBUTING.md">Contributing</a>
+    </div>
+    <div>MIT <span id="year"></span> &copy; better-seo.js contributors.</div>
+  </footer>
+  <script src="../script.js"></script>
+  <script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+</body>
+</html>

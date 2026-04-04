@@ -167,10 +167,10 @@ Approximate **week labels** mirror [`PRD.md`](./PRD.md) §5; calendar is **indic
 
 ### Wave 10 — `add` / `scan` / `fix`
 
-| Deliverable                                                            | Feature IDs |
-| ---------------------------------------------------------------------- | ----------- |
-| **`add`**, **`scan`**, **`fix`**, safety flags, idempotency, AST-first | L3          |
-| **`analyze`** solid exit codes                                         | L4          |
+| Deliverable                                                                | Feature IDs |
+| -------------------------------------------------------------------------- | ----------- |
+| **`add`**, **`scan`**, **`fix`**, safety flags, idempotency, pattern-based | L3          |
+| **`analyze`** solid exit codes                                             | L4          |
 
 ---
 

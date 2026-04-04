@@ -146,7 +146,49 @@ export async function runSnapshot(rest: string[]): Promise<number> {
       const sa = JSON.stringify(a)
       const sb = JSON.stringify(b)
       if (sa !== sb) {
+        // Structured diff output
         console.error("snapshot compare: files differ")
+        const aLen = a.length
+        const bLen = b.length
+        console.error(`  a: ${aLen} tag(s)`)
+        console.error(`  b: ${bLen} tag(s)`)
+
+        // Find added/removed/changed tags
+        const aStrs = a.map((t) => JSON.stringify(t))
+        const bStrs = b.map((t) => JSON.stringify(t))
+
+        const removed = aStrs.filter((s) => !bStrs.includes(s))
+        const added = bStrs.filter((s) => !aStrs.includes(s))
+
+        if (removed.length > 0) {
+          console.error(`  Removed (${removed.length}):`)
+          for (const r of removed) {
+            const tag = JSON.parse(r) as TagDescriptor
+            const label =
+              tag.kind === "meta"
+                ? `${tag.name}="${tag.content}"`
+                : tag.kind === "link"
+                  ? `<link ${tag.rel}>`
+                  : `<script type="${tag.type}">`
+            console.error(`    - ${label}`)
+          }
+        }
+        if (added.length > 0) {
+          console.error(`  Added (${added.length}):`)
+          for (const ad of added) {
+            const tag = JSON.parse(ad) as TagDescriptor
+            const label =
+              tag.kind === "meta"
+                ? `${tag.name}="${tag.content}"`
+                : tag.kind === "link"
+                  ? `<link ${tag.rel}>`
+                  : `<script type="${tag.type}">`
+            console.error(`    + ${label}`)
+          }
+        }
+        if (removed.length === 0 && added.length === 0 && aLen === bLen) {
+          console.error("  (tags differ in attribute values)")
+        }
         return 1
       }
       console.log("snapshot compare: OK (identical)")

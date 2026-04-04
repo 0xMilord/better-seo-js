@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pages Router — better-seo.js</title>
+  <meta name="description" content="Next.js Pages Router integration with better-seo.js using _app, _document, and Head component.">
+  <link rel="canonical" href="https://0xmilord.github.io/better-seo-js/recipes/pages-router.html">
+  <meta property="og:type" content="article"><meta property="og:title" content="Pages Router — better-seo.js">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Pages Router — better-seo.js">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="site-header">
+    <a href="../" class="site-logo">better-seo<span>.js</span></a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
+    <div class="header-right">
+      <nav class="header-links"><a href="https://github.com/0xMilord/better-seo-js">GitHub</a><a href="https://www.npmjs.com/package/@better-seo/core">npm</a></nav>
+      <button class="theme-toggle" aria-label="Toggle theme">&#9790;</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div class="site-layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Getting Started</div>
+        <a class="sidebar-link" href="../">Home</a>
+        <a class="sidebar-link" href="../getting-started/">Install &amp; Setup</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Core</div>
+        <a class="sidebar-link" href="../concepts/">Concepts</a>
+        <a class="sidebar-link" href="../api/">API Reference</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Guides</div>
+        <a class="sidebar-link" href="./">Recipes</a>
+        <a class="sidebar-link" href="../cli/">CLI</a>
+        <a class="sidebar-link" href="../commands.html">All Commands</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">More</div>
+        <a class="sidebar-link" href="../adapters/">Adapters</a>
+        <a class="sidebar-link" href="../assets/">Assets</a>
+        <a class="sidebar-link" href="../compare/">Compare</a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="breadcrumbs"><a href="../">Home</a> <span>›</span> <a href="./">Recipes</a> <span>›</span> Pages Router</div>
+      <h1>Next.js Pages Router</h1>
+      <p>Use <code>@better-seo/react</code> with <code>react-helmet-async</code> for Pages Router. The <code>@better-seo/next</code> <code>seo()</code> helper is App Router only.</p>
+
+      <h2>Setup</h2>
+      <div class="code-block-wrapper"><pre><code>npm install @better-seo/core @better-seo/react react-helmet-async</code></pre></div>
+
+      <h2>Wrap _app.tsx</h2>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">// pages/_app.tsx
+import type { AppProps } from "next/app"
+import { HelmetProvider } from "react-helmet-async"
+
+export default function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    &lt;HelmetProvider&gt;
+      &lt;Component {...pageProps} /&gt;
+    &lt;/HelmetProvider&gt;
+  )
+}</code></pre></div>
+
+      <h2>Per-page SEO</h2>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">// pages/about.tsx
+import { BetterSEOHelmet } from "@better-seo/react"
+import { createSEO, webPage } from "@better-seo/core"
+
+const seo = createSEO(
+  {
+    title: "About Us",
+    description: "Learn about our team and mission.",
+    canonical: "/about",
+    schema: [webPage({ name: "About Us", url: "https://example.com/about" })],
+  },
+  { baseUrl: "https://example.com" },
+)
+
+export default function AboutPage() {
+  return (
+    &lt;&gt;
+      &lt;BetterSEOHelmet seo={seo} /&gt;
+      &lt;h1&gt;About Us&lt;/h1&gt;
+    &lt;/&gt;
+  )
+}</code></pre></div>
+
+      <h2>Using toHelmetProps directly</h2>
+      <div class="code-block-wrapper"><pre><code class="language-tsx">import { Helmet } from "react-helmet-async"
+import { toHelmetProps } from "@better-seo/react"
+
+&lt;Helmet {...toHelmetProps(seo)} /&gt;</code></pre></div>
+
+      <h2>Layout + Page Merge</h2>
+      <p>For shared layout SEO, create a parent <code>SEO</code> in a shared module and merge page-level overrides:</p>
+      <div class="code-block-wrapper"><pre><code class="language-ts">// lib/seo.ts
+import { createSEO, mergeSEO, type SEO } from "@better-seo/core"
+
+export const layoutSEO = createSEO(
+  { title: "Site" },
+  { baseUrl: "https://example.com", titleTemplate: "%s | Site" },
+)
+
+// pages/about.tsx
+import { layoutSEO } from "../lib/seo"
+const pageSEO = mergeSEO(layoutSEO, { title: "About" })</code></pre></div>
+
+      <h2>Next</h2>
+      <ul>
+        <li><a href="./">All recipes</a></li>
+        <li><a href="../api/react.md">React adapter API</a></li>
+      </ul>
+
+      <div class="page-nav">
+        <a href="./"><span class="nav-label">← Back</span><span class="nav-title">Recipes</span></a>
+        <a class="next" href="../api/"><span class="nav-label">Next</span><span class="nav-title">API Reference →</span></a>
+      </div>
+    </main>
+  </div>
+  <footer class="site-footer">
+    <div class="site-footer-links">
+      <a href="https://github.com/0xMilord/better-seo-js">GitHub</a>
+      <a href="https://www.npmjs.com/package/@better-seo/core">npm</a>
+      <a href="https://github.com/0xMilord/better-seo-js/blob/main/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/0xMilord/better-seo-js/blob/main/CONTRIBUTING.md">Contributing</a>
+    </div>
+    <div>MIT <span id="year"></span> &copy; better-seo.js contributors.</div>
+  </footer>
+  <script src="../script.js"></script>
+  <script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+</body>
+</html>

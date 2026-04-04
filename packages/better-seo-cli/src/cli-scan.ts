@@ -1,5 +1,5 @@
 /**
- * Wave 10 — AST-first SEO scanner for codebases.
+ * Wave 10 — Pattern-based SEO scanner for codebases.
  * Detects pages/components missing SEO metadata (Next.js App Router, Pages Router, React).
  * Zero external AST deps — uses regex patterns aligned with ARCHITECTURE §1 (zero-dep core).
  */

@@ -1,5 +1,5 @@
 /**
- * Wave 10 — AST-first SEO injector for codebases.
+ * Wave 10 — Pattern-based SEO injector for codebases.
  * Adds `seo()` imports and exports to Next.js App Router pages/layouts.
  * Zero external AST deps — uses regex patterns aligned with ARCHITECTURE §1 (zero-dep core).
  */

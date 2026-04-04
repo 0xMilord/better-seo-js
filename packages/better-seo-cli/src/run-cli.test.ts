@@ -411,15 +411,28 @@ describe("runCli", () => {
     log.mockRestore()
   })
 
-  it("snapshot compare differ exits 1", async () => {
+  it("snapshot compare differ exits 1 with structured diff", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
     const err = vi.spyOn(console, "error").mockImplementation(() => {})
     const a = join(tmpdir(), `cmp2-a-${Date.now()}.json`)
     const b = join(tmpdir(), `cmp2-b-${Date.now()}.json`)
     created.push(a, b)
-    writeFileSync(a, JSON.stringify([1]), "utf8")
-    writeFileSync(b, JSON.stringify([2]), "utf8")
+    const tagA = JSON.stringify([{ kind: "meta", name: "description", content: "old" }])
+    const tagB = JSON.stringify([
+      { kind: "meta", name: "description", content: "new" },
+      { kind: "meta", name: "keywords", content: "x" },
+    ])
+    writeFileSync(a, tagA, "utf8")
+    writeFileSync(b, tagB, "utf8")
     expect(await runCli(["node", "cli", "snapshot", "compare", a, b])).toBe(1)
+    const out = err.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("files differ")
+    expect(out).toContain("Removed")
+    expect(out).toContain("Added")
+    expect(out).toContain('description="old"')
+    expect(out).toContain('keywords="x"')
     err.mockRestore()
+    log.mockRestore()
   })
 
   it("snapshot with --config applies titleTemplate", async () => {
@@ -522,6 +535,87 @@ describe("runCli", () => {
     const err = vi.spyOn(console, "error").mockImplementation(() => {})
     expect(await runCli(["node", "cli", "template", "nope"])).toBe(1)
     err.mockRestore()
+  })
+
+  it("template switch writes config file", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const out = join(tmpdir(), `tpl-switch-${Date.now()}.ts`)
+    created.push(out)
+    expect(await runCli(["node", "cli", "template", "switch", "blog", "--out", out])).toBe(0)
+    expect(readFileSync(out, "utf8")).toContain("defineSEO")
+    expect(readFileSync(out, "utf8")).toContain("My blog")
+    log.mockRestore()
+  })
+
+  it("template switch --dry-run prints without writing", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "template", "switch", "saas", "--dry-run"])).toBe(0)
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("[dry-run]")
+    expect(out).toContain("Ship faster with Acme")
+    log.mockRestore()
+  })
+
+  it("template switch without id exits 1", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {})
+    expect(await runCli(["node", "cli", "template", "switch"])).toBe(1)
+    err.mockRestore()
+  })
+
+  it("init --framework next prints install command", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "init", "--framework", "next"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("@better-seo/next")
+    expect(out).toContain("npm install")
+    log.mockRestore()
+  })
+
+  it("init --framework react prints install command", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "init", "--framework", "react"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("@better-seo/react")
+    expect(out).toContain("npm install")
+    log.mockRestore()
+  })
+
+  it("init --preset blog prints blog SEO snippet", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "init", "--preset", "blog"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("defineSEO")
+    expect(out).toContain("blog")
+    log.mockRestore()
+  })
+
+  it("doctor --json outputs valid JSON with status fields", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "doctor", "--json"])
+    const out = log.mock.calls[0]?.[0]
+    const parsed = JSON.parse(out)
+    expect(parsed).toHaveProperty("ok")
+    expect(parsed).toHaveProperty("node")
+    expect(parsed).toHaveProperty("nodeMeetsEngineRange")
+    log.mockRestore()
+  })
+
+  it("doctor checks Node version and passes on Node 24+", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "doctor", "--json"])
+    const out = log.mock.calls[0]?.[0]
+    const parsed = JSON.parse(out)
+    expect(parsed.nodeMeetsEngineRange).toBe(true)
+    log.mockRestore()
+  })
+
+  it("migrate from-next-seo prints migration guidance", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    await runCli(["node", "cli", "migrate", "from-next-seo"])
+    const out = log.mock.calls.map((c) => String(c[0])).join("\n")
+    expect(out).toContain("fromNextSeo")
+    expect(out).toContain("@better-seo/core")
+    log.mockRestore()
   })
 
   it("content --help exits 0", async () => {

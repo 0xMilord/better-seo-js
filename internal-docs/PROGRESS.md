@@ -4,7 +4,7 @@
 
 **Last updated:** 2026-04-04 (Full audit complete — 354 unit tests + rich results E2E)
 
-**Docs site:** Nextra 4 app in **`apps/docs`** (`better-seo-docs-site`): syncs repo-root **`docs/`** → `content/` on dev/build; root layout dogfoods **`prepareNextSeo`** + **`NextJsonLd`**. Root **`npm run build`** includes the docs site.
+**Docs site:** Static HTML/CSS/JS in **`docs/`** served via GitHub Pages. Zero build, zero deps. Replaced the Nextra app (`apps/docs` was removed in v0.1.0).
 
 ---
 
@@ -41,7 +41,7 @@ Roadmap waves **1–12** plus **ongoing** (see **`Roadmap.md`** §2). Status her
 
 ### Ongoing (not a single wave)
 
-Packaged plugins (**P4**), playground (**D8**), Pages Router (**NX2**), i18n (**NX7**), etc. — see **`Roadmap.md`** “Ongoing”.
+Packaged plugins (**P4** — `better-seo-plugin-*` npm packages not yet published; built-in plugins exist in core), playground (**D8**), Pages Router (**NX2**), i18n (**NX7**), etc. — see **`Roadmap.md`** "Ongoing".
 
 ---
 
@@ -76,7 +76,7 @@ Waves **1–6** are **✅ done** (detail below). Waves **7–9** meet the **✅ 
 | **OG / CLI (Wave 2)**        | Shipped           | **`@better-seo/assets`**: **`generateOG`** + optional **`template`** (`.js`/`.mjs`); **`@better-seo/cli`**: **`og`**, **`--template`**; tests + bin smoke.                                                                                                              |
 | **Icons / CLI (Wave 3)**     | Shipped           | **`@better-seo/assets`**: **`generateIcons`**, **`buildWebAppManifest`**, **`formatWebManifest`** (Sharp, **`to-ico`** favicon); **`@better-seo/cli`**: **`icons`**; tests + bin smoke.                                                                                 |
 | **CLI TUI + crawl (9 / 12)** | **Done**          | **`@better-seo/cli`**: Clack **launcher**, **`crawl`** (robots, sitemap, **rss**, **atom**, **llms**, **sitemap-index**), **`snapshot` / `preview` / `analyze`**, **`doctor`** ( **`package.json`** adapter hints), **`init`**, **`migrate`** — **`docs/commands.md`**. |
-| **Wave 10: automation**      | **Done**          | CLI **`add` / `scan` / `fix`** — AST-first (regex) detection; **`analyze`** exit codes; idempotent; **`cli-scan.test.ts`**, **`cli-add.test.ts`**, **`cli-fix.test.ts`**.                                                                                               |
+| **Wave 10: automation**      | **Done**          | CLI **`add` / `scan` / `fix`** — pattern-based (regex) detection; **`analyze`** exit codes; idempotent; **`cli-scan.test.ts`**, **`cli-add.test.ts`**, **`cli-fix.test.ts`**.                                                                                           |
 | **Wave 11: splash/tokens**   | **Done**          | **`generateSplash`** (iOS/iPadOS sizes), **`ogPaletteFromTokens`** (design tokens → OG palette) — **`generate-splash.ts`**, **`og-palette.ts`**, tests.                                                                                                                 |
 | **Wave 12: crawl/codemods**  | **Done**          | **`@better-seo/crawl`**: robots, sitemap, RSS, Atom, llms.txt, sitemap-index; **`@better-seo/compiler`**: `fromMdx`; **`codemods.ts`**: `transformNextSeoImports`, `transformNextSeoConfig`; **`techArticle`** schema helper.                                           |
 | **`@better-seo/core/node`**  | Shipped           | **`exports` `./node`**: **`readPackageJsonForSEO`**, **`inferSEOConfigFromEnvAndPackageJson`**, **`initSEOFromPackageJson`** — **`node.test.ts`**.                                                                                                                      |
@@ -139,7 +139,7 @@ Waves **1–6** are **✅ done** (detail below). Waves **7–9** meet the **✅ 
 
 | Deliverable (Roadmap)                                      | Status | Evidence                                                                                                                     |
 | ---------------------------------------------------------- | :----: | ---------------------------------------------------------------------------------------------------------------------------- |
-| **`scan`** — AST-first codebase scanner (L3)               |   ✅   | **`packages/better-seo-cli/src/cli-scan.ts`**, **`cli-scan.test.ts`** (7 tests) — detects Next App/Pages Router, React       |
+| **`scan`** — Pattern-based codebase scanner (L3)           |   ✅   | **`packages/better-seo-cli/src/cli-scan.ts`**, **`cli-scan.test.ts`** (7 tests) — detects Next App/Pages Router, React       |
 | **`add`** — per-file SEO injector (L3)                     |   ✅   | **`packages/better-seo-cli/src/cli-add.ts`**, **`cli-add.test.ts`** (8 tests) — idempotent, dry-run support                  |
 | **`fix`** — auto-remediation across codebase (L3)          |   ✅   | **`packages/better-seo-cli/src/cli-fix.ts`**, **`cli-fix.test.ts`** (8 tests) — title/description inference, custom defaults |
 | CLI wiring + TUI integration                               |   ✅   | **`run-cli.ts`**, **`launch-interactive.ts`** — `scan`, `add`, `fix` commands; TUI menu options                              |

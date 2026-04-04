@@ -26,17 +26,17 @@ This document lists **planned features**, **where they live** in the monorepo, a
 
 A feature is **enterprise-ready** when it meets **all** relevant rows—not “works in a demo.”
 
-| Dimension              | What “really good” means                                                                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Correctness**        | Deterministic output for the same `SEO` + config; documented merge and fallback order; JSON-LD via **`serializeJSONLD`** only (no ad-hoc script strings). |
-| **Types**              | No `any` on public exports; strict `JSONLDValue` / `JSONLD`; adapter outputs typed against framework types where applicable (e.g. Next `Metadata`).       |
-| **Multi-tenant / SSR** | **`createSEOContext`** supported for production paths; **no required global singleton** on Edge or per-request isolated configs documented.               |
-| **Runtime**            | Clear matrix: Node vs **Edge** (no `fs` / package.json inference in Edge bundles); behavior documented in [`ARCHITECTURE.md`](./ARCHITECTURE.md) §10–§13. |
-| **Security**           | Untrusted CMS fields never concatenated into HTML; tests for `</script>` / U+2028 edge cases on serialization where applicable.                           |
-| **Observability**      | **`validateSEO`** in dev; **`doctor`** CLI for config/adapters; **snapshots** for regressions where meaningful.                                           |
-| **Testing**            | **Unit** (core), **adapter goldens** (`SEO` → expected Next metadata), **E2E** on `examples/nextjs-app` for Next-facing changes.                          |
-| **Operations**         | CLI **`--no-interactive`**, stable exit codes; **idempotent** `add` / `fix`; **AST-first** detection for inject/scan when claiming high success rates.    |
-| **Docs**               | Recipe + copy-paste for Next first; “when to use” + explicit enterprise pattern (`createSEOContext`, explicit adapter id).                                |
+| Dimension              | What “really good” means                                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Correctness**        | Deterministic output for the same `SEO` + config; documented merge and fallback order; JSON-LD via **`serializeJSONLD`** only (no ad-hoc script strings).  |
+| **Types**              | No `any` on public exports; strict `JSONLDValue` / `JSONLD`; adapter outputs typed against framework types where applicable (e.g. Next `Metadata`).        |
+| **Multi-tenant / SSR** | **`createSEOContext`** supported for production paths; **no required global singleton** on Edge or per-request isolated configs documented.                |
+| **Runtime**            | Clear matrix: Node vs **Edge** (no `fs` / package.json inference in Edge bundles); behavior documented in [`ARCHITECTURE.md`](./ARCHITECTURE.md) §10–§13.  |
+| **Security**           | Untrusted CMS fields never concatenated into HTML; tests for `</script>` / U+2028 edge cases on serialization where applicable.                            |
+| **Observability**      | **`validateSEO`** in dev; **`doctor`** CLI for config/adapters; **snapshots** for regressions where meaningful.                                            |
+| **Testing**            | **Unit** (core), **adapter goldens** (`SEO` → expected Next metadata), **E2E** on `examples/nextjs-app` for Next-facing changes.                           |
+| **Operations**         | CLI **`--no-interactive`**, stable exit codes; **idempotent** `add` / `fix`; **pattern-based** detection for inject/scan when claiming high success rates. |
+| **Docs**               | Recipe + copy-paste for Next first; “when to use” + explicit enterprise pattern (`createSEOContext`, explicit adapter id).                                 |
 
 ---
 
@@ -148,19 +148,19 @@ Each adapter: **fixture tests** (`SEO` in → framework output snapshot).
 
 ## 8. `@better-seo/cli`
 
-| ID  | Command / capability                                   | Enterprise notes                                              |
-| --- | ------------------------------------------------------ | ------------------------------------------------------------- |
-| L1  | **`init`** (+ wizard + `--no-interactive`)             | Deterministic output; framework flag required in CI           |
-| L2  | **`og` / `icons` / `splash`**                          | Delegates to assets; same contracts as library                |
-| L3  | **`add` / `scan` / `fix`**                             | **AST-first** detection; `--dry-run`, `--safe`, idempotency   |
-| L4  | **`analyze`**                                          | Clear report format; exit codes for CI                        |
-| L5  | **`snapshot` / `--compare`**                           | Stable JSON schema for diffs in PRs                           |
-| L6  | **`preview`**                                          | Local HTML; no production dependency                          |
-| L7  | **`migrate`**                                          | Codemods + CHANGELOG linkage                                  |
-| L8  | **`doctor`**                                           | Validates config + adapter registration; fails CI on errors   |
-| L9  | **Templates** (blog, docs, SaaS, ecommerce, portfolio) | Compose public API only; no core forks                        |
-| L10 | **`template switch`**                                  | Non-destructive merge with existing config (PRD §12 CLI)      |
-| L11 | **`template preview`**                                 | Show template bundle (rules, schema presets) without applying |
+| ID  | Command / capability                                   | Enterprise notes                                                |
+| --- | ------------------------------------------------------ | --------------------------------------------------------------- |
+| L1  | **`init`** (+ wizard + `--no-interactive`)             | Deterministic output; framework flag required in CI             |
+| L2  | **`og` / `icons` / `splash`**                          | Delegates to assets; same contracts as library                  |
+| L3  | **`add` / `scan` / `fix`**                             | **Pattern-based** detection; `--dry-run`, `--safe`, idempotency |
+| L4  | **`analyze`**                                          | Clear report format; exit codes for CI                          |
+| L5  | **`snapshot` / `--compare`**                           | Stable JSON schema for diffs in PRs                             |
+| L6  | **`preview`**                                          | Local HTML; no production dependency                            |
+| L7  | **`migrate`**                                          | Codemods + CHANGELOG linkage                                    |
+| L8  | **`doctor`**                                           | Validates config + adapter registration; fails CI on errors     |
+| L9  | **Templates** (blog, docs, SaaS, ecommerce, portfolio) | Compose public API only; no core forks                          |
+| L10 | **`template switch`**                                  | Non-destructive merge with existing config (PRD §12 CLI)        |
+| L11 | **`template preview`**                                 | Show template bundle (rules, schema presets) without applying   |
 
 ---
 
