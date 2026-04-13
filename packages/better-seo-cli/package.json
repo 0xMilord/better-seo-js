@@ -41,7 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "25.5.0",
+    "@types/node": "25.6.0",
     "@vitest/coverage-v8": "4.1.2",
     "image-size": "2.0.2",
     "tsup": "8.5.1",
